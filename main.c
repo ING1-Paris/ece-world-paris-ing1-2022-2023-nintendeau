@@ -12,6 +12,13 @@
 #include <stdio.h>
 #include <Allegro.h>
 
+//define a new structure for the player (the player is a rectangle)
+typedef struct {
+    int x, y;
+    int width, height;
+    int speed;
+    int score;
+} Player;
 
 int main() {
 
@@ -29,12 +36,56 @@ int main() {
     }
 
     // reste du code principal
+    //summon the player at the center of the window
+    Player player = {SCREEN_W / 2, SCREEN_H / 2, 20, 20, 5, 0}; //!{x, y, width, height, speed, score}
+
 
     while (!key[KEY_ESC]) {
         // boucle principale du menu (carte du parc)
+
+        //clear the screen
+        clear_to_color(screen, makecol(0, 0, 0));
+
+        //using arrow keys to move the rectangle around
+        if (key[KEY_LEFT]) {
+            player.x -= player.speed;
+        }
+        if (key[KEY_RIGHT]) {
+            player.x += player.speed;
+        }
+        if (key[KEY_UP]) {
+            player.y -= player.speed;
+        }
+        if (key[KEY_DOWN]) {
+            player.y += player.speed;
+        }
+
+        //draw the player
+        rectfill(screen, player.x, player.y, player.x + player.width, player.y + player.height, makecol(255, 0, 0));
+
+        //draw the score
+        textprintf_ex(screen, font, 10, 10, makecol(255, 255, 255), -1, "Score: %d", player.score);
+
+        //if the player is out of the screen, he will be summoned at the center
+        if (player.x < 0 || player.x > SCREEN_W) {
+            player.x = SCREEN_W / 2;
+            player.y = SCREEN_H / 2;
+        }
+        if (player.y < 0 || player.y > SCREEN_H) {
+            player.x = SCREEN_W / 2;
+            player.y = SCREEN_H / 2;
+        }
+
+        //if the player touch the mouse, he earns 1 point
+        if (mouse_x > player.x && mouse_x < player.x + player.width && mouse_y > player.y && mouse_y < player.y + player.height) {
+            player.score++;
+        }
+
+        // Pause de 10 millisecondes pour ralentir la boucle
+        rest(10); 
     }
 
     readkey();
-
+    allegro_exit();
     return 0;
-}
+}END_OF_MAIN();
