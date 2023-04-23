@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <Allegro.h>
 
+
 //define a new structure for the player (the player is a rectangle)
 typedef struct {
     int x, y;
@@ -35,16 +36,28 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
+    BITMAP * buffer = create_bitmap(SCREEN_W, SCREEN_H);
+    BITMAP * map = load_bitmap("C:\\Users\\ASUS ROG ALFRED\\Documents\\CODE\\ALGO\\SEMESTRE 2\\PROJET_ALGO_S2\\PROJET_ALGO_S2_POUR_DE_VRAI\\ece-world-paris-ing1-2022-2023-nintendeau\\assets\\map.bmp", NULL);
+    BITMAP * player_sprite = load_bitmap("C:\\Users\\ASUS ROG ALFRED\\Documents\\CODE\\ALGO\\SEMESTRE 2\\PROJET_ALGO_S2\\PROJET_ALGO_S2_POUR_DE_VRAI\\ece-world-paris-ing1-2022-2023-nintendeau\\assets\\player.bmp", NULL);
+
+
+    if (!map) {
+        allegro_message("Error loading image");
+        allegro_exit();
+        exit(EXIT_FAILURE);
+    }
+
+
     // reste du code principal
     //summon the player at the center of the window
-    Player player = {SCREEN_W / 2, SCREEN_H / 2, 20, 20, 5, 0}; //!{x, y, width, height, speed, score}
+    Player player = {SCREEN_W / 2, SCREEN_H / 2, player_sprite->w, player_sprite->h, 7, 0}; //!{x, y, width, height, speed, score}
 
 
     while (!key[KEY_ESC]) {
         // boucle principale du menu (carte du parc)
 
         //clear the screen
-        clear_to_color(screen, makecol(0, 0, 0));
+        //clear_to_color(screen, makecol(0, 0, 0));
 
         //using arrow keys to move the rectangle around
         if (key[KEY_LEFT]) {
@@ -60,10 +73,7 @@ int main() {
             player.y += player.speed;
         }
 
-        //draw the player
-        rectfill(screen, player.x, player.y, player.x + player.width, player.y + player.height, makecol(255, 0, 0));
 
-        //draw the score
         textprintf_ex(screen, font, 10, 10, makecol(255, 255, 255), -1, "Score: %d", player.score);
 
         //if the player is out of the screen, he will be summoned at the center
@@ -80,9 +90,14 @@ int main() {
         if (mouse_x > player.x && mouse_x < player.x + player.width && mouse_y > player.y && mouse_y < player.y + player.height) {
             player.score++;
         }
+        show_mouse(screen);
 
         // Pause de 10 millisecondes pour ralentir la boucle
-        rest(10); 
+        //rest(10);
+        clear_bitmap(buffer);
+        stretch_blit(map, buffer, 0, 0, map->w, map->h, 0, 0, buffer->w, buffer->h);
+        masked_blit(player_sprite, buffer, 0, 0, player.x, player.y, player_sprite->w, player_sprite->h);
+        blit(buffer, screen, 0, 0, 0, 0, buffer->w, buffer->h);
     }
 
     readkey();
