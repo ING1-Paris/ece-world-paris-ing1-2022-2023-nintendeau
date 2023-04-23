@@ -40,12 +40,17 @@ int main() {
     BITMAP * map = load_bitmap("assets\\map.bmp", NULL);
     BITMAP * player_sprite = load_bitmap("assets\\player.bmp", NULL);
 
-
-    if (!map) {
-        allegro_message("Error loading image");
-        allegro_exit();
-        exit(EXIT_FAILURE);
+    if (!map || !player_sprite) {
+        map = load_bitmap("../assets/map.bmp", NULL);
+        player_sprite = load_bitmap("../assets/player.bmp", NULL);
+        if (!map || !player_sprite) {
+            allegro_message("Error loading image");
+            allegro_exit();
+            exit(EXIT_FAILURE);
+        }
     }
+
+
 
 
     // reste du code principal
