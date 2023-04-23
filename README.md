@@ -17,6 +17,7 @@ Programmer un jeu parc d'attraction a deux joueurs en C, en utilisant la bibliot
 Chaque membre de l'équipe doit réaliser un jeu (attraction)
 
 Liste des attractions :
+
 * Pêche aux canards - ✅
 * Taupe-la (jeu des taupes) - ✅
 * Tir aux ballons - ✅
@@ -26,5 +27,7 @@ Liste des attractions :
 * Palais des glaces (labyrinthe) - ⚠️
 * Héro de la guitare (Guitar Hero) - ❗
 * Serpent (Snake à deux joueurs) - ❗
+
+(Facile = ✅| Moyen = ⚠️| Difficile = ❗)
 
 La notation dépendra de la difficulté de l'attraction, mais aussi de la qualité de la réalisation.
