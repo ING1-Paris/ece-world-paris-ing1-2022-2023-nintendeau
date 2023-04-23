@@ -37,8 +37,8 @@ int main() {
     }
 
     BITMAP * buffer = create_bitmap(SCREEN_W, SCREEN_H);
-    BITMAP * map = load_bitmap("C:\\Users\\ASUS ROG ALFRED\\Documents\\CODE\\ALGO\\SEMESTRE 2\\PROJET_ALGO_S2\\PROJET_ALGO_S2_POUR_DE_VRAI\\ece-world-paris-ing1-2022-2023-nintendeau\\assets\\map.bmp", NULL);
-    BITMAP * player_sprite = load_bitmap("C:\\Users\\ASUS ROG ALFRED\\Documents\\CODE\\ALGO\\SEMESTRE 2\\PROJET_ALGO_S2\\PROJET_ALGO_S2_POUR_DE_VRAI\\ece-world-paris-ing1-2022-2023-nintendeau\\assets\\player.bmp", NULL);
+    BITMAP * map = load_bitmap("assets\\map.bmp", NULL);
+    BITMAP * player_sprite = load_bitmap("assets\\player.bmp", NULL);
 
 
     if (!map) {
