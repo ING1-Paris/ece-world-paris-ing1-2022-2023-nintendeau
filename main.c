@@ -13,17 +13,18 @@
 #include <Allegro.h>
 
 
-//define a new structure for the player (the player is a rectangle)
+// Structure Player qui contient les informations du joueur
 typedef struct {
     int x, y;
     int width, height;
     int speed;
     int score;
+    int tickets;
 } Player;
 
 int main() {
 
-    // initialisation de la fenetre, de la souris et du clavier
+    //& initialisation de la fenetre, de la souris et du clavier
     allegro_init();
     install_keyboard();
     install_mouse();
@@ -36,9 +37,10 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
+    //& charger les images (compaptible avec vscode et Clion grace au if)
     BITMAP * buffer = create_bitmap(SCREEN_W, SCREEN_H);
-    BITMAP * map = load_bitmap("assets\\map.bmp", NULL);
-    BITMAP * player_sprite = load_bitmap("assets\\player.bmp", NULL);
+    BITMAP * map = load_bitmap("assets\\map1.bmp", NULL);
+    BITMAP * player_sprite = load_bitmap("assets\\character_resized.bmp", NULL);
 
     if (!map || !player_sprite) {
         map = load_bitmap("../assets/map.bmp", NULL);
@@ -51,20 +53,16 @@ int main() {
     }
 
 
-
-
-    // reste du code principal
-    //summon the player at the center of the window
-    Player player = {SCREEN_W / 2, SCREEN_H / 2, player_sprite->w, player_sprite->h, 7, 0}; //!{x, y, width, height, speed, score}
+    //& reste du code principal
+    // fait apparaitre le joueur au centre de l'ecran
+    Player player = {SCREEN_W / 2, SCREEN_H / 2, player_sprite->w, player_sprite->h, 4, 0, 5}; //!{x, y, width, height, speed, score}
 
 
     while (!key[KEY_ESC]) {
-        // boucle principale du menu (carte du parc)
+        //& boucle principale du menu (carte du parc)
 
-        //clear the screen
-        //clear_to_color(screen, makecol(0, 0, 0));
 
-        //using arrow keys to move the rectangle around
+        // deplacements du joueur (touches directionnelles)
         if (key[KEY_LEFT]) {
             player.x -= player.speed;
         }
@@ -78,27 +76,31 @@ int main() {
             player.y += player.speed;
         }
 
+        // gerer les collisions avec les bords de l'ecran
+        if (player.x < 0) {
+            player.x = 0;
+        }
+        if (player.x > SCREEN_W - player.width) {
+            player.x = SCREEN_W - player.width;
+        }
+        if (player.y < 0) {
+            player.y = 0;
+        }
+        if (player.y > SCREEN_H - player.height) {
+            player.y = SCREEN_H - player.height;
+        }
 
+        // afficher le score du joueur en haut a gauche de l'ecran
         textprintf_ex(screen, font, 10, 10, makecol(255, 255, 255), -1, "Score: %d", player.score);
 
-        //if the player is out of the screen, he will be summoned at the center
-        if (player.x < 0 || player.x > SCREEN_W) {
-            player.x = SCREEN_W / 2;
-            player.y = SCREEN_H / 2;
-        }
-        if (player.y < 0 || player.y > SCREEN_H) {
-            player.x = SCREEN_W / 2;
-            player.y = SCREEN_H / 2;
-        }
 
-        //if the player touch the mouse, he earns 1 point
+        // test pour le score
         if (mouse_x > player.x && mouse_x < player.x + player.width && mouse_y > player.y && mouse_y < player.y + player.height) {
             player.score++;
         }
         show_mouse(screen);
 
-        // Pause de 10 millisecondes pour ralentir la boucle
-        //rest(10);
+        // afficher le joueur et la carte
         clear_bitmap(buffer);
         stretch_blit(map, buffer, 0, 0, map->w, map->h, 0, 0, buffer->w, buffer->h);
         masked_blit(player_sprite, buffer, 0, 0, player.x, player.y, player_sprite->w, player_sprite->h);
