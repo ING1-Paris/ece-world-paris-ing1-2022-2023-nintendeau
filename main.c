@@ -46,17 +46,30 @@ void write_best_score(int score) {
 }
 
 
+// afifcher le score
+void afficher_score(BITMAP * score_image, BITMAP * buffer, Player player) {
+    stretch_blit(score_image, buffer, 0, 0, score_image->w, score_image->h, 0, 0, SCREEN_W, SCREEN_H);
+    textprintf_ex(buffer, font, SCREEN_W/2, SCREEN_H/2, makecol(0, 0, 0), -1, "Score: %d", player.score);
+}
+
+
 // fonction d'affichage
-void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player_sprite, Player player, int * can_move) {
+void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player_sprite, Player player, int * can_move, BITMAP * score_image) {
 
     clear_bitmap(buffer);
     stretch_blit(map, buffer, 0, 0, map->w, map->h, 0, 0, buffer->w, buffer->h);
     masked_blit(player_sprite, buffer, 0, 0, player.x, player.y, player_sprite->w, player_sprite->h);
     masked_stretch_blit(titre, buffer, 0, 0, titre->w, titre->h, SCREEN_W/2 - titre->w/1.35, SCREEN_H/2 - titre->h*1.5, titre->w*1.5, titre->h*1.5);
 
+    // enlever le titre si la souris est clique
     if (mouse_b & 1) {
         clear_to_color(titre, makecol(255, 0, 255));
         *can_move = 1;
+    }
+
+    // afficher le score si le joueur est sur la case "score"
+    if (940 < player.x && player.x < 1000 && 100 < player.y && player.y < 200) {
+        afficher_score(score_image, buffer, player);
     }
 
     blit(buffer, screen, 0, 0, 0, 0, buffer->w, buffer->h);
@@ -79,6 +92,7 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
+
     //! VARIABLES
     int frame_count = 0;
     int can_move = 0;
@@ -88,10 +102,11 @@ int main() {
     BITMAP * titre = load_bitmap("assets\\Titre.bmp", NULL);
     BITMAP * map = load_bitmap("assets\\map1.bmp", NULL);
     BITMAP * player_sprite = load_bitmap("assets\\anim_player_bas\\frame_1.bmp", NULL);
+    BITMAP * score_image = load_bitmap("assets\\score.bmp", NULL);
 
 
     // si le chemin d'acces ne fonctionne pas, on essaye avec un autre chemin d'acces (pour Clion et vscode)
-    if (!map || !player_sprite || !titre) {
+    if (!map || !player_sprite || !titre || !score_image) {
         map = load_bitmap("assets/map1.bmp", NULL);
         player_sprite = load_bitmap("../assets/anim_player_bas/frame_1.bmp", NULL);
         titre = load_bitmap("../assets/Titre.bmp", NULL);
@@ -153,10 +168,8 @@ int main() {
 
         // passer a la frame suivante de l'animation du joueur (4 frames)
         frame_count = (frame_count + 1) % 4;
-
-        afficher_map(titre, buffer, map, player_sprite, player, &can_move);
+        afficher_map(titre, buffer, map, player_sprite, player, &can_move, score_image);
     }
-
 
     readkey();
     allegro_exit();
