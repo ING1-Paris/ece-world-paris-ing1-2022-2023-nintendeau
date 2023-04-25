@@ -16,6 +16,7 @@
 // Structure Player qui contient les informations du joueur
 typedef struct {
     int x, y;
+    int previous_x, previous_y;
     int speed;
     int score;
     int tickets;
@@ -25,8 +26,10 @@ typedef struct {
 // fonction pour ecrire le meilleur score dans le fichier "meilleurs_scores.txt"
 void write_best_score(int score) {
 
+    // on ouvre le fichier "meilleurs_scores.txt" en mode ecriture
     FILE * file = fopen("saves\\meilleurs_scores.txt", "w");
 
+    // si le fichier n'existe pas, on essaie avec un autre chemin (vscode et Clion)
     if (!file) {
         file = fopen("../saves/meilleurs_scores.txt", "w");
 
@@ -37,16 +40,67 @@ void write_best_score(int score) {
         }
     }
 
-    int best_score = 0;
+    int best_score;
     fscanf(file, "%d", &best_score);
     if (score > best_score) {
         fprintf(file, "%d\n", score);
+    }
+    else {
+        fprintf(file, "%d\n", best_score);
     }
     fclose(file);
 }
 
 
-// afifcher le score
+// fonction qui gere les collisions de la map
+void check_collision(Player * player, BITMAP * calque_collisions, BITMAP * player_sprite) {
+
+    int x = player->previous_x;
+    int y = player->previous_y;
+    int ground = makecol(0, 255, 0);
+    int wall = makecol(255, 0, 0);
+    int game = makecol(0, 0, 255);
+    int color_array[3] = {ground, wall, game};
+
+    for (int i = 0; i < 3; i++) {
+        // on regarde la couleur des pixels aux 4 coins de la hitbox du joueur
+        if (getpixel(calque_collisions, (player->x)*calque_collisions->w/SCREEN_W, (player->y + player_sprite->h/1.3)*calque_collisions->h/SCREEN_H) == color_array[i] || getpixel(calque_collisions, (player->x + player_sprite->w)*calque_collisions->w/SCREEN_W, (player->y + player_sprite->h/1.3)*calque_collisions->h/SCREEN_H) == color_array[i] || getpixel(calque_collisions, (player->x)*calque_collisions->w/SCREEN_W, (player->y + player_sprite->h)*calque_collisions->h/SCREEN_H) == color_array[i] || getpixel(calque_collisions, (player->x + player_sprite->w)*calque_collisions->w/SCREEN_W, (player->y + player_sprite->h)*calque_collisions->h/SCREEN_H) == color_array[i]) {
+            // si le joueur est sur une case mur, on le replace a sa position precedente
+            if (color_array[i] == wall) {
+                player->x = x;
+                player->y = y;
+            }
+
+            // si le joueur est sur une case "game", on lance l'attraction correspondante, et on actualise sa position precedente
+            else {
+                if (color_array[i] == game) {
+                    printf("game\n");
+                }
+                player->previous_x = player->x;
+                player->previous_y = player->y;
+            }
+        }
+
+        // collisions avec les bordures de la fenetre
+        else if (player->x < 0)
+            player->x = 0;
+        else if (player->x > SCREEN_W - player_sprite->w)
+            player->x = SCREEN_W - player_sprite->w;
+        else if (player->y < 0)
+            player->y = 0;
+        else if (player->y > SCREEN_H - player_sprite->h)
+            player->y = SCREEN_H - player_sprite->h;
+
+        // actualisation de la position precedente
+        else {
+            player->previous_x = player->x;
+            player->previous_y = player->y;
+        }
+    }
+}
+
+
+// afficher le score
 void afficher_score(BITMAP * score_image, BITMAP * buffer, Player player) {
     stretch_blit(score_image, buffer, 0, 0, score_image->w, score_image->h, 0, 0, SCREEN_W, SCREEN_H);
     textprintf_ex(buffer, font, SCREEN_W/2, SCREEN_H/2, makecol(0, 0, 0), -1, "Score: %d", player.score);
@@ -54,9 +108,10 @@ void afficher_score(BITMAP * score_image, BITMAP * buffer, Player player) {
 
 
 // fonction d'affichage
-void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player_sprite, Player player, int * can_move, BITMAP * score_image) {
+void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player_sprite, Player player, int * can_move, BITMAP * score_image, BITMAP * calque_collisions) {
 
     clear_bitmap(buffer);
+    stretch_blit(calque_collisions, buffer, 0, 0, calque_collisions->w, calque_collisions->h, 0, 0, buffer->w, buffer->h);
     stretch_blit(map, buffer, 0, 0, map->w, map->h, 0, 0, buffer->w, buffer->h);
     masked_blit(player_sprite, buffer, 0, 0, player.x, player.y, player_sprite->w, player_sprite->h);
     masked_stretch_blit(titre, buffer, 0, 0, titre->w, titre->h, SCREEN_W/2 - titre->w/1.35, SCREEN_H/2 - titre->h*1.5, titre->w*1.5, titre->h*1.5);
@@ -73,6 +128,22 @@ void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player
     }
 
     blit(buffer, screen, 0, 0, 0, 0, buffer->w, buffer->h);
+}
+
+
+void move_player(Player * player) {
+    if (key[KEY_UP]) {
+        player->y -= player->speed;
+    }
+    if (key[KEY_DOWN]) {
+        player->y += player->speed;
+    }
+    if (key[KEY_LEFT]) {
+        player->x -= player->speed;
+    }
+    if (key[KEY_RIGHT]) {
+        player->x += player->speed;
+    }
 }
 
 
@@ -100,16 +171,21 @@ int main() {
     //! CHARGEMENT DES BITMAPS
     BITMAP * buffer = create_bitmap(SCREEN_W, SCREEN_H);
     BITMAP * titre = load_bitmap("assets\\Titre.bmp", NULL);
-    BITMAP * map = load_bitmap("assets\\map1.bmp", NULL);
-    BITMAP * player_sprite = load_bitmap("assets\\anim_player_bas\\frame_1.bmp", NULL);
+    BITMAP * map = load_bitmap("assets\\map_v2.bmp", NULL);
+    BITMAP * calque_collisions = load_bitmap("assets\\collision_v3.bmp", NULL);
     BITMAP * score_image = load_bitmap("assets\\score.bmp", NULL);
+    BITMAP * player_sprite = load_bitmap("assets\\anim_player_bas\\frame_1.bmp", NULL);
 
 
     // si le chemin d'acces ne fonctionne pas, on essaye avec un autre chemin d'acces (pour Clion et vscode)
-    if (!map || !player_sprite || !titre || !score_image) {
-        map = load_bitmap("assets/map1.bmp", NULL);
+    if (!map || !player_sprite || !titre || !score_image || !calque_collisions) {
+
+        map = load_bitmap("assets/map_v2.bmp", NULL);
         player_sprite = load_bitmap("../assets/anim_player_bas/frame_1.bmp", NULL);
         titre = load_bitmap("../assets/Titre.bmp", NULL);
+        score_image = load_bitmap("../assets/score.bmp", NULL);
+        calque_collisions = load_bitmap("../assets/collision_v3.bmp", NULL);
+
         if (!map || !player_sprite) {
             allegro_message("BITMAP ERROR");
             allegro_exit();
@@ -125,50 +201,26 @@ int main() {
     //& boucle principale du menu (carte du parc)
     while (!key[KEY_ESC]) {
 
-        // deplacements du joueur (touches directionnelles)
+        check_collision(&player, calque_collisions, player_sprite);
+
         if (can_move) {
-            if (key[KEY_LEFT]) {
-                player.x -= player.speed;
-            }
-            if (key[KEY_RIGHT]) {
-                player.x += player.speed;
-            }
-            if (key[KEY_UP]) {
-                player.y -= player.speed;
-            }
-            if (key[KEY_DOWN]) {
-                player.y += player.speed;
-            }
+            move_player(&player);
         }
-
-        // gerer les collisions avec les bords de l'ecran
-        if (player.x < 0) {
-            player.x = 0;
-        }
-        if (player.x > SCREEN_W - player_sprite->w) {
-            player.x = SCREEN_W - player_sprite->w;
-        }
-        if (player.y < 0) {
-            player.y = 0;
-        }
-        if (player.y > SCREEN_H - player_sprite->h) {
-            player.y = SCREEN_H - player_sprite->h;
-        }
-
-        // afficher le score du joueur en haut a gauche de l'ecran
-        textprintf_ex(screen, font, 10, 10, makecol(0, 0, 0), -1, "Score: %d", player.score);
 
         // test pour le score
         if (mouse_x > player.x && mouse_x < player.x + player_sprite->w && mouse_y > player_sprite->h && mouse_y < player.y + player_sprite->h) {
             player.score++;
         }
+
+        // ecrire le score dans le fichier
         write_best_score(player.score);
 
         show_mouse(screen);
 
         // passer a la frame suivante de l'animation du joueur (4 frames)
         frame_count = (frame_count + 1) % 4;
-        afficher_map(titre, buffer, map, player_sprite, player, &can_move, score_image);
+
+        afficher_map(titre, buffer, map, player_sprite, player, &can_move, score_image, calque_collisions);
     }
 
     readkey();
