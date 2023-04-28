@@ -168,9 +168,29 @@ int main() {
         rectfill(buffer, 0, 0, SCREEN_W/3 - 1, 200, makecol(255, 0, 0));
         affichage_score(player, buffer);
 
+        if (player->life == 0) {
+            allegro_message("GAME OVER");
+            allegro_exit();
+            exit(EXIT_SUCCESS);
+        }
 
         blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 
+    }
+
+    // liberer la memoire allouee par les bitmaps et les joueurs
+    destroy_bitmap(buffer);
+    destroy_bitmap(stage);
+    destroy_bitmap(logo);
+    free(player);
+    free(player_2);
+
+    // liberer la memoire allouee pour les notes
+    Note * current = ancre;
+    Note * next = NULL;
+    while (current->next != NULL) {
+        free(current);
+        current = current->next;
     }
 
     return 0;
