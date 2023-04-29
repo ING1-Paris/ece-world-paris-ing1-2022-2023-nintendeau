@@ -1,6 +1,5 @@
-#include <stdio.h>
 #include <stdlib.h>
-#include <Allegro.h>
+#include <allegro.h>
 #include <time.h>
 
 #define MAX_INTERVALLE 40
@@ -25,7 +24,7 @@ typedef struct {
 
 
 // afficher le temps de jeu et le nombre de vies restantes
-void affichage_temps(Player * player, BITMAP * buffer, int duration) {
+void afficher_stats(Player * player, BITMAP * buffer, int duration) {
     textprintf_ex(buffer, font, 10, 30, makecol(255, 255, 255), -1, "life : %d", player->life);
     textprintf_ex(buffer, font, 10, 50, makecol(255, 255, 255), -1, "duration : %d s", duration);
 }
@@ -48,7 +47,7 @@ void afficher_boutons(BITMAP * stage, int positions[5], int couleurs[5]) {
 
 
 // afficher l'écran de fin de partie
-void final_screen(int duration, BITMAP * buffer, BITMAP * game_over) {
+void afficher_final_screen(int duration, BITMAP * buffer, BITMAP * game_over) {
     clear(buffer);
     textprintf_ex(buffer, font, SCREEN_W/2 - 50, SCREEN_H/2  + 50, makecol(255, 255, 255), -1, "time : %d s", duration);
     textprintf_ex(buffer, font, SCREEN_W/2 - 140, SCREEN_H/2  + 65, makecol(255, 255, 255), -1, "Appuyer sur ENTER pour continuer");
@@ -57,14 +56,78 @@ void final_screen(int duration, BITMAP * buffer, BITMAP * game_over) {
 }
 
 
+// déterminer le vainqueur
 int victory (int temps_1, int temps_2) {
-    if (temps_1 > temps_2) {
-        return 1;
-    } else if (temps_1 < temps_2) {
-        return 2;
-    } else {
-        return 0;
+    return (temps_1 > temps_2) ? 1 : (temps_2 > temps_1) ? 2 : 0;
+}
+
+
+// fonction pour gérer le gagnant en fin de partie
+void fin_partie(BITMAP * buffer, int gagnant) {
+
+    if (gagnant != 0) {
+        textprintf_ex(buffer, font, SCREEN_W / 2 - 70, SCREEN_H / 2 + 80, makecol(255, 255, 255), -1,"Joueur %d gagne !", gagnant);
     }
+    else {
+        textprintf_ex(buffer, font, SCREEN_W / 2 - 47, SCREEN_H / 2 + 80, makecol(255, 255, 255), -1, "Egalite !");
+    }
+
+    textprintf_ex(buffer, font, SCREEN_W / 2 - 90, SCREEN_H / 2 + 100, makecol(255, 255, 255), -1, "MERCI D'AVOIR JOUE !");
+    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+    rest(2000);
+    allegro_exit();
+    exit(EXIT_SUCCESS);
+}
+
+// fonction pour afficher les boutons et
+void afficher(BITMAP * buffer, BITMAP * stage, int positions[4], int couleurs[4]) {
+    afficher_boutons(stage, positions, couleurs);
+    blit(stage, buffer, 0, 0, SCREEN_W/3, 0, SCREEN_W, SCREEN_H);
+    rectfill(buffer, SCREEN_W*2/3, 0, SCREEN_W*2/3 + 2, SCREEN_H, makecol(0, 0, 0));
+    rectfill(buffer, SCREEN_W/3, 0, SCREEN_W/3 - 2, SCREEN_H, makecol(0, 0, 0));
+}
+
+// fonction pour afficher les cordes
+void afficher_cordes(BITMAP * stage, int positions[4], int couleurs[4]) {
+    for (int i = 0; i < NB_CORDES; i++) {
+        rectfill(stage, positions[i], 0, positions[i] + 1, SCREEN_H, couleurs[i]);
+    }
+}
+
+
+void afficher_note(BITMAP * stage, Note * note) {
+    circlefill(stage, note->x, note->y, 20, note->color);
+}
+
+
+// fonction pour libérer la mémoire
+void free_memory(BITMAP * buffer, BITMAP * stage, BITMAP * logo, BITMAP * background, BITMAP * game_over, Player * player_1, Player * player_2, Player * player, Note * ancre) {
+
+    destroy_bitmap(buffer);
+    destroy_bitmap(stage);
+    destroy_bitmap(logo);
+    destroy_bitmap(background);
+    free(player_1);
+    free(player_2);
+    free(player);
+
+    Note * current = ancre;
+    while (current->next != NULL) {
+        Note * tmp = current;
+        free(tmp);
+        current = current->next;
+    }
+}
+
+
+Note * allouer_note(Note * note, int x, int color) {
+    note->x = x;
+    note->y = 0;
+    note->y_speed = 7;
+    note->color = color;
+    note->alive = 1;
+    note->next = NULL;
+    return note;
 }
 
 
@@ -85,6 +148,8 @@ int main() {
 
     srand(time(NULL));
 
+
+    // initialisation des joueurs
     Player * player_1 = malloc(sizeof(Player));
     player_1->temps = 0;
     player_1->tickets = 5;
@@ -97,19 +162,12 @@ int main() {
 
     Player * player = player_1;
 
-
+    // initialisation des bitmaps
     BITMAP * buffer = create_bitmap(SCREEN_W, SCREEN_H);
     BITMAP * stage = create_bitmap(SCREEN_W/3, SCREEN_H);
     BITMAP * background = load_bitmap("../assets/background.bmp", NULL);
     BITMAP * logo = load_bitmap("../assets/logo.bmp", NULL);
     BITMAP * game_over = load_bitmap("../assets/game_over.bmp", NULL);
-
-    int frame_counter = 0;
-    int intervalle = MAX_INTERVALLE;
-    int liste_boutons[4] = {0};
-
-    int positions[NB_CORDES] = {stage->w/5, stage->w*2/5, stage->w*3/5, stage->w*4/5, };
-    int couleurs[NB_CORDES] = {makecol(103, 147, 52), makecol(195, 64, 60), makecol(228, 207, 76), makecol(90, 157, 188)};
 
     if (!logo || !background || !game_over) {
         game_over = load_bitmap("assets\\game_over.bmp", NULL);
@@ -122,39 +180,42 @@ int main() {
         }
     }
 
+    int frame_counter = 0;
+    int intervalle = MAX_INTERVALLE;
+    int liste_boutons[4] = {0};
     time_t start_time, end_time;
     int duration = 0;
 
+    int positions[NB_CORDES] = {stage->w/5, stage->w*2/5, stage->w*3/5, stage->w*4/5, };
+    int couleurs[NB_CORDES] = {makecol(103, 147, 52), makecol(195, 64, 60), makecol(228, 207, 76), makecol(90, 157, 188)};
+
+
     Note * ancre = NULL;
 
+    // on démarre le timer
     time(&start_time);
 
+    // boucle principale
     while (!key[KEY_ESC]) {
 
+        //réinitialiser le buffer et le stage
         clear_bitmap(buffer);
         clear_to_color(stage, makecol(41, 33, 30));
         masked_stretch_blit(background, buffer, 0, 0, background->w, background->h, 0, 200, SCREEN_W/3 - 1, SCREEN_H - 200);
         stretch_blit(logo, buffer, 0, 0, logo->w, logo->h, SCREEN_W*2/3, 0, SCREEN_W/3, SCREEN_H);
 
-        for (int i = 0; i < NB_CORDES; i++) {
-            // ligne verticale pour chaque position de la liste positions
-            rectfill(stage, positions[i], 0, positions[i] + 1, SCREEN_H, couleurs[i]);
-        }
+        afficher_cordes(stage, positions, couleurs);
 
         show_mouse(screen);
 
+        // on initialise la nouvelle note
         Note * nouvelle_note = malloc(sizeof(Note));
 
         if (frame_counter % intervalle == 0) {
 
             // création d'une nouvelle note
             int random_number = rand() % NB_CORDES;
-            nouvelle_note->x = positions[random_number];
-            nouvelle_note->y = 0;
-            nouvelle_note->y_speed = 7;
-            nouvelle_note->color = couleurs[random_number];
-            nouvelle_note->alive = 1;
-            nouvelle_note->next = NULL;
+            nouvelle_note = allouer_note(nouvelle_note, positions[random_number], couleurs[random_number]);
 
             // ajout de la note à la liste chainée
             if (*&ancre == NULL) {
@@ -166,7 +227,7 @@ int main() {
             }
         }
 
-
+        // on parcourt la liste chainée
         Note * notes = ancre;
         Note * current = notes;
 
@@ -174,7 +235,7 @@ int main() {
         while (current->next != NULL) {
             if (current->alive == 1) {
                 // on l'affiche
-                circlefill(stage, current->x, current->y, 20, current->color);
+                afficher_note(stage, current);
                 // si la note est dans la zone de pression
                 if (current->y <= SCREEN_H - 78 && current->y >= SCREEN_H - 122) {
                     // si la touche correspondante est pressée
@@ -208,21 +269,17 @@ int main() {
         frame_counter++;
 
         // on affiche ce qu'il y a a afficher (boutons, stage, le rested de l'UI)
-        afficher_boutons(stage, positions, couleurs);
-        blit(stage, buffer, 0, 0, SCREEN_W/3, 0, SCREEN_W, SCREEN_H);
-        rectfill(buffer, 0, 0, SCREEN_W/3 - 1, 200, makecol(255, 0, 0));
-        rectfill(buffer, SCREEN_W*2/3, 0, SCREEN_W*2/3 + 2, SCREEN_H, makecol(0, 0, 0));
-        rectfill(buffer, SCREEN_W/3, 0, SCREEN_W/3 - 2, SCREEN_H, makecol(0, 0, 0));
-        time(&end_time);
+        afficher(buffer, stage, positions, couleurs);
 
         // on calcule le temps écoulé depuis le début de la partie
+        time(&end_time);
         duration = difftime(end_time, start_time);
-        affichage_temps(player, buffer, duration);
+        afficher_stats(player, buffer, duration);
 
         // si le joueur n'a plus de vie, on affiche l'écran de fin
         if (player->life == 0) {
             player->temps = duration;
-            final_screen(duration, buffer, game_over);
+            afficher_final_screen(duration, buffer, game_over);
 
             // on attend que le joueur appuie sur entrée pour continuer
             while (!key[KEY_ENTER]) {
@@ -237,16 +294,11 @@ int main() {
                 ancre->next = NULL;
             }
 
-            // si le joueur 2 a joué, on affiche l'écran de fin
+                // si le joueur 2 a joué, on affiche l'écran de fin
             else {
                 player_2 = player;
                 int gagnant = victory(player_1->temps, player_2->temps);
-                textprintf_ex(buffer, font, SCREEN_W/2 - 70, SCREEN_H/2 + 80, makecol(255, 255, 255), -1, "Joueur %d gagne !", gagnant);
-                blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-                rest(2000);
-                allegro_message("GAME OVER");
-                allegro_exit();
-                exit(EXIT_SUCCESS);
+                fin_partie(buffer, gagnant);
             }
         }
 
@@ -260,19 +312,8 @@ int main() {
 
     }
 
-    // on libère la memoire allouee
-    destroy_bitmap(buffer);
-    destroy_bitmap(stage);
-    destroy_bitmap(logo);
-    free(player);
-
-    // on libère la memoire allouée pour les notes
-    Note * current = ancre;
-    Note * next = NULL;
-    while (current->next != NULL) {
-        free(current);
-        current = current->next;
-    }
+    // on libère la memoire allouée
+    free_memory(buffer, stage, logo, background, game_over, player_1, player_2, player, ancre);
 
     return 0;
 }END_OF_MAIN();
