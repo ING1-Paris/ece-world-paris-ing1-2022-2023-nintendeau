@@ -14,3 +14,9 @@ cmake-build-debug
 
 # executable généré par le compilateur
 main.exe
+attractions/guiter_hero.exe
+attractions/snake.exe
+
+# fichiers générés par le compilateur
+saves/meilleurs_scores.txt
+saves/meilleurs_scores.txt
