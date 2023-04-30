@@ -2,15 +2,16 @@
 #include <allegro.h>
 #include <time.h>
 
+#define MAX_IMAGES_CASE 3
+
 
 int main(int argc, char *argv[])
 {
     srand(time(NULL));
     int cblanc, crouge, cbleu, cnoir;
-    int vblanc = 1, vrouge = 2,vbleu = 3;
+    int v7 = 1, vviande = 2,vcoeur = 3;
     int fin;
     int nbrTicket = 5 ;
-    int dernierAppui = 0;
 
     allegro_init();
     install_keyboard();
@@ -23,7 +24,35 @@ int main(int argc, char *argv[])
         allegro_exit();
         exit(EXIT_FAILURE);
     }
+
     show_mouse(screen);
+
+
+    BITMAP *sprite1;
+    BITMAP *sprite2;
+    BITMAP *sprite3;
+    BITMAP *sprite4;
+
+    int compteur_animation = 0;
+    char filename[100];
+
+    sprite1 = load_bitmap("../Projet_2/image_case/image_case0.bmp", NULL);
+    sprite2 = load_bitmap("../Projet_2/image_case/image_case1.bmp", NULL);
+    sprite3 = load_bitmap("../Projet_2/image_case/image_case2.bmp", NULL);
+    sprite4 = load_bitmap("../Projet_2/point_d'interro.bmp", NULL);
+
+    if (!sprite1 || !sprite2 || !sprite3) {
+         sprite1 = load_bitmap("Projet_2\\image_case\\image_case0.bmp", NULL);
+         sprite2 = load_bitmap("Projet_2\\image_case\\image_case1.bmp", NULL);
+         sprite3 = load_bitmap("Projet_2\\image_case\\image_case2.bmp", NULL);
+         sprite4 = load_bitmap("Projet_2\\point_d'interro.bmp", NULL);
+         if (!sprite1 || !sprite2 || !sprite3) {
+             allegro_message("prb gfx mode");
+             allegro_exit();
+             exit(EXIT_FAILURE);
+         }
+    }
+
 
     // Avoir une couleur (ici du blanc)
     cblanc=makecol(255,255,255);
@@ -34,20 +63,14 @@ int main(int argc, char *argv[])
     rectfill(screen,570,300,690,310,makecol(0,128,0 ));
     textprintf_ex(screen,font,572,302,makecol(255,0,0),makecol(0,255,0),"lancer le jeu ");
     fin=0;
+    int dernierAppui = 0;
 
     textprintf_ex(screen, font, 300, 500, cblanc, -1, "il vous reste %d tickets", nbrTicket);
+    draw_sprite(screen, sprite4, 140, 240);
+    draw_sprite(screen, sprite4, 350, 240);
+    draw_sprite(screen, sprite4, 560, 240);
 
 
-    for(int i = 0 ; i < 3 ; i++) {
-        int choix = rand() % 3 + 1;
-        if (choix == vbleu) {
-            rectfill(screen, 240 + i * 110, 240, 340 + i *  110, 340, cbleu);
-        } else if (choix == vblanc) {
-            rectfill(screen, 240 + i * 110, 240, 340 + i *  110, 340, cblanc);
-        } else if (choix == vrouge){
-            rectfill(screen, 240 + i * 110, 240, 340 + i *  110, 340, crouge);
-        }
-    }
 
     while (!fin) {
 
@@ -65,12 +88,35 @@ int main(int argc, char *argv[])
 
                 for(int i = 0 ; i < 3 ; i++) {
                     int choix = rand() % 3 + 1;
-                    if (choix == vbleu) {
-                        rectfill(screen, 240 + i * 110, 240, 340 + i *  110, 340, cbleu);
-                    } else if (choix == vblanc) {
-                        rectfill(screen, 240 + i * 110, 240, 340 + i *  110, 340, cblanc);
-                    } else if (choix == vrouge){
-                        rectfill(screen, 240 + i * 110, 240, 340 + i *  110, 340, crouge);
+                    for (int j = 0; j < 9 ; j++){
+                        if (j == 0) {
+                            draw_sprite(screen, sprite1, 140 + i * 110, 240);
+                        } else if (j == 1) {
+                            draw_sprite(screen, sprite2, 140 + i * 110, 240);
+                        } else if (j == 2) {
+                            draw_sprite(screen, sprite3, 140 + i * 110, 240);
+                        } else if (j == 3) {
+                            draw_sprite(screen, sprite1, 140 + i * 110, 240);
+                        } else if (j == 4) {
+                            draw_sprite(screen, sprite2, 140 + i * 110, 240);
+                        } else if (j == 5) {
+                            draw_sprite(screen, sprite3, 140 + i * 110, 240);
+                        } else if (j == 6) {
+                            draw_sprite(screen, sprite1, 140 + i * 110, 240);
+                        } else if (j == 7) {
+                            draw_sprite(screen, sprite2, 140 + i * 110, 240);
+                        } else if (j == 8) {
+                            draw_sprite(screen, sprite3, 140 + i * 110, 240);
+                        }
+                        rest(150);
+                    }
+
+                    if (choix == v7) {
+                        draw_sprite(screen, sprite1, 140 + i * 110, 240);
+                    } else if (choix == vviande) {
+                        draw_sprite(screen, sprite2, 140 + i * 110, 240);
+                    } else if (choix == vcoeur) {
+                        draw_sprite(screen, sprite3, 140 + i * 110, 240);
                     }
                 }
 
