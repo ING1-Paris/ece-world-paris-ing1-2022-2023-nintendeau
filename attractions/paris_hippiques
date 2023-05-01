@@ -2,47 +2,81 @@
 #include <allegro.h>
 #include <stdlib.h>
 
-int main(){
+int main() {
     allegro_init();
     install_keyboard();
     set_color_depth(32);
     set_gfx_mode(GFX_AUTODETECT_WINDOWED, 800, 500, 0, 0);
-    BITMAP *buffer = create_bitmap(800, 500);
-    int choixmenu=0;
-    textprintf_ex(buffer, font, 10, 10, makecol(255, 255, 255), -1, "BIENVENUE DANS LE JEU PARIS HIPPIQUES");
-    textprintf_ex(buffer, font, 10, 30, makecol(255, 255, 255), -1, "Avant de jouer, laissez moi vous expliquer les règles du jeu:");
-    textprintf_ex(buffer, font, 10, 50, makecol(255, 255, 255), -1, "Vous serez 2 JOUEURS et vous allez devoir choisir un cheval parmi les 4 qui vous sont proposés.");
-    textprintf_ex(buffer, font, 10, 70, makecol(255, 255, 255), -1, "Vous allez ensuite miser un ou plusieurs tickets sur ce cheval.");
-    textprintf_ex(buffer, font, 10, 90, makecol(255, 255, 255), -1, "Si votre cheval gagne, vous remportez 2 fois votre mise.");
-    textprintf_ex(buffer, font, 10, 110, makecol(255, 255, 255), -1, "Mais si vous perdez, vous perdez un ticket.");
-    textprintf_ex(buffer, font, 10, 130, makecol(255, 255, 255), -1, "Chaque joueur commence avec un solde de 5 tickets.");
-    textprintf_ex(buffer, font, 10, 150, makecol(255, 255, 255), -1, "Le premier joueur qui arrive à un solde de 0 ticket a perdu.");
-    textprintf_ex(buffer, font, 10, 170, makecol(255, 255, 255), -1, "EST-CE QUE C'EST BON POUR VOUS ?");
-    textprintf_ex(buffer, font, 10, 190, makecol(0, 128, 0), -1, "1. OUI");
-    textprintf_ex(buffer, font, 10, 210, makecol(255, 0, 0), -1, "2. NON");
-    blit(buffer, screen, 0, 0, 0, 0, 800, 500);
-    while (choixmenu==0){
-        if (key[KEY_1]){
-            choixmenu=1;
-        }
-        if (key[KEY_2]){
-            choixmenu=2;
-        }
-    }
 
-    if (choixmenu==1){
-        BITMAP *buffer = create_bitmap(800, 500);
-        textprintf_ex(buffer, font, 10, 10, makecol(255, 255, 255), -1, "TRES BIEN, ON PEUT COMMENCER");
-        textprintf_ex(buffer, font, 10, 30, makecol(255, 255, 255), -1, "CHOISISSEZ VOTRE CHEVAL");
-        textprintf_ex(buffer, font, 10, 50, makecol(0, 128, 0), -1, "1. CHEVAL 1");
-        textprintf_ex(buffer, font, 10, 70, makecol(0, 128, 0), -1, "2. CHEVAL 2");
-        textprintf_ex(buffer, font, 10, 90, makecol(0, 128, 0), -1, "3. CHEVAL 3");
-        textprintf_ex(buffer, font, 10, 110, makecol(0, 128, 0), -1, "4. CHEVAL 4");
+    BITMAP *buffer = create_bitmap(800, 500);
+    int choixmenu = 0;
+
+    while (choixmenu == 0) {
+        // Affichage du menu principal
+        textprintf_ex(buffer, font, 10, 10, makecol(255, 255, 255), -1, "BIENVENUE DANS LE JEU PARIS HIPPIQUES");
+        textprintf_ex(buffer, font, 10, 30, makecol(255, 255, 255), -1, "Avant de jouer, laissez moi vous expliquer les règles du jeu:");
+        textprintf_ex(buffer, font, 10, 50, makecol(255, 255, 255), -1, "Vous serez 2 JOUEURS et vous allez devoir choisir un cheval parmi les 4 qui vous sont proposés.");
+        textprintf_ex(buffer, font, 10, 70, makecol(255, 255, 255), -1, "Vous allez ensuite miser un ou plusieurs tickets sur ce cheval.");
+        textprintf_ex(buffer, font, 10, 90, makecol(255, 255, 255), -1, "Si votre cheval gagne, vous remportez 2 fois votre mise.");
+        textprintf_ex(buffer, font, 10, 110, makecol(255, 255, 255), -1, "Mais si vous perdez, vous perdez un ticket.");
+        textprintf_ex(buffer, font, 10, 130, makecol(255, 255, 255), -1, "Chaque joueur commence avec un solde de 5 tickets.");
+        textprintf_ex(buffer, font, 10, 150, makecol(255, 255, 255), -1, "Le premier joueur qui arrive à un solde de 0 ticket a perdu.");
+        textprintf_ex(buffer, font, 10, 170, makecol(255, 255, 255), -1, "EST-CE QUE C'EST BON POUR VOUS ?");
+        textprintf_ex(buffer, font, 10, 190, makecol(0, 128, 0), -1, "1. OUI");
+        textprintf_ex(buffer, font, 10, 210, makecol(255, 0, 0), -1, "2. NON");
         blit(buffer, screen, 0, 0, 0, 0, 800, 500);
+
+        // Attente de la sélection de l'utilisateur
+        while (choixmenu==0){
+            if (key[KEY_1]){
+                choixmenu=1;
+            }
+            if (key[KEY_2]){
+                choixmenu=2;
+            }
+            rest(100); // pour éviter de saturer le processeur
+        }
+
+        if (choixmenu==1){
+            clear(buffer);
+            install_keyboard();
+            set_color_depth(32);
+            set_gfx_mode(GFX_AUTODETECT_WINDOWED, 800, 500, 0, 0);
+            textprintf_ex(buffer, font, 10, 10, makecol(255, 255, 255), -1, "TRES BIEN, ON PEUT COMMENCER");
+            textprintf_ex(buffer, font, 10, 30, makecol(255, 255, 255), -1, "CHOISISSEZ VOTRE CHEVAL");
+            textprintf_ex(buffer, font, 10, 50, makecol(0, 128, 0), -1, "1. CHEVAL 1");
+            textprintf_ex(buffer, font, 10, 70, makecol(0, 128, 0), -1, "2. CHEVAL 2");
+            textprintf_ex(buffer, font, 10, 90, makecol(0, 128, 0), -1, "3. CHEVAL 3");
+            textprintf_ex(buffer, font, 10, 110, makecol(0, 128, 0), -1, "4. CHEVAL 4");
+            blit(buffer, screen, 0, 0, 0, 0, 800, 500);
+
+        }
+
+        if (choixmenu==2){
+            allegro_exit();
+        }
+
+        while (!key[KEY_ESC]){ // boucle pour garder la fenêtre ouverte tant que l'utilisateur n'appuie pas sur la touche "échappement"
+            rest(100);
+        }
+
+        allegro_exit(); // fermeture d'Allegro à la fin du programme
+
+        return 0;
     }
-    if (choixmenu==2){
-        allegro_exit();
-    }
-    return 0;
 }END_OF_MAIN();
+
+typedef struct {
+    int num;
+    int x;
+    int y;
+    int dx;
+    int dy;
+} cheval;
+
+typedef struct {
+    int score;
+    int soldeticket;
+} joueur;
+
 
