@@ -2,6 +2,14 @@
 #include <allegro.h>
 #include <stdlib.h>
 
+#define LONGUEUR 800
+#define LARGEUR 500
+
+void choix_cheval();
+void init_chevaux();
+void relierchevaljoueur();
+
+
 int main() {
     allegro_init();
     install_keyboard();
@@ -12,7 +20,7 @@ int main() {
     int choixmenu = 0;
 
     while (choixmenu == 0) {
-        // Affichage du menu principal
+
         textprintf_ex(buffer, font, 10, 10, makecol(255, 255, 255), -1, "BIENVENUE DANS LE JEU PARIS HIPPIQUES");
         textprintf_ex(buffer, font, 10, 30, makecol(255, 255, 255), -1, "Avant de jouer, laissez moi vous expliquer les règles du jeu:");
         textprintf_ex(buffer, font, 10, 50, makecol(255, 255, 255), -1, "Vous serez 2 JOUEURS et vous allez devoir choisir un cheval parmi les 4 qui vous sont proposés.");
@@ -34,49 +42,133 @@ int main() {
             if (key[KEY_2]){
                 choixmenu=2;
             }
-            rest(100); // pour éviter de saturer le processeur
+            rest(100);
         }
 
         if (choixmenu==1){
-            clear(buffer);
-            install_keyboard();
-            set_color_depth(32);
-            set_gfx_mode(GFX_AUTODETECT_WINDOWED, 800, 500, 0, 0);
-            textprintf_ex(buffer, font, 10, 10, makecol(255, 255, 255), -1, "TRES BIEN, ON PEUT COMMENCER");
-            textprintf_ex(buffer, font, 10, 30, makecol(255, 255, 255), -1, "CHOISISSEZ VOTRE CHEVAL");
-            textprintf_ex(buffer, font, 10, 50, makecol(0, 128, 0), -1, "1. CHEVAL 1");
-            textprintf_ex(buffer, font, 10, 70, makecol(0, 128, 0), -1, "2. CHEVAL 2");
-            textprintf_ex(buffer, font, 10, 90, makecol(0, 128, 0), -1, "3. CHEVAL 3");
-            textprintf_ex(buffer, font, 10, 110, makecol(0, 128, 0), -1, "4. CHEVAL 4");
-            blit(buffer, screen, 0, 0, 0, 0, 800, 500);
-
+            init_chevaux();
+            choix_cheval();
         }
 
         if (choixmenu==2){
             allegro_exit();
         }
 
-        while (!key[KEY_ESC]){ // boucle pour garder la fenêtre ouverte tant que l'utilisateur n'appuie pas sur la touche "échappement"
+        while (!key[KEY_ESC]){
             rest(100);
         }
 
-        allegro_exit(); // fermeture d'Allegro à la fin du programme
+        allegro_exit();
 
         return 0;
     }
+}
+
+
+void choix_cheval() {
+    init_chevaux();
+
+    BITMAP *buffer = create_bitmap(800, 500);
+    int choixjoueur1 = 0, choixjoueur2 = 0;
+    clear(buffer);
+    install_keyboard();
+    set_color_depth(32);
+    set_gfx_mode(GFX_AUTODETECT_WINDOWED, 800, 500, 0, 0);
+    textprintf_ex(buffer, font, 10, 10, makecol(255, 255, 255), -1, "TRES BIEN, ON PEUT COMMENCER");
+    textprintf_ex(buffer, font, 10, 30, makecol(255, 255, 255), -1, "JOUEUR 1 ,CHOISISSEZ VOTRE CHEVAL:");
+    textprintf_ex(buffer, font, 10, 50, makecol(0, 128, 0), -1, "1. CHEVAL 1");
+    textprintf_ex(buffer, font, 10, 70, makecol(0, 128, 0), -1, "2. CHEVAL 2");
+    textprintf_ex(buffer, font, 10, 90, makecol(0, 128, 0), -1, "3. CHEVAL 3");
+    textprintf_ex(buffer, font, 10, 110, makecol(0, 128, 0), -1, "4. CHEVAL 4");
+    blit(buffer, screen, 0, 0, 0, 0, 800, 500);
+    while(choixjoueur1 == 0) {
+        if(key[KEY_1]) {
+            choixjoueur1 = 1;
+
+        }
+        if(key[KEY_2]) {
+            choixjoueur1 = 2;
+        }
+        if(key[KEY_3]) {
+            choixjoueur1 = 3;
+        }
+        if(key[KEY_4]) {
+            choixjoueur1 = 4;
+        }
+    }
+    textprintf_ex(buffer,font,10,10,makecol(255,255,255),-1,"VOUS AVEZ CHOISI LE CHEVAL %d",choixjoueur1);
+    rest(1000);
+    clear(buffer);
+    textprintf_ex(buffer, font, 10, 10, makecol(255, 255, 255), -1, "JOUEUR 2 ,CHOISISSEZ VOTRE CHEVAL:");
+    textprintf_ex(buffer, font, 10, 30, makecol(0, 128, 0), -1, "1. CHEVAL 1");
+    textprintf_ex(buffer, font, 10, 50, makecol(0, 128, 0), -1, "2. CHEVAL 2");
+    textprintf_ex(buffer, font, 10, 70, makecol(0, 128, 0), -1, "3. CHEVAL 3");
+    textprintf_ex(buffer, font, 10, 90, makecol(0, 128, 0), -1, "4. CHEVAL 4");
+    blit(buffer, screen, 0, 0, 0, 0, 800, 500);
+    readkey();
+    while(choixjoueur2 == 0) {
+        if(key[KEY_1]) {
+            choixjoueur2 = 1;
+            
+        }
+        if(key[KEY_2]) {
+            choixjoueur2 = 2;
+        }
+        if(key[KEY_3]) {
+            choixjoueur2 = 3;
+        }
+        if(key[KEY_4]) {
+            choixjoueur2 = 4;
+        }
+    }
+    rest(1000);
+    clear(buffer);
+
+    if (choixjoueur1 == choixjoueur2) {
+        textprintf_ex(buffer, font, 50, 110, makecol(255, 0, 0), -1, "VOUS NE POUVEZ PAS CHOISIR LE MEME CHEVAL QUE VOTRE ADVERSAIRE");
+        blit(buffer, screen, 0, 0, 0, 0, 800, 500);
+        rest(1000);
+        clear(buffer);
+        choix_cheval();
+    }
+
+
 }END_OF_MAIN();
 
 typedef struct {
-    int num;
     int x;
     int y;
-    int dx;
-    int dy;
+    int vitesse;
+    int choixjoueur1, choixjoueur2;
 } cheval;
 
 typedef struct {
-    int score;
     int soldeticket;
+    int choixjoueur1, choixjoueur2;
 } joueur;
 
+void init_chevaux() {
+    cheval cheval1;
+    cheval cheval2;
+    cheval cheval3;
+    cheval cheval4;
+    cheval1.x = 0;
+    cheval1.y = 0;
+    cheval1.vitesse = 0;
+    cheval2.x = 0;
+    cheval2.y = 0;
+    cheval2.vitesse = 0;
+    cheval3.x = 0;
+    cheval3.y = 0;
+    cheval3.vitesse = 0;
+    cheval4.x = 0;
+    cheval4.y = 0;
+    cheval4.vitesse = 0;
+}
 
+void init_joueur() {
+    joueur joueur1;
+    joueur joueur2;
+    joueur1.soldeticket = 5;
+    joueur2.soldeticket = 5;
+}
