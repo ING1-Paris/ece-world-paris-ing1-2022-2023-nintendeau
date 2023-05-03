@@ -1,43 +1,3 @@
-//le but du projet est de créer un jeu de paris hippiques
-//
-//le jeu se joue à 2 joueurs
-//
-//chaque joueur commence avec un solde de 5 tickets
-//
-//le premier joueur qui arrive à un solde de 0 ticket a perdu
-//
-//le jeu ne s'arretera que lorsque l'un des joueurs aura perdu
-//
-//le joueur peut aussi choisir de quitter le jeu à tout moment grace à la touche echap
-//
-//le jeu se déroule sur une piste de 20 cases
-//
-//chaque joueur choisit un cheval parmi les 4 qui lui sont proposés
-//
-//chaque joueur mise un ou plusieurs tickets sur le cheval qu'il a choisi
-//
-//si le cheval choisi par le joueur gagne, le joueur remporte 2 fois sa mise
-//
-//si le cheval choisi par le joueur perd, le joueur perd un ticket
-//
-//le joueur peut miser plusieurs tickets sur un cheval
-//
-//il faut initilaliser les chevaux
-//
-//il faut initialiser les joueurs
-//
-//il faut initialiser les tickets
-//
-//il faut initialiser la piste
-//
-//il faut initialiser le jeu
-//
-//il faut initialiser le menu
-//
-//il faut relier les fonctions entre elles
-//
-
-//premiere etape : initialiser les chevaux
 #include <stdio.h>
 #include <allegro.h>
 #include <stdlib.h>
@@ -58,63 +18,11 @@ typedef struct {
     int chevalchoisi; //1,2,3,4 en fonction du cheval choisi par le joueur 1 ou 2
 } joueur;
 
-void choix_cheval();
-void regles_jeu();
 void initialiser_chevaux();
 void initialiser_joueur();
-void afficher_chevaux();
-void afficher_decor();
-
-
-
-void menu(){
-    BITMAP *buffer = create_bitmap(800, 500);
-    textprintf_ex(buffer, font, 400, 10, makecol(255, 255, 255), -1, "MENU");
-    textprintf_ex(buffer, font, 10, 90, makecol(255, 255, 255), -1, "1. REGLES DU JEU");
-    textprintf_ex(buffer, font, 10, 130, makecol(255, 255, 255), -1, "2. JOUER");
-    textprintf_ex(buffer, font, 10, 170, makecol(255, 255, 255), -1, "3. QUITTER");
-    blit(buffer, screen, 0, 0, 0, 0, 800, 500);
-    int choix = 0;
-    while (choix == 0){
-        if (key[KEY_1]){
-            choix = 1;
-        }
-        if (key[KEY_2]){
-            choix = 2;
-        }
-        if (key[KEY_3]){
-            choix = 3;
-        }
-    }
-    if (choix == 1){
-        regles_jeu();
-    }
-    if (choix == 2){
-        choix_cheval();
-    }
-    if (choix == 3){
-        allegro_exit();
-    }
-}
-
-void regles_jeu(){
-    install_keyboard();
-    set_color_depth(32);
-    BITMAP *buffer = create_bitmap(800, 500);
-    textprintf_ex(buffer, font, 10, 10, makecol(255, 255, 255), -1, "BIENVENUE DANS LE JEU PARIS HIPPIQUES");
-    textprintf_ex(buffer, font, 10, 30, makecol(255, 255, 255), -1, "Avant de jouer, laissez moi vous expliquer les règles du jeu:");
-    textprintf_ex(buffer, font, 10, 50, makecol(255, 255, 255), -1, "Vous serez 2 JOUEURS et vous allez devoir choisir un cheval parmi les 4 qui vous sont proposés.");
-    textprintf_ex(buffer, font, 10, 70, makecol(255, 255, 255), -1, "Vous allez ensuite miser un ou plusieurs tickets sur ce cheval.");
-    textprintf_ex(buffer, font, 10, 90, makecol(255, 255, 255), -1, "Si votre cheval gagne, vous remportez 2 fois votre mise.");
-    textprintf_ex(buffer, font, 10, 110, makecol(255, 255, 255), -1, "Mais si vous perdez, vous perdez un ticket.");
-    textprintf_ex(buffer, font, 10, 130, makecol(255, 255, 255), -1, "Chaque joueur commence avec un solde de 5 tickets.");
-    textprintf_ex(buffer, font, 10, 150, makecol(255, 255, 255), -1, "Le premier joueur qui arrive à un solde de 0 ticket a perdu.");
-    textprintf_ex(buffer, font, 10, 170, makecol(255, 255, 255), -1, "EST-CE QUE C'EST BON POUR VOUS ?");
-    if(key[KEY_ENTER]){
-        choix_cheval();
-    }
-
-}
+void choix_cheval();
+void regles_jeu();
+void afficher();
 
 void initialiser_chevaux(){
     cheval cheval1;
@@ -227,47 +135,56 @@ void choix_cheval() {
     }
 }
 
-void afficher_decor(){
-    BITMAP *buffer = create_bitmap(800, 500);
-    BITMAP *fond = load_bitmap("course.bmp", NULL);
-    blit(fond, buffer, 0, 0, 0, 0, 800, 500);
-    blit(buffer, screen, 0, 0, 0, 0, 800, 500);
+void afficher() {
+   //charger l'image dans le buffer
+    BITMAP *course = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\course.bmp", NULL);
+    if(!course){
+        allegro_message("Erreur lors du chargement de l'image");
+        exit(EXIT_FAILURE);
+    }
+    //afficher l'image
+    blit(course, screen, 0, 0, 0, 0, course->w, course->h);
+
+    //charger les chevaux dans le buffer
+    BITMAP *cheval1 = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\cheval1.bmp", NULL);
+    BITMAP *cheval_resized1 = create_bitmap(cheval1->w/8, cheval1->h/8);
+    if(!cheval1){
+        allegro_message("Erreur lors du chargement de l'image");
+        exit(EXIT_FAILURE);
+    }
+    stretch_blit(cheval1, cheval_resized1, 0, 0, cheval1->w, cheval1->h, 0, 0, cheval_resized1->w, cheval_resized1->h);
+
+    BITMAP *cheval2 = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\cheval2.bmp", NULL);
+    BITMAP *cheval_resized2 = create_bitmap(cheval2->w/8, cheval2->h/8);
+    if(!cheval2){
+        allegro_message("Erreur lors du chargement de l'image");
+        exit(EXIT_FAILURE);
+    }
+    stretch_blit(cheval2, cheval_resized2, 0, 0, cheval2->w, cheval2->h, 0, 0, cheval_resized2->w, cheval_resized2->h);
+
+    BITMAP *cheval3 = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\cheval3.bmp", NULL);
+    BITMAP *cheval_resized3 = create_bitmap(cheval3->w/8, cheval3->h/8);
+    if(!cheval3){
+        allegro_message("Erreur lors du chargement de l'image");
+        exit(EXIT_FAILURE);
+    }
+    stretch_blit(cheval3, cheval_resized3, 0, 0, cheval3->w, cheval3->h, 0, 0, cheval_resized3->w, cheval_resized3->h);
+
+
+    BITMAP *cheval4 = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\cheval4.bmp", NULL);
+    BITMAP *cheval_resized4 = create_bitmap(cheval4->w/8, cheval4->h/8);
+    if(!cheval4){
+        allegro_message("Erreur lors du chargement de l'image");
+        exit(EXIT_FAILURE);
+    }
+    stretch_blit(cheval4, cheval_resized4, 0, 0, cheval4->w, cheval4->h, 0, 0, cheval_resized4->w, cheval_resized4->h);
+
+    set_trans_blender(255,0,255,0);
+    draw_trans_sprite(screen,cheval1,0,0);
+    draw_trans_sprite(screen,cheval2,0,0);
+    draw_trans_sprite(screen,cheval3,0,0);
+    draw_trans_sprite(screen,cheval4,0,0);
 }
-
-void afficher_chevaux(){
-    BITMAP *buffer = create_bitmap(800, 500);
-    BITMAP *cheval1 = load_bitmap("cheval1.bmp", NULL);
-    BITMAP *cheval2 = load_bitmap("cheval2.bmp", NULL);
-    BITMAP *cheval3 = load_bitmap("cheval3.bmp", NULL);
-    BITMAP *cheval4 = load_bitmap("cheval4.bmp", NULL);
-    blit(cheval1, buffer, 0, 0, 0, 0, 800, 500);
-    blit(cheval2, buffer, 0, 0, 0, 0, 800, 500);
-    blit(cheval3, buffer, 0, 0, 0, 0, 800, 500);
-    blit(cheval4, buffer, 0, 0, 0, 0, 800, 500);
-    blit(buffer, screen, 0, 0, 0, 0, 800, 500);
-}
-
-void afficher_tout(){
-    afficher_decor();
-    afficher_chevaux();
-}
-
-void deplacer_chevaux(){
-    cheval cheval1;
-    cheval cheval2;
-    cheval cheval3;
-    cheval cheval4;
-    cheval1.x = 207;
-    cheval2.x = 207;
-    cheval3.x = 207;
-    cheval4.x = 207;
-
-}
-
-
-
-
-
 
 int main(){
     allegro_init();
