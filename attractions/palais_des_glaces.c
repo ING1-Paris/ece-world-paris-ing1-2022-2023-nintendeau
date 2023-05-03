@@ -1,0 +1,268 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <allegro.h>
+#include <time.h>
+
+#define SIZE 10
+#define CELL_SIZE 800 / SIZE
+
+
+typedef struct {
+    int x;
+    int y;
+    int mur[4];
+    int visite;
+} Cell;
+
+
+// fonction pour afficher la grille
+void show_grid(Cell *** cell_grid, BITMAP * maze, BITMAP * buffer) {
+
+    // couuleurs
+    int wall_color = makecol(255, 255, 255);
+    int cell_color = makecol(0, 0, 0);
+
+    // afficher les murs et les cases
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+
+            // mur du haut
+            if (cell_grid[i][j]->mur[0]) {
+                rectfill(maze, i * CELL_SIZE - 1, j*CELL_SIZE - 1, i*CELL_SIZE+CELL_SIZE, j*CELL_SIZE + 1, wall_color);
+            }
+            else if (!cell_grid[i][j]->mur[0]) {
+                rectfill(maze, i * CELL_SIZE + 2, j*CELL_SIZE - 1, i*CELL_SIZE+CELL_SIZE - 2, j*CELL_SIZE + 1, cell_color);
+            }
+
+            // mur de droite
+            if (cell_grid[i][j]->mur[1]) {
+                rectfill(maze, i*CELL_SIZE+CELL_SIZE - 1, j*CELL_SIZE - 1, i*CELL_SIZE+CELL_SIZE + 1, j*CELL_SIZE+CELL_SIZE, wall_color);
+            }
+            else if (!cell_grid[i][j]->mur[1]) {
+                rectfill(maze, i*CELL_SIZE+CELL_SIZE - 1, j*CELL_SIZE + 2, i*CELL_SIZE+CELL_SIZE + 1, j*CELL_SIZE+CELL_SIZE, cell_color);
+            }
+
+            // mur du bas
+            if (cell_grid[i][j]->mur[2]) {
+                rectfill(maze, i*CELL_SIZE - 1, j*CELL_SIZE+CELL_SIZE - 1, i*CELL_SIZE+CELL_SIZE + 1, j*CELL_SIZE+CELL_SIZE + 1, wall_color);
+            }
+            else if (!cell_grid[i][j]->mur[2]) {
+                rectfill(maze, i*CELL_SIZE  + 2, j*CELL_SIZE+CELL_SIZE - 1, i*CELL_SIZE+CELL_SIZE - 2, j*CELL_SIZE+CELL_SIZE + 1, cell_color);
+            }
+
+            // mur de gauche
+            if (cell_grid[i][j]->mur[3]) {
+                rectfill(maze, i*CELL_SIZE - 1, j*CELL_SIZE, i*CELL_SIZE + 1, j*CELL_SIZE+CELL_SIZE + 1, wall_color);
+            }
+            else if (!cell_grid[i][j]->mur[3]) {
+                rectfill(maze, i*CELL_SIZE - 1, j*CELL_SIZE + 2, i*CELL_SIZE + 1, j*CELL_SIZE+CELL_SIZE - 2, cell_color);
+            }
+        }
+    }
+    blit(maze, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+}
+
+
+// fonction pour creer une cellule
+Cell * creer_cellule(int x, int y) {
+
+    Cell * new_cell = malloc(sizeof(Cell));
+    new_cell->x = x;
+    new_cell->y = y;
+    new_cell->mur[0] = 1;
+    new_cell->mur[1] = 1;
+    new_cell->mur[2] = 1;
+    new_cell->mur[3] = 1;
+    new_cell->visite = 0;
+
+    return new_cell;
+}
+
+
+// fonction pour remplir la grille de cellules
+Cell *** remplir_grille(Cell *** cell_grid) {
+
+    // pour chaque cellule de la grille, on en crée une
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE ; j++) {
+            Cell * new_cell = creer_cellule(j, i);
+            cell_grid[i][j] = new_cell;
+        }
+    }
+    return cell_grid;
+}
+
+
+// fonction pour liberer la grille de cellules et les cellules
+void free_grid(Cell *** cell_grid) {
+
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE ; j++) {
+            free(cell_grid[i][j]);
+        }
+        free(cell_grid[i]);
+    }
+    free(cell_grid);
+}
+
+
+// fonction pour regarder  les voisins d'une cellule et retourner un voisin aléatoire
+Cell * check_neighbours(Cell * cell, Cell *** cell_grid) {
+
+    // liste des voisins potentiels non visités
+    Cell * neighbours[4];
+    int nb_neighbours = 0;
+
+    // on récupère les coordonnées de la cellule
+    int x = cell->x;
+    int y = cell->y;
+
+    // on récupère les voisins
+    Cell * top    = (y > 0) ?      cell_grid[y - 1][x] : NULL;
+    Cell * right  = (x < SIZE-1) ? cell_grid[y][x + 1] : NULL;
+    Cell * bottom = (y < SIZE-1) ? cell_grid[y + 1][x] : NULL;
+    Cell * left   = (x > 0) ?      cell_grid[y][x - 1] : NULL;
+
+    // on vérifie si les voisins existent et non visités pour les ajouter a la liste
+    if (top && !top->visite) {
+        neighbours[nb_neighbours] = top;
+        nb_neighbours++;
+    }
+    if (right && !right->visite) {
+        neighbours[nb_neighbours] = right;
+        nb_neighbours++;
+    }
+    if (bottom && !bottom->visite) {
+        neighbours[nb_neighbours] = bottom;
+        nb_neighbours++;
+    }
+    if (left && !left->visite) {
+        neighbours[nb_neighbours] = left;
+        nb_neighbours++;
+    }
+
+    // si il y a des voisins non visités
+    if (nb_neighbours > 0) {
+
+        // on choisit un voisin au hasard
+        int random = rand() % nb_neighbours;
+        Cell * chosen_neighbour = neighbours[random];
+
+        // on retourne le voisin
+        return chosen_neighbour;
+    }
+
+    // sinon on retourne NULL
+    return NULL;
+}
+
+
+// fonction pour vérifier si toutes les cellules ont été visitées
+int check_visited(Cell *** cell_grid) {
+
+    // on parcourt la grille, des qu'on trouve une cellule non visitée on retourne 0
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE ; j++) {
+            if (cell_grid[i][j]->visite == 0) {
+                return 0;
+            }
+        }
+    }
+    // sinon on retourne 1
+    return 1;
+}
+
+
+// fonction pour supprimer le mur entre deux cellules
+void remove_wall(Cell * current_cell, Cell * chosen_neighbour) {
+
+    // on récupère la différence entre les coordonnées des deux cellules
+    int x_diff = current_cell->x - chosen_neighbour->x;
+    int y_diff = current_cell->y - chosen_neighbour->y;
+
+    // on supprime le mur entre les deux cellules
+    if (x_diff == 1) {
+        current_cell->mur[0] = 0;
+        chosen_neighbour->mur[2] = 0;
+    }
+
+    else if (x_diff == -1) {
+        current_cell->mur[2] = 0;
+        chosen_neighbour->mur[0] = 0;
+    }
+
+    else if (y_diff == 1) {
+        current_cell->mur[3] = 0;
+        chosen_neighbour->mur[1] = 0;
+    }
+
+    else if (y_diff == -1) {
+        current_cell->mur[1] = 0;
+        chosen_neighbour->mur[3] = 0;
+    }
+}
+
+
+int main() {
+
+    allegro_init();
+    install_mouse();
+    install_keyboard();
+    install_timer();
+    set_window_title("MAZE RUN");
+
+    set_color_depth(desktop_color_depth());
+    if (set_gfx_mode(GFX_AUTODETECT_WINDOWED, 1200, 800, 0, 0) != 0) {
+        allegro_message("GFX ERROR");
+        allegro_exit();
+        exit(EXIT_FAILURE);
+    }
+
+    srand(time(NULL));
+
+    // on initialise les BITMAPS
+    BITMAP * buffer = create_bitmap(SCREEN_W, SCREEN_H);
+    BITMAP * maze = create_bitmap(SCREEN_H, SCREEN_H);
+
+    // création du tableau de cellules (SIZE*SIZE)
+    Cell *** cell_grid = malloc(sizeof(Cell**) * SIZE);
+    for (int i = 0; i < SIZE; i++) {
+        cell_grid[i] = malloc(sizeof(Cell*) * SIZE);
+    }
+    cell_grid = remplir_grille(cell_grid);
+
+    // initialisation de la premiere cellule
+    Cell * current_cell = cell_grid[0][0];
+
+    // création de la pile de cellules
+    Cell ** stack = malloc(sizeof(Cell*) * SIZE * SIZE);
+    int stack_size = 0;
+
+    // loop de generation du labyrinthe
+    while (!check_visited(cell_grid)) {
+
+        current_cell->visite = 1;
+        Cell * next_cell = check_neighbours(current_cell, cell_grid);
+        if (next_cell) {
+            next_cell->visite = 1;
+            // afficher la cellule courante en rouge en inversant x et y
+            stack[stack_size] = current_cell;
+            stack_size++;
+            rectfill(maze, current_cell->y * CELL_SIZE + 2, current_cell->x * CELL_SIZE + 2, current_cell->y * CELL_SIZE + CELL_SIZE - 2, current_cell->x * CELL_SIZE + CELL_SIZE - 2, makecol(0, 0, 0));
+            remove_wall(current_cell, next_cell);
+            current_cell = next_cell;
+            rectfill(maze, next_cell->y * CELL_SIZE + 2, next_cell->x * CELL_SIZE + 2, next_cell->y * CELL_SIZE + CELL_SIZE - 2, next_cell->x * CELL_SIZE + CELL_SIZE - 2, makecol(255, 0, 0));
+
+        }
+        else if (stack_size > 0) {
+            stack_size--;
+            rectfill(maze, current_cell->y * CELL_SIZE + 2, current_cell->x * CELL_SIZE + 2, current_cell->y * CELL_SIZE + CELL_SIZE - 2, current_cell->x * CELL_SIZE + CELL_SIZE - 2, makecol(0, 0, 0));
+            current_cell = stack[stack_size];
+            rectfill(maze, current_cell->y * CELL_SIZE + 2, current_cell->x * CELL_SIZE + 2, current_cell->y * CELL_SIZE + CELL_SIZE - 2, current_cell->x * CELL_SIZE + CELL_SIZE - 2, makecol(255, 0, 0));
+        }
+        show_grid(cell_grid, maze, buffer);
+        rectfill(maze, current_cell->y * CELL_SIZE + 2, current_cell->x * CELL_SIZE + 2, current_cell->y * CELL_SIZE + CELL_SIZE - 2, current_cell->x * CELL_SIZE + CELL_SIZE - 2, makecol(0, 0, 0));
+        rest(10);
+    }
+    return 0;
+}END_OF_MAIN();
