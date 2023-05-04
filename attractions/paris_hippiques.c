@@ -137,54 +137,66 @@ void choix_cheval() {
 
 void afficher() {
    //charger l'image dans le buffer
-    BITMAP *course = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\course.bmp", NULL);
+    BITMAP *course = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\coursefinal.bmp", NULL);
     if(!course){
         allegro_message("Erreur lors du chargement de l'image");
         exit(EXIT_FAILURE);
     }
     //afficher l'image
-    blit(course, screen, 0, 0, 0, 0, course->w, course->h);
+    blit(course, screen, 0, 0, 0, 0, course->w, course->h);//
+
+    //dessiner la ligne de depart de couleur jaune fluo sur l'image course, les coordonnées de la ligne sont (x = 67, y1 = 530, y2= 703)
+    line(screen, 111, 530, 111, 703, makecol(255, 255, 0));
+
+    //dessiner la ligne d'arrivée de couleur violet sur l'image course, les coordonnées de la ligne sont (x=1377, y1=530, y2=703)
+    line(screen, 1377, 530, 1377, 707, makecol(255, 0, 255));
+
 
     //charger les chevaux dans le buffer
-    BITMAP *cheval1 = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\cheval1.bmp", NULL);
-    BITMAP *cheval_resized1 = create_bitmap(cheval1->w/8, cheval1->h/8);
+    BITMAP *cheval1 = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\cat2.bmp", NULL);
     if(!cheval1){
         allegro_message("Erreur lors du chargement de l'image");
         exit(EXIT_FAILURE);
     }
-    stretch_blit(cheval1, cheval_resized1, 0, 0, cheval1->w, cheval1->h, 0, 0, cheval_resized1->w, cheval_resized1->h);
-
-    BITMAP *cheval2 = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\cheval2.bmp", NULL);
-    BITMAP *cheval_resized2 = create_bitmap(cheval2->w/8, cheval2->h/8);
-    if(!cheval2){
-        allegro_message("Erreur lors du chargement de l'image");
-        exit(EXIT_FAILURE);
-    }
-    stretch_blit(cheval2, cheval_resized2, 0, 0, cheval2->w, cheval2->h, 0, 0, cheval_resized2->w, cheval_resized2->h);
-
-    BITMAP *cheval3 = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\cheval3.bmp", NULL);
-    BITMAP *cheval_resized3 = create_bitmap(cheval3->w/8, cheval3->h/8);
-    if(!cheval3){
-        allegro_message("Erreur lors du chargement de l'image");
-        exit(EXIT_FAILURE);
-    }
-    stretch_blit(cheval3, cheval_resized3, 0, 0, cheval3->w, cheval3->h, 0, 0, cheval_resized3->w, cheval_resized3->h);
+    blit(cheval1, screen, 0, 0, 0, 500, cheval1->w, cheval1->h);
+    //faire bouger le cheval 1 avec une vitesse aléatoire entre 1 et 10 pixels par seconde et afficher le cheval 1 sur l'image course
+    deplacer_cheval1(cheval1);
 
 
-    BITMAP *cheval4 = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\cheval4.bmp", NULL);
-    BITMAP *cheval_resized4 = create_bitmap(cheval4->w/8, cheval4->h/8);
-    if(!cheval4){
-        allegro_message("Erreur lors du chargement de l'image");
-        exit(EXIT_FAILURE);
-    }
-    stretch_blit(cheval4, cheval_resized4, 0, 0, cheval4->w, cheval4->h, 0, 0, cheval_resized4->w, cheval_resized4->h);
 
-    set_trans_blender(255,0,255,0);
-    draw_trans_sprite(screen,cheval1,0,0);
-    draw_trans_sprite(screen,cheval2,0,0);
-    draw_trans_sprite(screen,cheval3,0,0);
-    draw_trans_sprite(screen,cheval4,0,0);
 }
+
+//initalialiser la position du cheval 1
+void init_cheval1(player1 *cheval1){
+    cheval1->x1 = 0;
+    cheval1->y = 500;
+    cheval1->dx1 = 0;
+    cheval1->dy1 = 0;
+}
+
+void deplacer_cheval1(player1 *cheval1){
+    BITMAP *buffer = create_bitmap(SCREEN_W, SCREEN_H);
+    //initialiser la position du cheval 1
+    init_cheval1(cheval1);
+    //afficher le cheval 1
+    afficher();
+    //dessiner le cheval 1 dans le buffer
+    draw_sprite(buffer, cheval1, cheval1->x1, cheval1->y);
+    //deplacer le cheval 1 avec une vitesse aléatoire entre 1 et 10 pixels par seconde
+    cheval1->dx1 = rand() % 10 + 1;
+    cheval1->x1 += cheval1->dx1;
+    //afficher le buffer sur l'écran
+    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+}
+
+
+
+void condition_victoire(player1 *cheval1){
+    if(cheval1->x1 == 1377 && getpixel(cheval1,cheval1->x1, cheval1->y) == makecol(255, 0, 255)){
+        allegro_message("Le cheval 1 a gagné");
+    }
+}
+
 
 int main(){
     allegro_init();
