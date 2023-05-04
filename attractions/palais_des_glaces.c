@@ -10,6 +10,17 @@
 typedef struct {
     int x;
     int y;
+    int size;
+    int previous_x;
+    int previous_y;
+    int speed;
+    int temps;
+} Player;
+
+
+typedef struct {
+    int x;
+    int y;
     int mur[4];
     int visite;
 } Cell;
@@ -173,6 +184,22 @@ int check_visited(Cell *** cell_grid) {
 }
 
 
+// fonction pour créer un joueur
+Player * initialiser_joueur() {
+
+    Player * player = malloc(sizeof(Player));
+    player->x = 5;
+    player->y = 5;
+    player->size = CELL_SIZE/3;
+    player->previous_x = 0;
+    player->previous_y = 0;
+    player->speed = 3;
+    player->temps = 0;
+
+    return player;
+}
+
+
 // fonction pour supprimer le mur entre deux cellules
 void remove_wall(Cell * current_cell, Cell * chosen_neighbour) {
 
@@ -220,9 +247,33 @@ int main() {
 
     srand(time(NULL));
 
+    // on initialise les joueurs
+    Player * player_1 = initialiser_joueur();
+    player_1->x = CELL_SIZE/2;
+    player_1->y = CELL_SIZE/2 - player_1->size;
+
+    Player * player_2 = initialiser_joueur();
+    player_2->x = CELL_SIZE/2 - player_2->size;
+    player_2->y = CELL_SIZE/2;
+
     // on initialise les BITMAPS
     BITMAP * buffer = create_bitmap(SCREEN_W, SCREEN_H);
     BITMAP * maze = create_bitmap(SCREEN_H, SCREEN_H);
+    BITMAP * titre = load_bitmap("../assets/palais_des_glaces/maze_run.bmp", NULL);
+    BITMAP * player_sprite_1 = create_bitmap(player_1->size, player_1->size);
+    BITMAP * player_sprite_2 = create_bitmap(player_2->size, player_2->size);
+    rectfill(player_sprite_1, 0, 0, player_1->size, player_1->size, makecol(255, 0, 0));
+    rectfill(player_sprite_2, 0, 0, player_2->size, player_2->size, makecol(0, 0, 255));
+
+    // on vérifie que les BITMAPS ont bien été initialisés
+    if (!titre) {
+        titre = load_bitmap("assets\\palais_des_glaces\\maze_run.bmp", NULL);
+        if (!titre) {
+            allegro_message("BITMAP ERROR");
+            allegro_exit();
+            exit(EXIT_FAILURE);
+        }
+    }
 
     // création du tableau de cellules (SIZE*SIZE)
     Cell *** cell_grid = malloc(sizeof(Cell**) * SIZE);
@@ -238,7 +289,7 @@ int main() {
     Cell ** stack = malloc(sizeof(Cell*) * SIZE * SIZE);
     int stack_size = 0;
 
-    // loop de generation du labyrinthe
+    // main loop
     while (!check_visited(cell_grid)) {
 
         current_cell->visite = 1;
@@ -263,6 +314,25 @@ int main() {
         show_grid(cell_grid, maze, buffer);
         rectfill(maze, current_cell->y * CELL_SIZE + 2, current_cell->x * CELL_SIZE + 2, current_cell->y * CELL_SIZE + CELL_SIZE - 2, current_cell->x * CELL_SIZE + CELL_SIZE - 2, makecol(0, 0, 0));
         rest(10);
+    }
+
+    while (!key[KEY_ESC]) {
+        clear(buffer);
+
+        // affichage
+        // départ en haut a gauche et arrivée en bas a droite
+        rectfill(maze, 2, 2, CELL_SIZE - 2, CELL_SIZE - 2, makecol(100, 200, 100));
+        rectfill(maze, SCREEN_H - CELL_SIZE + 2, SCREEN_H - CELL_SIZE + 2, SCREEN_H - 2, SCREEN_H - 2, makecol(100, 100, 200));
+
+        blit(maze, buffer, 0, 0, 0, 0, SCREEN_H, SCREEN_H);
+        blit(player_sprite_1, buffer, 0, 0, player_1->x, player_1->y, player_1->size, player_1->size);
+        blit(player_sprite_2, buffer, 0, 0, player_2->x, player_2->y, player_2->size, player_2->size);
+
+        // encore affichage
+        masked_stretch_blit(titre, buffer, 0, 0, titre->w, titre->h, 810, 10, 380, 50);
+        rectfill(buffer, SCREEN_W*2/3, 70, SCREEN_W, 70, makecol(255, 255, 255));
+        rectfill(buffer, SCREEN_H, 0, SCREEN_H, SCREEN_H, makecol(255, 255, 255));
+        blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
     }
     return 0;
 }END_OF_MAIN();
