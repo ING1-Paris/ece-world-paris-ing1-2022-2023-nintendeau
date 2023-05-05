@@ -207,6 +207,7 @@ Player * initialiser_joueur() {
 
 
 // fonction qui gere les collisions de la map
+//! (a corriger)
 void check_collision(Player * player, BITMAP * maze) {
 
     // on récupère les coordonnées précédentes du joueur
@@ -217,7 +218,7 @@ void check_collision(Player * player, BITMAP * maze) {
     int wall = makecol(255, 255, 255);
 
     // collisions avec les murs
-    if (getpixel(maze, player->x, player->y) == wall || getpixel(maze, player->x + player->size, player->y) == wall || getpixel(maze, player->x, player->y + player->size) == wall || getpixel(maze, player->x + player->size, player->y + player->size) == wall) {
+    if (getpixel(maze, player->x, player->y - 10) == wall || getpixel(maze, player->x + player->size, player->y - 10) == wall || getpixel(maze, player->x, player->y + player->size) == wall || getpixel(maze, player->x + player->size, player->y + player->size) == wall) {
         player->x = x;
         player->y = y;
     }
@@ -245,6 +246,7 @@ void check_collision(Player * player, BITMAP * maze) {
 // fonction pour déplacer les joueurs
 void move_players(Player * player_1, Player * player_2) {
 
+    //
     if (key[KEY_UP]) {
         player_1->y -= player_1->speed;
     }
@@ -334,15 +336,19 @@ int main() {
     BITMAP * buffer = create_bitmap(SCREEN_W, SCREEN_H);
     BITMAP * maze = create_bitmap(SCREEN_H, SCREEN_H);
     BITMAP * titre = load_bitmap("../assets/palais_des_glaces/maze_run.bmp", NULL);
-    BITMAP * player_sprite_1 = create_bitmap(player_1->size, player_1->size);
-    BITMAP * player_sprite_2 = create_bitmap(player_2->size, player_2->size);
-    rectfill(player_sprite_1, 0, 0, player_1->size, player_1->size, makecol(255, 0, 0));
-    rectfill(player_sprite_2, 0, 0, player_2->size, player_2->size, makecol(0, 0, 255));
+
+    BITMAP * player_sprite_1 = load_bitmap("../assets/palais_des_glaces/player_1.bmp", NULL);
+    BITMAP * player_sprite_2 = load_bitmap("../assets/palais_des_glaces/player_2.bmp", NULL);
 
     // on vérifie que les BITMAPS ont bien été initialisés
-    if (!titre) {
+    if (!titre || !player_sprite_1 || !player_sprite_2) {
+
         titre = load_bitmap("assets\\palais_des_glaces\\maze_run.bmp", NULL);
-        if (!titre) {
+        player_sprite_1 = load_bitmap("assets\\palais_des_glaces\\player_1.bmp", NULL);
+        player_sprite_2 = load_bitmap("assets\\palais_des_glaces\\player_2.bmp", NULL);
+
+        if (!titre || !player_sprite_1 || !player_sprite_2) {
+
             allegro_message("BITMAP ERROR");
             allegro_exit();
             exit(EXIT_FAILURE);
@@ -398,8 +404,8 @@ int main() {
         rectfill(maze, SCREEN_H - CELL_SIZE + 2, SCREEN_H - CELL_SIZE + 2, SCREEN_H - 2, SCREEN_H - 2, makecol(100, 100, 200));
 
         blit(maze, buffer, 0, 0, 0, 0, SCREEN_H, SCREEN_H);
-        blit(player_sprite_1, buffer, 0, 0, player_1->x, player_1->y, player_1->size, player_1->size);
-        blit(player_sprite_2, buffer, 0, 0, player_2->x, player_2->y, player_2->size, player_2->size);
+        masked_stretch_blit(player_sprite_1, buffer, 0, 0, player_sprite_1->w, player_sprite_1->h, player_1->x, player_1->y - 10, player_1->size, player_1->size + 10);
+        masked_stretch_blit(player_sprite_2, buffer, 0, 0, player_sprite_2->w, player_sprite_2->h, player_2->x, player_2->y - 10, player_2->size, player_2->size + 10);
 
         // collisions et mouvements
         check_collision(player_1, maze);
