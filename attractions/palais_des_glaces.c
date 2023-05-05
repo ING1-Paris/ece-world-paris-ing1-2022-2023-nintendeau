@@ -1,3 +1,10 @@
+//! Alfred de Vulpian - Groupe 13 - ECE Paris - 2023
+
+//* Programme du jeu de course dans un labyrinthe (palais des glaces) avec 2 joueurs
+
+//? generation du labyrinthe (taille modulable) avec l'algorithme DFS (Depth First Search)
+//? deplacement et collisions des joueurs
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <allegro.h>
@@ -29,7 +36,7 @@ typedef struct {
 // fonction pour afficher la grille
 void show_grid(Cell *** cell_grid, BITMAP * maze, BITMAP * buffer) {
 
-    // couuleurs
+    // couleurs
     int wall_color = makecol(255, 255, 255);
     int cell_color = makecol(0, 0, 0);
 
@@ -194,9 +201,76 @@ Player * initialiser_joueur() {
     player->previous_x = 0;
     player->previous_y = 0;
     player->speed = 3;
-    player->temps = 0;
 
     return player;
+}
+
+
+// fonction qui gere les collisions de la map
+void check_collision(Player * player, BITMAP * maze) {
+
+    // on récupère les coordonnées précédentes du joueur
+    int x = player->previous_x;
+    int y = player->previous_y;
+
+    // couleur des murs
+    int wall = makecol(255, 255, 255);
+
+    // collisions avec les murs
+    if (getpixel(maze, player->x, player->y) == wall || getpixel(maze, player->x + player->size, player->y) == wall || getpixel(maze, player->x, player->y + player->size) == wall || getpixel(maze, player->x + player->size, player->y + player->size) == wall) {
+        player->x = x;
+        player->y = y;
+    }
+    else {
+        player->previous_x = player->x;
+        player->previous_y = player->y;
+    }
+
+    // collisions avec les bords de la map
+    if (player->x < 0) {
+        player->x = 0;
+    }
+    if (player->y < 0) {
+        player->y = 0;
+    }
+    if (player->x > maze->w - player->size) {
+        player->x = maze->w - player->size;
+    }
+    if (player->y > maze->h - player->size) {
+        player->y = maze->h - player->size;
+    }
+}
+
+
+// fonction pour déplacer les joueurs
+void move_players(Player * player_1, Player * player_2) {
+
+    if (key[KEY_UP]) {
+        player_1->y -= player_1->speed;
+    }
+    if (key[KEY_DOWN]) {
+        player_1->y += player_1->speed;
+    }
+    if (key[KEY_LEFT]) {
+        player_1->x -= player_1->speed;
+    }
+    if (key[KEY_RIGHT]) {
+        player_1->x += player_1->speed;
+    }
+
+    if (key[KEY_W]) {
+        player_2->y -= player_2->speed;
+    }
+    if (key[KEY_S]) {
+        player_2->y += player_2->speed;
+    }
+    if (key[KEY_A]) {
+        player_2->x -= player_2->speed;
+    }
+    if (key[KEY_D]) {
+        player_2->x += player_2->speed;
+    }
+
 }
 
 
@@ -253,7 +327,7 @@ int main() {
     player_1->y = CELL_SIZE/2 - player_1->size;
 
     Player * player_2 = initialiser_joueur();
-    player_2->x = CELL_SIZE/2 - player_2->size;
+    player_2->x = CELL_SIZE/2 - player_1->size;
     player_2->y = CELL_SIZE/2;
 
     // on initialise les BITMAPS
@@ -319,7 +393,6 @@ int main() {
     while (!key[KEY_ESC]) {
         clear(buffer);
 
-        // affichage
         // départ en haut a gauche et arrivée en bas a droite
         rectfill(maze, 2, 2, CELL_SIZE - 2, CELL_SIZE - 2, makecol(100, 200, 100));
         rectfill(maze, SCREEN_H - CELL_SIZE + 2, SCREEN_H - CELL_SIZE + 2, SCREEN_H - 2, SCREEN_H - 2, makecol(100, 100, 200));
@@ -328,11 +401,17 @@ int main() {
         blit(player_sprite_1, buffer, 0, 0, player_1->x, player_1->y, player_1->size, player_1->size);
         blit(player_sprite_2, buffer, 0, 0, player_2->x, player_2->y, player_2->size, player_2->size);
 
+        // collisions et mouvements
+        check_collision(player_1, maze);
+        check_collision(player_2, maze);
+        move_players(player_1, player_2);
+
         // encore affichage
         masked_stretch_blit(titre, buffer, 0, 0, titre->w, titre->h, 810, 10, 380, 50);
         rectfill(buffer, SCREEN_W*2/3, 70, SCREEN_W, 70, makecol(255, 255, 255));
         rectfill(buffer, SCREEN_H, 0, SCREEN_H, SCREEN_H, makecol(255, 255, 255));
         blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
     }
+    free_grid(cell_grid);
     return 0;
 }END_OF_MAIN();
