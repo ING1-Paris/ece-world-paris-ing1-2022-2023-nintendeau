@@ -8,7 +8,7 @@
 int main(int argc, char *argv[])
 {
     srand(time(NULL));
-    int cblanc, crouge, cbleu, cnoir, cvert, cviolet;
+    int cblanc, crouge, cbleu, cvert, cviolet;
     int v7 = 1, vviande = 2,vcoeur = 3;
     int fin;
     int nbrTicket = 5 ;
@@ -63,7 +63,6 @@ int main(int argc, char *argv[])
     cblanc=makecol(255,255,255);
     crouge=makecol(255,0,0);
     cbleu=makecol(0,0,255);
-    cnoir= makecol(0,0,0);
     cvert= makecol(0,255,0);
     cviolet = makecol(163,73,164);
 
@@ -79,13 +78,22 @@ int main(int argc, char *argv[])
 
 
     textprintf_ex(screen,font,589,469,makecol(255,0,0),makecol(200,255,0),"START");
-    textprintf_ex(screen, font, 300, 500, cblanc, -1, "il vous reste %d tickets", nbrTicket);
+    textprintf_ex(screen, font, 300, 550, cblanc, -1, "il vous reste %d tickets", nbrTicket);
+    textprintf_ex(screen, font, 5, 20, cblanc, -1, "Bienvenue au jeu du JACKPOT");
+    textprintf_ex(screen, font, 5, 35, cblanc, -1, "REGLES DU JEU :");
+    textprintf_ex(screen, font, 5, 60, cblanc, -1, "- Cliquez sur START pour jouer !");
+    textprintf_ex(screen, font, 5, 75, cblanc, -1, "- si les 3 images sont");
+    textprintf_ex(screen, font, 5, 85, cblanc, -1, "  identiques vous gagnez");
+    textprintf_ex(screen, font, 5, 95, cblanc, -1, "  3 tickets");
+    textprintf_ex(screen, font, 5, 110, cblanc, -1, "- si les 3 images ne sont");
+    textprintf_ex(screen, font, 5, 120, cblanc, -1, "  pas identiques vous ");
+    textprintf_ex(screen, font, 5, 130, cblanc, -1, "  perdez 1 ticket");
 
     while (!fin) {
 
         if (nbrTicket <= 0) {
-            rectfill(screen, 300, 500, 400, 520, cviolet);
-            textprintf_ex(screen, font, 300, 500, cblanc, -1, "Vous n'avez plus de tickets !");
+            rectfill(screen, 300, 545, 500, 560, cviolet);
+            textprintf_ex(screen, font, 300, 550, cblanc, -1, "Vous n'avez plus de tickets !");
             rest(1000);
             fin = 1;
         }
@@ -145,28 +153,28 @@ int main(int argc, char *argv[])
                     rectfill(screen, 350, 45, 475, 60, cviolet);
                     textprintf_ex(screen,font,350,50,cblanc,-1,"Vous avez gagné");
                     nbrTicket = nbrTicket + 1;
-                    rectfill(screen, 300, 500, 400, 520, cviolet);
-                    textprintf_ex(screen, font, 300, 500, cblanc, -1, "il vous reste %d tickets", nbrTicket); // Affiche le nouveau texte
+                    rectfill(screen, 300, 545, 500, 560, cviolet);
+                    textprintf_ex(screen, font, 300, 550, cblanc, -1, "il vous reste %d tickets", nbrTicket); // Affiche le nouveau texte
 
                 } else if (getpixel(screen, 234, 275) == cbleu && getpixel(screen, 234 + 126, 275) == cbleu && getpixel(screen, 234 + 2*126, 275) == cbleu) {
                     rectfill(screen, 350, 45, 475, 60, cviolet);
                     textprintf_ex(screen,font,350,50,cblanc,-1,"Vous avez gagné");
                     nbrTicket = nbrTicket + 1;
-                    rectfill(screen, 300, 500, 400, 520, cviolet);
-                    textprintf_ex(screen, font, 300, 500, cblanc, -1, "il vous reste %d tickets", nbrTicket); // Affiche le nouveau texte
+                    rectfill(screen, 300, 545, 500, 560, cviolet);
+                    textprintf_ex(screen, font, 300, 550, cblanc, -1, "il vous reste %d tickets", nbrTicket); // Affiche le nouveau texte
 
                 } else if (getpixel(screen, 234, 275) == crouge && getpixel(screen, 234 + 126, 275) == crouge && getpixel(screen, 234 + 2*126, 275) == crouge) {
                     rectfill(screen, 350, 45, 475, 60, cviolet);
                     textprintf_ex(screen,font,350,50,cblanc,-1,"Vous avez gagné");
                     nbrTicket = nbrTicket + 1;
-                    rectfill(screen, 300, 500, 400, 520, cviolet);
-                    textprintf_ex(screen, font, 300, 500, cblanc, -1, "il vous reste %d tickets", nbrTicket); // Affiche le nouveau texte
+                    rectfill(screen, 300, 545, 500, 560, cviolet);
+                    textprintf_ex(screen, font, 300, 550, cblanc, -1, "il vous reste %d tickets", nbrTicket); // Affiche le nouveau texte
 
                 } else {
                     rectfill(screen, 350, 45, 475, 60, cviolet);
                     textprintf_ex(screen,font,350,50,cblanc,-1,"Vous avez perdu");
-                    rectfill(screen, 300, 500, 500, 520, cviolet);
-                    textprintf_ex(screen, font, 300, 500, cblanc, -1, "il vous reste %d tickets", nbrTicket); // Affiche le nouveau texte
+                    rectfill(screen, 300, 545, 500, 560, cviolet);
+                    textprintf_ex(screen, font, 300, 550, cblanc, -1, "il vous reste %d tickets", nbrTicket); // Affiche le nouveau texte
 
                 }
             }
