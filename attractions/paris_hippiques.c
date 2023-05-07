@@ -220,6 +220,8 @@ int main() {
     destroy_bitmap(background);
     destroy_bitmap(sprite1);
     destroy_bitmap(sprite2);
+    destroy_bitmap(sprite3);
+    destroy_bitmap(sprite4);
 
     return 0;
 }END_OF_MAIN();
