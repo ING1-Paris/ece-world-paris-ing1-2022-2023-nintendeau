@@ -100,7 +100,7 @@ void lib_memoire(snake *head, food *food) { //¤Fonction pour libérer la mémoi
 }
 
 //!Fonctions relatives au serpent et appelées souvent
-void add_block(snake *head) { //¤ On ajoute un bloc au serpent
+void add_block(snake *head) {
     snake *current_block = head;
     while (current_block->next != NULL) {
         current_block = current_block->next;
@@ -114,7 +114,7 @@ void add_block(snake *head) { //¤ On ajoute un bloc au serpent
     current_block->next = new_block;
 }
 
-void move_snake(snake *head){ //¤ On bouge tout le serpent
+void move_snake(snake *head){ // On bouge chaque bloc du serpent en fonction de la direction du bloc qui le précède
     int previous_pos_x = head->x;
     int previous_pos_y = head->y;
     //Déplacement du serpent 1
@@ -145,15 +145,15 @@ void move_snake(snake *head){ //¤ On bouge tout le serpent
 }
 
 int collision_mort(snake *head1, snake *head2){ //¤ On vérifie si le serpent sort de l'écran ou se mord la queue ou mord l'autre serpent
-    int game_over = 0;
+    int looser = 0;
     //vérifier si le serpent sort de l'écran
     if (head1->x < 0 || head1->x >= SCREEN_WIDTH || head1->y < 0 || head1->y >= SCREEN_HEIGHT) {
         printf("Game Over ! Le serpent 1 a perdu !\n");
-        game_over = 1;
+        looser = 1;
     }
     if (head2->x < 0 || head2->x >= SCREEN_WIDTH || head2->y < 0 || head2->y >= SCREEN_HEIGHT) {
         printf("Game Over ! Le serpent 2 a perdu !\n");
-        game_over = 1;
+        looser = 1;
     }
 
     //vérifier si le serpent se mord la queue
@@ -162,7 +162,7 @@ int collision_mort(snake *head1, snake *head2){ //¤ On vérifie si le serpent s
     while (current_block != NULL) {
         if (head1->x == current_block->x && head1->y == current_block->y) {
             printf("Game Over ! first player ate himself !\n");
-            game_over = 1;
+            looser = 1;
         }
         current_block = current_block->next;
     }
@@ -171,7 +171,7 @@ int collision_mort(snake *head1, snake *head2){ //¤ On vérifie si le serpent s
     while (current_block != NULL) {
         if (head2->x == current_block->x && head2->y == current_block->y) {
             printf("Game Over ! second player ate himself !\n");
-            game_over = 1;
+            looser = 1;
         }
         current_block = current_block->next;
     }
@@ -181,7 +181,7 @@ int collision_mort(snake *head1, snake *head2){ //¤ On vérifie si le serpent s
     while (current_block != NULL) {
         if (head1->x == current_block->x && head1->y == current_block->y) {
             printf("Game Over ! first player ate second player !\n");
-            game_over = 1;
+            looser = 1;
         }
         current_block = current_block->next;
     }
@@ -190,18 +190,20 @@ int collision_mort(snake *head1, snake *head2){ //¤ On vérifie si le serpent s
     while (current_block != NULL) {
         if (head2->x == current_block->x && head2->y == current_block->y) {
             printf("Game Over ! second player ate first player !\n");
-            game_over = 1;
+            looser = 1;
         }
         current_block = current_block->next;
     }
 
-    return game_over;
+    return looser;
 }
 
 int collision_food(snake *head, food *food) { //¤ On vérifie si le serpent mange la nourriture
     if (head->x <= food->x + BLOCK_SIZE && food->x <= head->x + BLOCK_SIZE && head->y <= food->y + BLOCK_SIZE && food->y <= head->y + BLOCK_SIZE) {
         init_food(food);
-        return true;
+        return 1;
+    }else{
+        return 0;
     }
 }
 
@@ -213,7 +215,6 @@ int main(int argc, char *argv[]){
     int game_over = 0;
     int score1 = 0;
     int score2 = 0;
-    //serpent1 en rouge et serpent2 en bleu
     int color1 = makecol(255, 0, 0);
     int color2 = makecol(0, 0, 255);
 
@@ -234,6 +235,7 @@ int main(int argc, char *argv[]){
         clear_to_color(screen, makecol(0, 0, 0));
         textprintf_ex(screen, font, 10, 10, makecol(255, 255, 255), -1, "Score : %d", score1);
         rectfill(screen, food1->x, food1->y, food1->x + BLOCK_SIZE, food1->y + BLOCK_SIZE, makecol(0, 255, 0));
+        rectfill(screen, food2->x, food2->y, food2->x + BLOCK_SIZE, food2->y + BLOCK_SIZE, makecol(0, 255, 0));
         draw_snake(head1, color1);
         draw_snake(head2, color2);
 
@@ -269,16 +271,22 @@ int main(int argc, char *argv[]){
         move_snake(head2);
 
         //Gestion des collisions : si le serpent sort de l'écran, si le serpent se touche lui-même ou si la tête du serpent touche le corps du serpent
-        if (collision_mort(head1, head2)) {
+        int looser = collision_mort(head1, head2);
+        if (looser != 0) {
+            if (looser == 1) {
+                printf("Game Over ! first player loosed !\n");
+            }else{
+                printf("Game Over ! second player loosed !\n");
+            }
             game_over = 1;
         }
 
         //Gestion des collisions avec la nourriture
-        if (!collision_food(head1, food1) || !collision_food(head1, food2)){
+        if (collision_food(head1, food1) || collision_food(head1, food2)){
             score1++;
             add_block(head1);
         }
-        if (!collision_food(head2, food1) || !collision_food(head2, food2)){
+        if (collision_food(head2, food1) || collision_food(head2, food2)){
             score2++;
             add_block(head2);
         }
