@@ -130,55 +130,97 @@ void choix_cheval() {
     }
 }
 
+#include <allegro.h>
+#include <stdlib.h>
 
+#define SCREEN_W 1500
+#define SCREEN_H 700
 
 int main() {
     //initialisation d'Allegro
     allegro_init();
     install_keyboard();
-    set_color_depth(16);
+    set_color_depth(32);
     set_gfx_mode(GFX_AUTODETECT_WINDOWED, SCREEN_W, SCREEN_H, 0, 0);
 
     //chargement des bitmaps
-    BITMAP* background = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\coursefinal.bmp", NULL);
-    BITMAP* sprite1 = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\applejack1.bmp", NULL);
-    BITMAP* sprite2 = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\purplewave1.bmp", NULL);
-    BITMAP *sprite3 = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\rainbowdash1.bmp", NULL);
-    BITMAP *sprite4 = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\purseypink1.bmp", NULL);
+    int compteur = 0;
+    int anim = 0;
 
-
+    BITMAP* background = load_bitmap("../images/coursefinal.bmp", NULL);
+    BITMAP*page = create_bitmap(SCREEN_W, SCREEN_H);
+    BITMAP* sprite1[3];
+    sprite1[0] = load_bitmap("../images/applejack1.bmp", NULL);
+    sprite1[1] = load_bitmap("../images/applejack2.bmp", NULL);
+    sprite1[2] = load_bitmap("../images/applejack3.bmp", NULL);
+    if (!sprite1[0] || !sprite1[1] || !sprite1[2]) {
+        allegro_message("Erreur lors du chargement des sprites");
+        exit(EXIT_FAILURE);
+    }
+    BITMAP *sprite2[3];
+    sprite2[0] = load_bitmap("../images/rainbowdash1.bmp", NULL);
+    sprite2[1] = load_bitmap("../images/rainbowdash2.bmp", NULL);
+    sprite2[2] = load_bitmap("../images/rainbowdash3.bmp", NULL);
+    if (!sprite2[0] || !sprite2[1] || !sprite2[2]) {
+        allegro_message("Erreur lors du chargement des sprites 1");
+        exit(EXIT_FAILURE);
+    }
+    BITMAP *sprite3[3];
+    sprite3[0] = load_bitmap("../images/purseypink1.bmp", NULL);
+    sprite3[1] = load_bitmap("../images/purseypink2.bmp", NULL);
+    sprite3[2] = load_bitmap("../images/purseypink3.bmp", NULL);
+    if (!sprite3[0] || !sprite3[1] || !sprite3[2]) {
+        allegro_message("Erreur lors du chargement des sprites 2");
+        exit(EXIT_FAILURE);
+    }
+    BITMAP *sprite4[3];
+    sprite4[0] = load_bitmap("../images/purplewave1.bmp", NULL);
+    sprite4[1] = load_bitmap("../images/purplewave2.bmp", NULL);
+    sprite4[2] = load_bitmap("../images/purplewave3.bmp", NULL);
+    if (!sprite4[0] || !sprite4[1] || !sprite4[2]) {
+        allegro_message("Erreur lors du chargement des sprites 3");
+        exit(EXIT_FAILURE);
+    }
     //initialisation des variables de position et de vitesse pour chaque sprite
-    int x1 = 99, y1 = 580, speed1 = rand() % 10 + 1;
-    int x2 = 99, y2 = 550, speed2 = rand() % 10 + 1;
-    int x3 = 99, y3 = 520, speed3 = rand() % 10 + 1;
-    int x4 = 99, y4 = 490, speed4 = rand() % 10 + 1;
+    int x1 = 99, y1 = 580, speed1 = rand() % 5 + 1;
+    int x2 = 99, y2 = 550, speed2 = rand() % 5 + 1;
+    int x3 = 99, y3 = 520, speed3 = rand() % 5 + 1;
+    int x4 = 99, y4 = 490, speed4 = rand() % 5 + 1;
 
-
-
-    // Boucle de jeu
+    //boucle de jeu
     while (!key[KEY_ESC]) {
+        compteur++;
+        if(compteur % 4==0){ //changer d'image toutes les 4 frames (pour ralentir l'animation)
+            //changer d'image
+            anim++;
+            if (anim > 2)
+                anim = 0;
+        }
         //si toutes les vitesses sont égales, on relance le random pour tous les sprites
         if(speed4 == speed3 && speed3 == speed2 && speed2 == speed1){
-            speed4 = rand() % 10 + 1;
-            speed3 = rand() % 10 + 1;
-            speed2 = rand() % 10 + 1;
-            speed1 = rand() % 10 + 1;
+            speed4 = rand() % 5 + 1;
+            speed3 = rand() % 5 + 1;
+            speed2 = rand() % 5 + 1;
+            speed1 = rand() % 5 + 1;
         }
-        //un meme sprite ne peut pas avoir la meme vitesse que lors du tour précédent
-        if(speed4 == speed3 || speed4 == speed2 || speed4 == speed1){
-            speed2 = rand() % 10 + 1;
+
+        if(speed4 == speed1){
+            speed1 = rand() % 5 + 1;
         }
-        if(speed3 == speed2 || speed3 == speed1){
-            speed3 = rand() % 10 + 1;
+        if(speed3 == speed2){
+            speed3 = rand() % 5 + 1;
         }
         if(speed2 == speed1){
-            speed2 = rand() % 10 + 1;
+            speed2 = rand() % 5 + 1;
+        }
+        if (speed2 == speed4){
+            speed4 = rand() % 5 + 1;
         }
 
         // Affichage du fond
-        blit(background, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-        line(screen, 100, 530, 100, 703, makecol(255, 255, 0));
-        line(screen, 1400, 530, 1400, 703, makecol(50, 0, 50));
+        blit(background, page, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+        line(page, 100, 530, 100, 703, makecol(255, 255, 0));
+        line(page, 1400, 530, 1400, 703, makecol(50, 0, 50));
 
 
         // Déplacement du sprite 1
@@ -187,7 +229,7 @@ int main() {
             allegro_message("Le sprite 1 a gagné !");
             break;
         }
-        draw_sprite(screen, sprite1, x1, y1);
+        draw_sprite(page, sprite1[anim], x1, y1);
 
         // Déplacement du sprite 2
         x2 += speed2;
@@ -195,7 +237,7 @@ int main() {
             allegro_message("Le sprite 2 a gagné !");
             break;
         }
-        draw_sprite(screen, sprite2, x2, y2);
+        draw_sprite(page, sprite2[anim], x2, y2);
 
         // Déplacement du sprite 3
         x3 += speed3;
@@ -203,7 +245,7 @@ int main() {
             allegro_message("Le sprite 3 a gagné !");
             break;
         }
-        draw_sprite(screen, sprite3, x3, y3);
+        draw_sprite(page, sprite3[anim], x3, y3);
 
         // Déplacement du sprite 4
         x4 += speed4;
@@ -211,17 +253,15 @@ int main() {
             allegro_message("Le sprite 4 a gagné !");
             break;
         }
-        draw_sprite(screen, sprite4, x4, y4);
-
+        draw_sprite(page, sprite4[anim], x4, y4);
+        blit(page, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 
     }
 
     // Libération de la mémoire allouée aux bitmaps
     destroy_bitmap(background);
-    destroy_bitmap(sprite1);
-    destroy_bitmap(sprite2);
-    destroy_bitmap(sprite3);
-    destroy_bitmap(sprite4);
+    //destroy_bitmap(sprite1);
+    //destroy_bitmap(sprite2);
 
     return 0;
 }END_OF_MAIN();
