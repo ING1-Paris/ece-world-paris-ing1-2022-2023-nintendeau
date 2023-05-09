@@ -38,7 +38,7 @@ void show_grid(Cell *** cell_grid, BITMAP * maze, BITMAP * buffer) {
 
     // couleurs
     int wall_color = makecol(255, 255, 255);
-    int cell_color = makecol(0, 0, 0);
+    int cell_color = makecol(50, 50, 50);
 
     // afficher les murs et les cases
     for (int i = 0; i < SIZE; i++) {
@@ -374,25 +374,29 @@ int main() {
 
         current_cell->visite = 1;
         Cell * next_cell = check_neighbours(current_cell, cell_grid);
+
         if (next_cell) {
+
             next_cell->visite = 1;
             // afficher la cellule courante en rouge en inversant x et y
             stack[stack_size] = current_cell;
             stack_size++;
-            rectfill(maze, current_cell->y * CELL_SIZE + 2, current_cell->x * CELL_SIZE + 2, current_cell->y * CELL_SIZE + CELL_SIZE - 2, current_cell->x * CELL_SIZE + CELL_SIZE - 2, makecol(0, 0, 0));
+            rectfill(maze, current_cell->y * CELL_SIZE + 2, current_cell->x * CELL_SIZE + 2, current_cell->y * CELL_SIZE + CELL_SIZE - 2, current_cell->x * CELL_SIZE + CELL_SIZE - 2, makecol(50, 50, 50));
             remove_wall(current_cell, next_cell);
             current_cell = next_cell;
             rectfill(maze, next_cell->y * CELL_SIZE + 2, next_cell->x * CELL_SIZE + 2, next_cell->y * CELL_SIZE + CELL_SIZE - 2, next_cell->x * CELL_SIZE + CELL_SIZE - 2, makecol(255, 0, 0));
 
         }
+
         else if (stack_size > 0) {
             stack_size--;
-            rectfill(maze, current_cell->y * CELL_SIZE + 2, current_cell->x * CELL_SIZE + 2, current_cell->y * CELL_SIZE + CELL_SIZE - 2, current_cell->x * CELL_SIZE + CELL_SIZE - 2, makecol(0, 0, 0));
+            rectfill(maze, current_cell->y * CELL_SIZE + 2, current_cell->x * CELL_SIZE + 2, current_cell->y * CELL_SIZE + CELL_SIZE - 2, current_cell->x * CELL_SIZE + CELL_SIZE - 2, makecol(50, 50, 50));
             current_cell = stack[stack_size];
             rectfill(maze, current_cell->y * CELL_SIZE + 2, current_cell->x * CELL_SIZE + 2, current_cell->y * CELL_SIZE + CELL_SIZE - 2, current_cell->x * CELL_SIZE + CELL_SIZE - 2, makecol(255, 0, 0));
         }
+
         show_grid(cell_grid, maze, buffer);
-        rectfill(maze, current_cell->y * CELL_SIZE + 2, current_cell->x * CELL_SIZE + 2, current_cell->y * CELL_SIZE + CELL_SIZE - 2, current_cell->x * CELL_SIZE + CELL_SIZE - 2, makecol(0, 0, 0));
+        rectfill(maze, current_cell->y * CELL_SIZE + 2, current_cell->x * CELL_SIZE + 2, current_cell->y * CELL_SIZE + CELL_SIZE - 2, current_cell->x * CELL_SIZE + CELL_SIZE - 2, makecol(50, 50, 50));
         rest(10);
     }
 

@@ -2,14 +2,15 @@
 #include <allegro.h>
 #include <time.h>
 
-#define MAX_INTERVALLE 40
+#define BPM 60
+#define MAX_INTERVALLE 2 * BPM // (1 bpm = 2 temps)
 #define NB_CORDES 4
 
 
 typedef struct {
     int temps;
-    int tickets;
     int life;
+    int id;
 } Player;
 
 
@@ -25,6 +26,7 @@ typedef struct {
 
 // afficher le temps de jeu et le nombre de vies restantes
 void afficher_stats(Player * player, BITMAP * buffer, int duration) {
+    textprintf_ex(buffer, font, 10, 10, makecol(255, 255, 255), -1, "player : %d", player->id);
     textprintf_ex(buffer, font, 10, 30, makecol(255, 255, 255), -1, "life : %d", player->life);
     textprintf_ex(buffer, font, 10, 50, makecol(255, 255, 255), -1, "duration : %d s", duration);
 }
@@ -56,6 +58,14 @@ void afficher_final_screen(int duration, BITMAP * buffer, BITMAP * game_over) {
 }
 
 
+Player * creer_player (int id) {
+    Player * player = malloc(sizeof(Player));
+    player->id = id;
+    player->life = 10;
+    player->temps = 0;
+    return player;
+}
+
 // déterminer le vainqueur
 int victory (int temps_1, int temps_2) {
     return (temps_1 > temps_2) ? 1 : (temps_2 > temps_1) ? 2 : 0;
@@ -85,6 +95,7 @@ void afficher(BITMAP * buffer, BITMAP * stage, int positions[4], int couleurs[4]
     blit(stage, buffer, 0, 0, SCREEN_W/3, 0, SCREEN_W, SCREEN_H);
     rectfill(buffer, SCREEN_W*2/3, 0, SCREEN_W*2/3 + 2, SCREEN_H, makecol(0, 0, 0));
     rectfill(buffer, SCREEN_W/3, 0, SCREEN_W/3 - 2, SCREEN_H, makecol(0, 0, 0));
+    rectfill(buffer, 0, 70, SCREEN_W/3, 71, makecol(255, 255, 255));
 }
 
 // fonction pour afficher les cordes
@@ -123,7 +134,7 @@ void free_memory(BITMAP * buffer, BITMAP * stage, BITMAP * logo, BITMAP * backgr
 Note * allouer_note(Note * note, int x, int color) {
     note->x = x;
     note->y = 0;
-    note->y_speed = 7;
+    note->y_speed = 4;
     note->color = color;
     note->alive = 1;
     note->next = NULL;
@@ -131,12 +142,32 @@ Note * allouer_note(Note * note, int x, int color) {
 }
 
 
+void play_guitar(Note * note, int positions[4], SAMPLE * music) {
+    if (key[KEY_D] && note->x == positions[0])
+        play_sample(music,255, 128, positions[0] * 5, 1);
+
+    if (key[KEY_F] && note->x == positions[1])
+        play_sample(music,255, 128, positions[1] * 5, 1);
+
+    if (key[KEY_J] && note->x == positions[2])
+        play_sample(music,255, 128, positions[2] * 5, 1);
+
+    if (key[KEY_K] && note->x == positions[3])
+        play_sample(music,255, 128, positions[3] * 5, 1);
+}
+
+
+int guitar_hero() {
+    return 1;
+}
+
 int main() {
 
     allegro_init();
     install_mouse();
     install_keyboard();
     install_timer();
+    install_sound(DIGI_AUTODETECT, MIDI_AUTODETECT, NULL);
     set_window_title("GUITAR HERO");
 
     set_color_depth(desktop_color_depth());
@@ -148,31 +179,25 @@ int main() {
 
     srand(time(NULL));
 
-
     // initialisation des joueurs
-    Player * player_1 = malloc(sizeof(Player));
-    player_1->temps = 0;
-    player_1->tickets = 5;
-    player_1->life = 10;
+    Player * player_1 = creer_player(1);
 
-    Player * player_2 = malloc(sizeof(Player));
-    player_2->temps = 0;
-    player_2->tickets = 5;
-    player_2->life = 10;
+    Player * player_2 = creer_player(2);
 
     Player * player = player_1;
 
-    // initialisation des bitmaps
+    // initialisation et chargement des bitmaps
     BITMAP * buffer = create_bitmap(SCREEN_W, SCREEN_H);
     BITMAP * stage = create_bitmap(SCREEN_W/3, SCREEN_H);
-    BITMAP * background = load_bitmap("../assets/background.bmp", NULL);
-    BITMAP * logo = load_bitmap("../assets/logo.bmp", NULL);
-    BITMAP * game_over = load_bitmap("../assets/game_over.bmp", NULL);
+
+    BITMAP * background = load_bitmap("../assets/guitar_hero/background.bmp", NULL);
+    BITMAP * logo = load_bitmap("../assets/guitar_hero/logo.bmp", NULL);
+    BITMAP * game_over = load_bitmap("../assets/guitar_hero/game_over.bmp", NULL);
 
     if (!logo || !background || !game_over) {
-        game_over = load_bitmap("assets\\game_over.bmp", NULL);
-        logo = load_bitmap("assets\\logo.bmp", NULL);
-        background = load_bitmap("assets\\background.bmp", NULL);
+        game_over = load_bitmap("assets\\guitar_hero\\game_over.bmp", NULL);
+        logo = load_bitmap("assets\\guitar_hero\\logo.bmp", NULL);
+        background = load_bitmap("assets\\guitar_hero\\background.bmp", NULL);
         if (!logo || !background || !game_over) {
             allegro_message("IMAGE ERROR");
             allegro_exit();
@@ -180,6 +205,19 @@ int main() {
         }
     }
 
+
+    // charger le son
+    SAMPLE * music = load_sample("../sounds/guitar.wav");
+    if (!music) {
+        music = load_sample("sounds\\guitar.wav");
+        if (!music) {
+            allegro_message("SOUND ERROR");
+            allegro_exit();
+        }
+    }
+
+
+    // variables
     int frame_counter = 0;
     int intervalle = MAX_INTERVALLE;
     int liste_boutons[4] = {0};
@@ -203,10 +241,7 @@ int main() {
         clear_to_color(stage, makecol(41, 33, 30));
         masked_stretch_blit(background, buffer, 0, 0, background->w, background->h, 0, 200, SCREEN_W/3 - 1, SCREEN_H - 200);
         stretch_blit(logo, buffer, 0, 0, logo->w, logo->h, SCREEN_W*2/3, 0, SCREEN_W/3, SCREEN_H);
-
         afficher_cordes(stage, positions, couleurs);
-
-        show_mouse(screen);
 
         // on initialise la nouvelle note
         Note * nouvelle_note = malloc(sizeof(Note));
@@ -244,6 +279,8 @@ int main() {
                         if (key[KEY_D] != liste_boutons[0] || key[KEY_F] != liste_boutons[1] || key[KEY_J] != liste_boutons[2] || key[KEY_K] != liste_boutons[3]) {
                             current->alive = 0;
                         }
+
+                        play_guitar(current, positions, music);
                     }
                 }
                 // sinon si la touche dépasse la zone, on la supprime et on enlève une vie
@@ -289,6 +326,7 @@ int main() {
             // on passe au joueur suivant, on réinitialise le temps et on vide la liste chainée
             if (player == player_1) {
                 player_1 = player;
+
                 player = player_2;
                 time(&start_time);
                 ancre->next = NULL;
@@ -297,6 +335,7 @@ int main() {
                 // si le joueur 2 a joué, on affiche l'écran de fin
             else {
                 player_2 = player;
+                player_2->id = 2;
                 int gagnant = victory(player_1->temps, player_2->temps);
                 fin_partie(buffer, gagnant);
             }
@@ -314,6 +353,8 @@ int main() {
 
     // on libère la memoire allouée
     free_memory(buffer, stage, logo, background, game_over, player_1, player_2, player, ancre);
+    destroy_sample(music);
+    allegro_exit();
 
     return 0;
 }END_OF_MAIN();
