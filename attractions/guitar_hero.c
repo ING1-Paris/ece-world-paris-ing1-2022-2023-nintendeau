@@ -2,7 +2,7 @@
 #include <allegro.h>
 #include <time.h>
 
-#define BPM 60
+#define BPM 30
 #define MAX_INTERVALLE 2 * BPM // (1 bpm = 2 temps)
 #define NB_CORDES 4
 
@@ -161,7 +161,7 @@ int guitar_hero() {
     return 1;
 }
 
-int main() {
+void guitar_hero() {
 
     allegro_init();
     install_mouse();
@@ -272,7 +272,7 @@ int main() {
                 // on l'affiche
                 afficher_note(stage, current);
                 // si la note est dans la zone de pression
-                if (current->y <= SCREEN_H - 78 && current->y >= SCREEN_H - 122) {
+                if (current->y <= SCREEN_H - 70 && current->y >= SCREEN_H - 130) {
                     // si la touche correspondante est pressée
                     if (key[KEY_D] && current->x == positions[0] || key[KEY_F] && current->x == positions[1] || key[KEY_J] && current->x == positions[2] || key[KEY_K] && current->x == positions[3]) {
                         // si la touche n'a pas déjà été pressée a la frame précédente, onn supprime la note
@@ -355,6 +355,12 @@ int main() {
     free_memory(buffer, stage, logo, background, game_over, player_1, player_2, player, ancre);
     destroy_sample(music);
     allegro_exit();
+}
+
+/*
+int main() {
+
+    guitar_hero();
 
     return 0;
-}END_OF_MAIN();
+}*/
