@@ -29,10 +29,10 @@
 #include <stdbool.h>
 
 //* Constantes pour la taille des blocs et de l'écran
-#define BLOCK_SIZE 10
+#define BLOCK_SIZE 20
 #define SPEED 1
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
+#define SCREEN_WIDTH 1200
+#define SCREEN_HEIGHT 800
 
 
 //* Structures pour les blocs du serpent et la nourriture
@@ -48,7 +48,7 @@ typedef struct food {
     int y;
 } food;
 
-//*Fonctions d'initialisation appeléesa
+//*Fonctions d'initialisation
 void init_allegro(){ //¤Initialisation des serpents (direction aléatoire)
     //Initialisation de la seed pour les nombres aléatoires
     srand(time(NULL));
@@ -69,26 +69,18 @@ void init_snake(snake *head, int x, int y) { //¤Initialisation de la nourriture
     head->x = x;
     head->y = y;
     head->direction = rand() % 4; //direction aléatoire
-    head->previous_pos_x = x;
-    head->previous_pos_y = y;
+    head->previous_pos_x = -30;
+    head->previous_pos_y = -30;
     head->is_head = true;
     head->next = NULL;
 } 
     
 void init_food(food *food) { //¤Affichage du serpent à partir de la tête
-    food->x = rand() % (SCREEN_WIDTH - BLOCK_SIZE);
+    food->x = rand() % (SCREEN_HEIGHT - BLOCK_SIZE);
     food->y = rand() % (SCREEN_HEIGHT - BLOCK_SIZE);
 }
     
-void draw_snake(snake *head, int color) { //¤Fonction pour libérer la mémoire
-    snake *current_block = head;
-    while (current_block != NULL) {
-        rectfill(screen, current_block->x, current_block->y, current_block->x + BLOCK_SIZE, current_block->y + BLOCK_SIZE, color);
-        current_block = current_block->next;
-    }
-}
-    
-void lib_memoire(snake *head, food *food) { //¤Fonction pour libérer la mémoire
+void lib_memoire(snake *head, food *Food, snake *head2, food *Food2, BITMAP *game, BITMAP *buffer) { //¤Fonction pour libérer la mémoire
     snake *current_block = head;
     snake *next_block = head->next;
     while (current_block != NULL) {
@@ -96,10 +88,28 @@ void lib_memoire(snake *head, food *food) { //¤Fonction pour libérer la mémoi
         free(current_block);
         current_block = next_block;
     }
-    free(food);
+    current_block = head2;
+    next_block = head2->next;
+    while (current_block != NULL) {
+        next_block = current_block->next;
+        free(current_block);
+        current_block = next_block;
+    }
+    free(Food);
+    free(Food2);
+    clear_bitmap(game);
+    clear_bitmap(buffer);
 }
 
 //!Fonctions relatives au serpent et appelées souvent
+void draw_snake(snake *head, int color, BITMAP *game) { //¤Fonction pour libérer la mémoire
+    snake *current_block = head;
+    while (current_block != NULL) {
+        rectfill(game, current_block->x, current_block->y, current_block->x + BLOCK_SIZE, current_block->y + BLOCK_SIZE, color);
+        current_block = current_block->next;
+    }
+}
+
 void add_block(snake *head) {
     snake *current_block = head;
     while (current_block->next != NULL) {
@@ -147,11 +157,11 @@ void move_snake(snake *head){ // On bouge chaque bloc du serpent en fonction de 
 int collision_mort(snake *head1, snake *head2){ //¤ On vérifie si le serpent sort de l'écran ou se mord la queue ou mord l'autre serpent
     int looser = 0;
     //vérifier si le serpent sort de l'écran
-    if (head1->x < 0 || head1->x >= SCREEN_WIDTH || head1->y < 0 || head1->y >= SCREEN_HEIGHT) {
+    if (head1->x < 0 || head1->x >= SCREEN_HEIGHT || head1->y < 0 || head1->y >= SCREEN_HEIGHT) {
         printf("Game Over ! Le serpent 1 a perdu !\n");
         looser = 1;
     }
-    if (head2->x < 0 || head2->x >= SCREEN_WIDTH || head2->y < 0 || head2->y >= SCREEN_HEIGHT) {
+    if (head2->x < 0 || head2->x >= SCREEN_HEIGHT || head2->y < 0 || head2->y >= SCREEN_HEIGHT) {
         printf("Game Over ! Le serpent 2 a perdu !\n");
         looser = 1;
     }
@@ -179,7 +189,7 @@ int collision_mort(snake *head1, snake *head2){ //¤ On vérifie si le serpent s
     //collisions entre les deux serpents : si la tête du serpent 1 touche le corps du serpent 2 ou inversement
     current_block = head2;
     while (current_block != NULL) {
-        if (head1->x == current_block->x && head1->y == current_block->y) {
+        if (head1->x <= current_block->x + BLOCK_SIZE && current_block->x <= head1->x + BLOCK_SIZE && head1->y <= current_block->y + BLOCK_SIZE && current_block->y <= head1->y + BLOCK_SIZE) {
             printf("Game Over ! first player ate second player !\n");
             looser = 1;
         }
@@ -188,7 +198,7 @@ int collision_mort(snake *head1, snake *head2){ //¤ On vérifie si le serpent s
 
     current_block = head1;
     while (current_block != NULL) {
-        if (head2->x == current_block->x && head2->y == current_block->y) {
+        if (head2->x <= current_block->x + BLOCK_SIZE && current_block->x <= head2->x + BLOCK_SIZE && head2->y <= current_block->y + BLOCK_SIZE && current_block->y <= head2->y + BLOCK_SIZE) {
             printf("Game Over ! second player ate first player !\n");
             looser = 1;
         }
@@ -211,18 +221,39 @@ int collision_food(snake *head, food *food) { //¤ On vérifie si le serpent man
 
 int main(int argc, char *argv[]){
     init_allegro();
+    BITMAP *buffer = create_bitmap(SCREEN_WIDTH, SCREEN_HEIGHT); //buffer est la fenêtre où on affiche tous les texte et autres 
+    BITMAP *game = create_bitmap(SCREEN_HEIGHT, SCREEN_HEIGHT); //game is a square 
+
+    BITMAP * logo_img = load_bitmap("../assets/snake/logo.bmp", NULL);
+    BITMAP * game_over_img = load_bitmap("../assets/snake/game_over.bmp", NULL);
+
+    if (!logo_img || !game_over_img) {
+        game_over_img = load_bitmap("assets\\snake\\game_over.bmp", NULL);
+        logo_img = load_bitmap("assets\\snake\\logo.bmp", NULL);
+        if (!logo_img || !game_over_img) {
+            allegro_message("IMAGE ERROR");
+            allegro_exit();
+            exit(EXIT_FAILURE);
+        }
+    }
+
+
+    
     //?Initialisation des variables 
     int game_over = 0;
     int score1 = 0;
     int score2 = 0;
     int color1 = makecol(255, 0, 0);
     int color2 = makecol(0, 0, 255);
+    int buffer_color = makecol(0x47, 0xE1, 0x0C);
+    int game_color = makecol(0, 0, 0);
+    int food_colour = makecol(71, 225, 12);
 
     //?Initialisation du serpent 1 (ses caractéristiques sont dans la fonction init_snake : position, direction, prochain bloc et si c'est la tête) et la nourriture et de sa position (seule caractéristique)
     snake *head1 = malloc(sizeof(snake));
     snake *head2 = malloc(sizeof(snake));
-    init_snake(head1, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-    init_snake(head2, SCREEN_WIDTH / 3, SCREEN_HEIGHT /3);
+    init_snake(head1, SCREEN_HEIGHT / 2, SCREEN_HEIGHT / 2);
+    init_snake(head2, SCREEN_HEIGHT / 3, SCREEN_HEIGHT /3);
     food *food1 = malloc(sizeof(food));
     food *food2 = malloc(sizeof(food));
     init_food(food1);
@@ -232,43 +263,54 @@ int main(int argc, char *argv[]){
     //Boucle principale
     while(!key[KEY_ESC] && !game_over){
         //Effacement de l'écran (actualisation) et de affichage de la nourriture et du score
-        clear_to_color(screen, makecol(0, 0, 0));
-        textprintf_ex(screen, font, 10, 10, makecol(255, 255, 255), -1, "Score : %d", score1);
-        rectfill(screen, food1->x, food1->y, food1->x + BLOCK_SIZE, food1->y + BLOCK_SIZE, makecol(0, 255, 0));
-        rectfill(screen, food2->x, food2->y, food2->x + BLOCK_SIZE, food2->y + BLOCK_SIZE, makecol(0, 255, 0));
-        draw_snake(head1, color1);
-        draw_snake(head2, color2);
+        clear_to_color(game, game_color);
+        clear_to_color(buffer, buffer_color);
+        //print logo on buffer on the far-right, a bit reduced with masked_stretch_blit
+        masked_stretch_blit(logo_img, buffer, 0, 0, logo_img->w, logo_img->h, SCREEN_HEIGHT + 20, 20, logo_img->w / 2, logo_img->h / 2);
+        //masked_blit(logo_img, buffer, 0, 0, SCREEN_HEIGHT - 100, 0, logo_img->w, logo_img->h);
+        textprintf_ex(buffer, font, SCREEN_HEIGHT + 10, 40, makecol(0,0,0), -1, "Score Joueur 1 : %d", score1);
+        textprintf_ex(buffer, font, SCREEN_HEIGHT + 10, 60, makecol(0,0,0), -1, "Score Joueur 2 : %d", score2);
+        rectfill(game, food1->x, food1->y, food1->x + BLOCK_SIZE, food1->y + BLOCK_SIZE, food_colour);
+        rectfill(game, food2->x, food2->y, food2->x + BLOCK_SIZE, food2->y + BLOCK_SIZE, food_colour);
+        draw_snake(head1, color1, game);
+        draw_snake(head2, color2, game);
 
-        //Déplacement du serpent 1 en fonction de la direction (0 = haut, 1 = droite, 2 = bas, 3 = gauche, pas de demi-tour possible)
+        //Déplacement du serpent 1 en fonction de la direction (0 = haut, 1 = droite, 2 = bas, d3 = gauche, pas de demi-tour possible)
+        //move snake 1 with arrows
         if (key[KEY_UP] && head1->direction != 2) {
             head1->direction = 0;
-        }
-        if (key[KEY_RIGHT] && head1->direction != 3) {
-            head1->direction = 1;
-        }
-        if (key[KEY_DOWN] && head1->direction != 0) {
-            head1->direction = 2;
         }
         if (key[KEY_LEFT] && head1->direction != 1) {
             head1->direction = 3;
         }
-
+        if (key[KEY_DOWN] && head1->direction != 0) {
+            head1->direction = 2;
+        }
+        if (key[KEY_RIGHT] && head1->direction != 3) {
+            head1->direction = 1;
+        }
+        
+        //move snake 2 with ZQSD (azerty keyboard)
         if (key[KEY_W] && head2->direction != 2) {
             head2->direction = 0;
-        }
-        if (key[KEY_D] && head2->direction != 3) {
-            head2->direction = 1;
-        }
-        if (key[KEY_S] && head2->direction != 0) {
-            head2->direction = 2;
         }
         if (key[KEY_A] && head2->direction != 1) {
             head2->direction = 3;
         }
+        if (key[KEY_S] && head2->direction != 0) {
+            head2->direction = 2;
+        }
+        if (key[KEY_D] && head2->direction != 3) {
+            head2->direction = 1;
+        }
+
+        
 
         //Déplacement du serpent 1
+        
         move_snake(head1);
         move_snake(head2);
+
 
         //Gestion des collisions : si le serpent sort de l'écran, si le serpent se touche lui-même ou si la tête du serpent touche le corps du serpent
         int looser = collision_mort(head1, head2);
@@ -292,15 +334,17 @@ int main(int argc, char *argv[]){
         }
 
         //Actualisation de l'écran
-        rest(100);
+        rest(120);
+        blit(game, buffer, 0, 0, 0, 0, SCREEN_HEIGHT, SCREEN_HEIGHT);
+        blit(buffer, screen, 0, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     }
 
 
     //¤Fin du programme
-    lib_memoire(head1, food1);
+    lib_memoire(head1, food1, head2, food2, buffer, game);
     allegro_exit();
     return 0;
-}END_OF_MAIN()
+}END_OF_MAIN();
 
 
     
