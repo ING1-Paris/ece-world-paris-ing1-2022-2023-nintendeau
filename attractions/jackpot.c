@@ -31,13 +31,12 @@ int main(int argc, char *argv[])
     BITMAP *sprite1 = load_bitmap("../Projet_2/image_case/image_case0.bmp", NULL);
     BITMAP *sprite2 = load_bitmap("../Projet_2/image_case/image_case1.bmp", NULL);
     BITMAP *sprite3 = load_bitmap("../Projet_2/image_case/image_case2.bmp", NULL);
-    BITMAP *sprite4 = load_bitmap("../Projet_2/point_d'interro.bmp", NULL);
     BITMAP *sprite5 = load_bitmap("../Projet_2/image_jackpot_3.bmp", NULL);
 
     BITMAP *dessprite1 = create_bitmap(86, 100);
     BITMAP *dessprite2 = create_bitmap(86, 100);
     BITMAP *dessprite3 = create_bitmap(86, 100);
-    BITMAP *dessprite4 = create_bitmap(86, 100);
+
 
     BITMAP *dessprite5 = create_bitmap(800, 650);
 
@@ -46,7 +45,6 @@ int main(int argc, char *argv[])
          sprite1 = load_bitmap("Projet_2\\image_case\\image_case0.bmp", NULL);
          sprite2 = load_bitmap("Projet_2\\image_case\\image_case1.bmp", NULL);
          sprite3 = load_bitmap("Projet_2\\image_case\\image_case2.bmp", NULL);
-         sprite4 = load_bitmap("Projet_2\\point_d'interro.bmp", NULL);
          sprite5 = load_bitmap("Projet_2\\image_jackpot_3.bmp", NULL);
          if (!sprite1 || !sprite2 || !sprite3) {
              allegro_message("prb gfx mode");
@@ -57,7 +55,6 @@ int main(int argc, char *argv[])
     stretch_blit(sprite1, dessprite1, 0, 0, sprite1->w, sprite1->h, 0, 0, dessprite1->w, dessprite1->h);
     stretch_blit(sprite2, dessprite2, 0, 0, sprite2->w, sprite2->h, 0, 0, dessprite2->w, dessprite2->h);
     stretch_blit(sprite3, dessprite3, 0, 0, sprite3->w, sprite3->h, 0, 0, dessprite3->w, dessprite3->h);
-    stretch_blit(sprite4, dessprite4, 0, 0, sprite4->w, sprite4->h, 0, 0, dessprite4->w, dessprite4->h);
     stretch_blit(sprite5, dessprite5, 0, 0, sprite5->w, sprite5->h, 0, 0, dessprite5->w, dessprite5->h);
 
     cblanc=makecol(255,255,255);
@@ -72,9 +69,9 @@ int main(int argc, char *argv[])
 
 
     draw_sprite(screen, dessprite5, 0, 0);
-    draw_sprite(screen, dessprite4, 233, 273);
-    draw_sprite(screen, dessprite4, 359, 273);
-    draw_sprite(screen, dessprite4, 485, 273);
+    draw_sprite(screen, dessprite1, 233, 273);
+    draw_sprite(screen, dessprite2, 359, 273);
+    draw_sprite(screen, dessprite3, 485, 273);
 
 
     textprintf_ex(screen,font,589,469,makecol(255,0,0),makecol(200,255,0),"START");
