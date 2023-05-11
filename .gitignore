@@ -16,7 +16,13 @@ cmake-build-debug
 main.exe
 attractions/guiter_hero.exe
 attractions/snake.exe
+attractions/tag.exe
+attractions/guitar_hero.exe
+attractions/palais_des_glaces.exe
+attractions/paris_hippiques.exe
+attractions/jackpot.exe
+
 
 # fichiers générés par le compilateur
 saves/meilleurs_scores.txt
-saves/meilleurs_scores.txt
+

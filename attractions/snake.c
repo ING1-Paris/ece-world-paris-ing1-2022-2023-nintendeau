@@ -2,21 +2,18 @@
 /*
  ! By Léon DALLE - ECE ING1 - TD13                                                                                                                      
  *
- *          ___           ___           ___           ___           ___     
- *         /  /\         /__/\         /  /\         /__/|         /  /\    
- *        /  /:/_        \  \:\       /  /::\       |  |:|        /  /:/_   
- *       /  /:/ /\        \  \:\     /  /:/\:\      |  |:|       /  /:/ /\  
- *      /  /:/ /::\   _____\__\:\   /  /:/~/::\   __|  |:|      /  /:/ /:/_ 
- *     /__/:/ /:/\:\ /__/::::::::\ /__/:/ /:/\:\ /__/\_|:|____ /__/:/ /:/ /\
- *     \  \:\/:/~/:/ \  \:\~~\~~\/ \  \:\/:/__\/ \  \:\/:::::/ \  \:\/:/ /:/
- *      \  \::/ /:/   \  \:\  ~~~   \  \::/       \  \::/~~~~   \  \::/ /:/ 
- *       \__\/ /:/     \  \:\        \  \:\        \  \:\        \  \:\/:/  
- *         /__/:/       \  \:\        \  \:\        \  \:\        \  \::/   
- *         \__\/         \__\/         \__\/         \__\/         \__\/    
+ *
  * 
  * 
- *                                                       
- *                                                           
+ *    ███████╗███╗   ██╗ █████╗ ██╗  ██╗███████╗
+ *    ██╔════╝████╗  ██║██╔══██╗██║ ██╔╝██╔════╝
+ *    ███████╗██╔██╗ ██║███████║█████╔╝ █████╗  
+ *    ╚════██║██║╚██╗██║██╔══██║██╔═██╗ ██╔══╝  
+ *    ███████║██║ ╚████║██║  ██║██║  ██╗███████╗
+ *    ╚══════╝╚═╝  ╚═══╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝  
+ * 
+ * 
+ *                                                     
  * Jeu : Reproduction d'un Snake à deux joueurs sur Allegro 4 
  * Objectif : Fluidité du jeu, gestion des collisions, gestion des scores sans fichier externe
  * Contrainte : Utilisation de listes chainées pour la gestion du serpent
@@ -217,6 +214,31 @@ int collision_food(snake *head, food *food) { //¤ On vérifie si le serpent man
     }
 }
 
+void gestion_mouvements(snake *head1, snake *head2){
+    //Déplacement du serpent 1 en fonction de la direction (0 = haut, 1 = droite, 2 = bas, d3 = gauche, pas de demi-tour possible)
+    //move snake 1 with arrows
+    if (key[KEY_UP] && head1->direction != 2) {
+        head1->direction = 0;
+    }else if (key[KEY_LEFT] && head1->direction != 1) {
+        head1->direction = 3;
+    }else if (key[KEY_DOWN] && head1->direction != 0) {
+        head1->direction = 2;
+    }else if (key[KEY_RIGHT] && head1->direction != 3) {
+        head1->direction = 1;
+    }
+    
+    //move snake 2 with ZQSD (azerty keyboard)
+    if (key[KEY_W] && head2->direction != 2) {
+        head2->direction = 0;
+    }else if (key[KEY_A] && head2->direction != 1) {
+        head2->direction = 3;
+    }else if (key[KEY_S] && head2->direction != 0) {
+        head2->direction = 2;
+    }else if (key[KEY_D] && head2->direction != 3) {
+        head2->direction = 1;
+    }
+}
+
 
 
 int main(int argc, char *argv[]){
@@ -275,41 +297,12 @@ int main(int argc, char *argv[]){
         draw_snake(head1, color1, game);
         draw_snake(head2, color2, game);
 
-        //Déplacement du serpent 1 en fonction de la direction (0 = haut, 1 = droite, 2 = bas, d3 = gauche, pas de demi-tour possible)
-        //move snake 1 with arrows
-        if (key[KEY_UP] && head1->direction != 2) {
-            head1->direction = 0;
-        }
-        if (key[KEY_LEFT] && head1->direction != 1) {
-            head1->direction = 3;
-        }
-        if (key[KEY_DOWN] && head1->direction != 0) {
-            head1->direction = 2;
-        }
-        if (key[KEY_RIGHT] && head1->direction != 3) {
-            head1->direction = 1;
-        }
         
-        //move snake 2 with ZQSD (azerty keyboard)
-        if (key[KEY_W] && head2->direction != 2) {
-            head2->direction = 0;
-        }
-        if (key[KEY_A] && head2->direction != 1) {
-            head2->direction = 3;
-        }
-        if (key[KEY_S] && head2->direction != 0) {
-            head2->direction = 2;
-        }
-        if (key[KEY_D] && head2->direction != 3) {
-            head2->direction = 1;
-        }
 
         
 
         //Déplacement du serpent 1
-        
-        move_snake(head1);
-        move_snake(head2);
+        gestion_mouvements(head1, head2);
 
 
         //Gestion des collisions : si le serpent sort de l'écran, si le serpent se touche lui-même ou si la tête du serpent touche le corps du serpent
