@@ -23,88 +23,124 @@
 #define SCREEN_WIDTH 1200
 #define SCREEN_HEIGHT 800
 
-// Constantes pour la gravité
-#define GRAVITY 0.2
-#define MAX_FALL_SPEED 8
-
 // Structure pour le bonhomme
 typedef struct {
     BITMAP *sprite;     // Sprite du bonhomme
     int x, y;           // Coordonnées du bonhomme
-    int xspeed, yspeed; // Vitesse horizontale et verticale du bonhomme
+    double xspeed, yspeed; // Vitesse horizontale et verticale du bonhomme
 } Bonhomme;
 
-int main()
-{
+void init_allegro(){ //¤Initialisation des serpents (direction aléatoire)
     //Initialisation de la seed pour les nombres aléatoires
     srand(time(NULL));
     //Initialisation d'Allegro
     allegro_init();
     install_keyboard();
     set_color_depth(32);
-    set_window_title("Snake");
+    set_window_title("Chat");
     set_color_depth(desktop_color_depth());
     if (set_gfx_mode(GFX_AUTODETECT_WINDOWED, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0) != 0) {
-        allegro_message("GFX ERROR");
+        allegro_message("Erreur relative à Allegro");
         allegro_exit();
         exit(EXIT_FAILURE);
     }
+}
+void mouvement(Bonhomme *bonhomme, int groundLevel, int HORIZONTAL_SPEED, int MAX_JUMP_HEIGHT, double GRAVITY, double MAX_FALL_SPEED, int UP, int RIGHT, int LEFT){
+    // Update bonhomme's position
+    bonhomme->x += bonhomme->xspeed;
+    bonhomme->y += (int)bonhomme->yspeed;
 
-    // Création du bonhomme
-    Bonhomme bonhomme = {NULL, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 0, 0};
-    BITMAP *player_sprite_1 = load_bitmap("../assets/palais_des_glaces/player_1.bmp", NULL);
+    // Handle keyboard input
+    if (key[RIGHT]) {
+        // Move right
+        bonhomme->xspeed = HORIZONTAL_SPEED;
+    } else if (key[LEFT]) {
+        // Move left
+        bonhomme->xspeed = -HORIZONTAL_SPEED;
+    } else {
+        // Stop horizontal movement
+        bonhomme->xspeed = 0;
+    }
+
+    // Jump only if the bonhomme is on the ground
+    if (key[UP] && bonhomme->y == groundLevel) {
+        bonhomme->yspeed = -MAX_JUMP_HEIGHT; // Set the initial vertical speed for the jump
+    }
+
+    // Apply gravity
+    bonhomme->yspeed += GRAVITY;
+
+    // Limit the maximum falling speed
+    if (bonhomme->yspeed >= MAX_FALL_SPEED) {
+        bonhomme->yspeed = MAX_FALL_SPEED;
+    }
+
+    // Limit the maximum height of the jump
+    if (bonhomme->y > groundLevel) {
+        bonhomme->y = groundLevel;
+        bonhomme->yspeed = 0;
+    }
+}
+BITMAP* image_loader(const char* filepath){
     // on vérifie que les BITMAPS ont bien été initialisés
-    if (!player_sprite_1) {
-        player_sprite_1 = load_bitmap("assets/palais_des_glaces/player_1.bmp", NULL);
-        if (!player_sprite_1) {
-            allegro_message("BITMAP ERROR");
+    char clion_filepath[100];
+    strcpy(clion_filepath, "../");
+    strcat(clion_filepath, filepath);
+    BITMAP *img = load_bitmap(clion_filepath, NULL);
+    if (!img) {
+        img = load_bitmap(filepath, NULL);
+        if (!img) {
+            allegro_message("Erreur d'importation d'd'image");
             allegro_exit();
             exit(EXIT_FAILURE);
         }
     }
-    bonhomme.sprite = player_sprite_1;
+    return img;
+}
 
+int main()
+{
+    // Initialisation d'Allegro
+    init_allegro();
+
+    //! Initialisation des variables du mouvement
+    double GRAVITY = 0.5;
+    double MAX_FALL_SPEED = 12;
+    int HORIZONTAL_SPEED = 7;
+    int MAX_JUMP_HEIGHT = 12;
+    int groundLevel = SCREEN_HEIGHT - 100;
+    //!##########################################
+
+    // Création du buffer
     BITMAP *buffer = create_bitmap(SCREEN_WIDTH, SCREEN_HEIGHT);
+
+    // Création du bonhomme
+    Bonhomme bonhomme1 = {image_loader("assets/palais_des_glaces/player_1.bmp"), SCREEN_WIDTH/2, groundLevel, 0, 0};
+    Bonhomme bonhomme2 = {image_loader("assets/palais_des_glaces/player_2.bmp"), SCREEN_WIDTH/3, groundLevel, 0, 0};
 
     // Boucle principale
     while (!key[KEY_ESC]) {
+        
+        // Update bonhomme's position
+        mouvement(&bonhomme1, groundLevel, HORIZONTAL_SPEED, MAX_JUMP_HEIGHT, GRAVITY, MAX_FALL_SPEED, KEY_UP, KEY_RIGHT, KEY_LEFT);
+        mouvement(&bonhomme2, groundLevel, HORIZONTAL_SPEED, MAX_JUMP_HEIGHT, GRAVITY, MAX_FALL_SPEED, KEY_W, KEY_D, KEY_A);
+
         // Effacer l'écran précédent
         clear(buffer);
 
-        // Déplacer le bonhomme en fonction des touches pressées
-        if (key[KEY_LEFT]) {
-            bonhomme.xspeed = -5;
-        }
-        else if (key[KEY_RIGHT]) {
-            bonhomme.xspeed = 5;
-        }
-        else {
-            bonhomme.xspeed = 0;
-        }
+        // Draw bonhomme sprite at its updated position
+        draw_sprite(buffer, bonhomme1.sprite, bonhomme1.x, bonhomme1.y);
+        draw_sprite(buffer, bonhomme2.sprite, bonhomme2.x, bonhomme2.y);
 
-        if (key[KEY_UP] && bonhomme.yspeed == 0) {
-            bonhomme.yspeed = -10;
-        }
-
-        // Ajouter la gravité à la vitesse verticale du bonhomme
-        bonhomme.yspeed += GRAVITY;
-        if (bonhomme.yspeed > MAX_FALL_SPEED) {
-            bonhomme.yspeed = MAX_FALL_SPEED;
-        }
-
-        // Mettre à jour les coordonnées du bonhomme en fonction de sa vitesse
-        bonhomme.x += bonhomme.xspeed;
-        bonhomme.y += bonhomme.yspeed;
-
-        // Dessiner le bonhomme à sa nouvelle position
-        draw_sprite(buffer, bonhomme.sprite, bonhomme.x, bonhomme.y);
-
-        // Rafraîchir l'écran
+        // Refresh screen
         vsync();
-        blit(buffer, screen, 0, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+        blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
     }
 
-    destroy_bitmap(player_sprite_1);
+    destroy_bitmap(bonhomme1.sprite);
+    destroy_bitmap(bonhomme2.sprite);
+    destroy_bitmap(buffer);
+
     // Fermeture d'Allegro
     allegro_exit();
     return 0;

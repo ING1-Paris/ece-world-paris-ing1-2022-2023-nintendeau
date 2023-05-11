@@ -19,6 +19,7 @@
  * Contrainte : Utilisation de listes chainées pour la gestion du serpent
  *                                                                                                                                                                                                                           
  */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -30,7 +31,6 @@
 #define SPEED 1
 #define SCREEN_WIDTH 1200
 #define SCREEN_HEIGHT 800
-
 
 //* Structures pour les blocs du serpent et la nourriture
 typedef struct snake {
@@ -76,6 +76,23 @@ void init_food(food *food) { //¤Affichage du serpent à partir de la tête
     food->x = rand() % (SCREEN_HEIGHT - BLOCK_SIZE);
     food->y = rand() % (SCREEN_HEIGHT - BLOCK_SIZE);
 }
+
+BITMAP* image_loader(const char* filepath){
+    // on vérifie que les BITMAPS ont bien été initialisés
+    char clion_filepath[100];
+    strcpy(clion_filepath, "../");
+    strcat(clion_filepath, filepath);
+    BITMAP *img = load_bitmap(clion_filepath, NULL);
+    if (!img) {
+        img = load_bitmap(filepath, NULL);
+        if (!img) {
+            allegro_message("Erreur d'importation d'd'image");
+            allegro_exit();
+            exit(EXIT_FAILURE);
+        }
+    }
+    return img;
+}
     
 void lib_memoire(snake *head, food *Food, snake *head2, food *Food2, BITMAP *game, BITMAP *buffer) { //¤Fonction pour libérer la mémoire
     snake *current_block = head;
@@ -97,8 +114,9 @@ void lib_memoire(snake *head, food *Food, snake *head2, food *Food2, BITMAP *gam
     clear_bitmap(game);
     clear_bitmap(buffer);
 }
+//*############################################################################################################################################
 
-//!Fonctions relatives au serpent et appelées souvent
+//!Fonctions relatives au serpent et appelées souvent 
 void draw_snake(snake *head, int color, BITMAP *game) { //¤Fonction pour libérer la mémoire
     snake *current_block = head;
     while (current_block != NULL) {
@@ -107,7 +125,7 @@ void draw_snake(snake *head, int color, BITMAP *game) { //¤Fonction pour libér
     }
 }
 
-void add_block(snake *head) {
+void add_block(snake *head) { //¤ Fonction pour ajouter un bloc au serpent
     snake *current_block = head;
     while (current_block->next != NULL) {
         current_block = current_block->next;
@@ -121,7 +139,7 @@ void add_block(snake *head) {
     current_block->next = new_block;
 }
 
-void move_snake(snake *head){ // On bouge chaque bloc du serpent en fonction de la direction du bloc qui le précède
+void move_snake(snake *head){ //¤ On bouge chaque bloc du serpent en fonction de la direction du bloc qui le précède
     int previous_pos_x = head->x;
     int previous_pos_y = head->y;
     //Déplacement du serpent 1
@@ -238,7 +256,7 @@ void gestion_mouvements(snake *head1, snake *head2){
         head2->direction = 1;
     }
 }
-
+//!############################################################################################################################################
 
 
 int main(int argc, char *argv[]){
@@ -246,21 +264,9 @@ int main(int argc, char *argv[]){
     BITMAP *buffer = create_bitmap(SCREEN_WIDTH, SCREEN_HEIGHT); //buffer est la fenêtre où on affiche tous les texte et autres 
     BITMAP *game = create_bitmap(SCREEN_HEIGHT, SCREEN_HEIGHT); //game is a square 
 
-    BITMAP * logo_img = load_bitmap("../assets/snake/logo.bmp", NULL);
-    BITMAP * game_over_img = load_bitmap("../assets/snake/game_over.bmp", NULL);
+    BITMAP * logo_img = image_loader("assets/snake/logo.bmp");
+    BITMAP * game_over_img = image_loader("assets/snake/game_over.bmp");
 
-    if (!logo_img || !game_over_img) {
-        game_over_img = load_bitmap("assets\\snake\\game_over.bmp", NULL);
-        logo_img = load_bitmap("assets\\snake\\logo.bmp", NULL);
-        if (!logo_img || !game_over_img) {
-            allegro_message("IMAGE ERROR");
-            allegro_exit();
-            exit(EXIT_FAILURE);
-        }
-    }
-
-
-    
     //?Initialisation des variables 
     int game_over = 0;
     int score1 = 0;
@@ -289,26 +295,27 @@ int main(int argc, char *argv[]){
         clear_to_color(buffer, buffer_color);
         //print logo on buffer on the far-right, a bit reduced with masked_stretch_blit
         masked_stretch_blit(logo_img, buffer, 0, 0, logo_img->w, logo_img->h, SCREEN_HEIGHT + 20, 20, logo_img->w / 2, logo_img->h / 2);
-        //masked_blit(logo_img, buffer, 0, 0, SCREEN_HEIGHT - 100, 0, logo_img->w, logo_img->h);
+
+        //print scores
         textprintf_ex(buffer, font, SCREEN_HEIGHT + 10, 40, makecol(0,0,0), -1, "Score Joueur 1 : %d", score1);
         textprintf_ex(buffer, font, SCREEN_HEIGHT + 10, 60, makecol(0,0,0), -1, "Score Joueur 2 : %d", score2);
+
+        //print food and snake
         rectfill(game, food1->x, food1->y, food1->x + BLOCK_SIZE, food1->y + BLOCK_SIZE, food_colour);
         rectfill(game, food2->x, food2->y, food2->x + BLOCK_SIZE, food2->y + BLOCK_SIZE, food_colour);
         draw_snake(head1, color1, game);
         draw_snake(head2, color2, game);
 
-        
-
-        
-
         //Déplacement du serpent 1
         gestion_mouvements(head1, head2);
+        move_snake(head1);
+        move_snake(head2);
 
 
         //Gestion des collisions : si le serpent sort de l'écran, si le serpent se touche lui-même ou si la tête du serpent touche le corps du serpent
         int looser = collision_mort(head1, head2);
         if (looser != 0) {
-            if (looser == 1) {
+            if (looser == 1) {  
                 printf("Game Over ! first player loosed !\n");
             }else{
                 printf("Game Over ! second player loosed !\n");
