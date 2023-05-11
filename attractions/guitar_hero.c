@@ -161,7 +161,8 @@ int guitar_hero() {
     return 1;
 }
 
-void guitar_hero() {
+
+int main() {
 
     allegro_init();
     install_mouse();
@@ -355,12 +356,5 @@ void guitar_hero() {
     free_memory(buffer, stage, logo, background, game_over, player_1, player_2, player, ancre);
     destroy_sample(music);
     allegro_exit();
-}
-
-/*
-int main() {
-
-    guitar_hero();
-
     return 0;
-}*/
+}END_OF_MAIN();
