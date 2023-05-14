@@ -297,8 +297,8 @@ int main(int argc, char *argv[]){
         masked_stretch_blit(logo_img, buffer, 0, 0, logo_img->w, logo_img->h, SCREEN_HEIGHT + 20, 20, logo_img->w / 2, logo_img->h / 2);
 
         //print scores
-        textprintf_ex(buffer, font, SCREEN_HEIGHT + 10, 40, makecol(0,0,0), -1, "Score Joueur 1 : %d", score1);
-        textprintf_ex(buffer, font, SCREEN_HEIGHT + 10, 60, makecol(0,0,0), -1, "Score Joueur 2 : %d", score2);
+        textprintf_ex(buffer, font, SCREEN_HEIGHT + 10, 100, makecol(0,0,0), -1, "Score Joueur 1 : %d", score1);
+        textprintf_ex(buffer, font, SCREEN_HEIGHT + 10, 120, makecol(0,0,0), -1, "Score Joueur 2 : %d", score2);
 
         //print food and snake
         rectfill(game, food1->x, food1->y, food1->x + BLOCK_SIZE, food1->y + BLOCK_SIZE, food_colour);
@@ -344,20 +344,4 @@ int main(int argc, char *argv[]){
     lib_memoire(head1, food1, head2, food2, buffer, game);
     allegro_exit();
     return 0;
-}END_OF_MAIN();
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
+}END_OF_MAIN()
