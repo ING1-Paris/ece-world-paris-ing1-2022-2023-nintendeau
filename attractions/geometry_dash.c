@@ -52,11 +52,12 @@ int get_ground_level(BITMAP * buffer, BITMAP * sprite, Player * player) {
     int ground = makecol(0, 0, 255);
     int ground_level = 0;
 
-    for (int y = 0; y < SCREEN_H - 263; y++) {
+
+    // entre le sol le plus bas et le sol le plus haut (gain de performances)
+    for (int y = SCREEN_H / 3; y < SCREEN_H - 263; y++) {
         if (getpixel(buffer, player->x, y) == ground || getpixel(buffer, player->x + sprite->w, y) == ground) {
             if (player->y + sprite->h > y) {
                 ground_level = y - sprite->h;
-                printf("ground level = %d\n", ground_level);
                 return ground_level;
             }
         }
@@ -75,84 +76,54 @@ void jump(Player * player, BITMAP * buffer, BITMAP * sprite, BITMAP * level_coll
     int ground_level = get_ground_level(buffer, sprite, player);
 
     bool on_ground;
-    bool in_ground;
-    bool in_air   ;
-    bool on_spike ;
     bool can_jump ;
 
 
-    // afficher les collisions
+    // detection du sol et des piques
     if (getpixel(buffer, player->x - 1, player->y + sprite->h + 1) == ground || getpixel(buffer, player->x + sprite->w + 1, player->y + sprite->h + 1) == ground) {
+
+        // sur le sol
         if (getpixel(buffer, player->x - 1, player->y + sprite->h - 1) == air || getpixel(buffer, player->x + sprite->w + 1, player->y + sprite->h - 1) == air) {
             on_ground = true;
-            //printf("on ground\n");
-            printf("Can jump\n");
+            can_jump = true;
         }
+
+        // dans le sol
         else if (getpixel(buffer, player->x - 1, player->y + sprite->h -1) == ground || getpixel(buffer, player->x + sprite->w + 1, player->y + sprite->h - 1) == ground) {
-            in_ground = true;
-            //printf("in ground\n");
-            printf("Can't jump\n");
+            can_jump = false;
         }
     }
-    if (getpixel(buffer, player->x - 1, player->y + sprite->h + 1) == air || getpixel(buffer, player->x + sprite->w + 1, player->y + sprite->h + 1) == air) {
-        in_air = true;
-        //printf("in air\n");
-        printf("Can't jump\n");
-    }
-    if (getpixel(buffer, player->x - 1, player->y + sprite->h - 1) == spike || getpixel(buffer, player->x + sprite->w + 1, player->y + sprite->h - 1) == spike) {
-        //printf("on spike\n");
-        printf("Can't jump\n");
+
+    // dans l'air
+    else if (getpixel(buffer, player->x - 1, player->y + sprite->h + 1) == air || getpixel(buffer, player->x + sprite->w + 1, player->y + sprite->h + 1) == air) {
+        can_jump = false;
     }
 
-    if (in_ground) {
-        can_jump = false;
-    }
-    else if (on_ground) {
-        can_jump = true;
-    }
-    else if (in_air) {
-        can_jump = false;
-    }
-    else if (on_spike) {
+    // sur un pique
+    else if (getpixel(buffer, player->x - 1, player->y + sprite->h - 1) == spike || getpixel(buffer, player->x + sprite->w + 1, player->y + sprite->h - 1) == spike) {
         can_jump = false;
     }
 
 
-    // [SPACE] et on est sur le sol
+    // gestion du saut
     if (key[KEY_SPACE] && can_jump) {
-        // on le fait sauter
-        player->jump_speed -= 17;
+        player->jump_speed -= 18;
     }
 
 
-    // si le joueur est sous le sol
+    // collision avec le sol
     if (player->y > ground_level) {
-        // on le remet sur le sol
         player->y = ground_level;
-    }
-
-    player->y += player->jump_speed;
-
-
-    // en chute libre
-    if (player->y < ground_level) {
-        // on le fait tomber
-        player->jump_speed += 1;
-    }
-    else {
         player->jump_speed = 0;
     }
 
-}
+    // appliquer la vitesse du saut
+    player->y += player->jump_speed;
 
-
-void check_collisions(Player * player, BITMAP * level_collisions, BITMAP * sprite) {
-
-    int ground = makecol(0, 0, 255);
-    int spike = makecol(255, 0, 0);
-    int air = makecol(0, 255, 0);
-
-
+    // appliquer la gravité
+    if (player->y < ground_level) {
+        player->jump_speed++;
+    }
 }
 
 
@@ -204,7 +175,9 @@ int main () {
     BITMAP * level = load_bitmap("../assets/geometry_dash/geometry_map.bmp", NULL);
     BITMAP * level_collisions = load_bitmap("../assets/geometry_dash/geometry_map_collisions.bmp", NULL);
     BITMAP * buffer = create_bitmap(SCREEN_W, SCREEN_H);
+    BITMAP * buffer2 = create_bitmap(SCREEN_W, SCREEN_H);
     clear_bitmap(buffer);
+    clear_bitmap(buffer2);
     SAMPLE * music = load_sample("../sounds/stereo_madness.wav");
 
     // If loading failed
@@ -236,8 +209,7 @@ int main () {
     bool game_over = false;
 
     //* musique
-    show_mouse(screen);
-    play_sample(music, 255, 128, 1000, 1);
+    play_sample(music, 100, 128, 1000, 1);
 
 
     //* boucle principale
@@ -245,15 +217,20 @@ int main () {
         clear_bitmap(buffer);
 
         show_background(buffer, level_collisions, bg, largeur);
+        show_background(buffer2, level, bg, largeur);
         move_bcg(compteur_frames, bg, largeur);
 
         jump(player, buffer, player_sprite, level_collisions);
 
         //* affichage
-        blit(player_sprite, buffer, 0, 0, player->x, player->y, 50, 50);
-        blit(buffer, screen, 0, 0, 0, 0,SCREEN_W,SCREEN_H);
+        blit(player_sprite, buffer2, 0, 0, player->x, player->y, 50, 50);
+        blit(buffer2, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
         compteur_frames++;
         slow();
+
+        if (player->life == false) {
+            game_over = true;
+        }
     }
 
     return 0;
