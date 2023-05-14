@@ -3,12 +3,12 @@
 #include <allegro.h>
 
 
-void dessinerRectangleBleu(int x, int y, int cbleu, int crouge, int compteur, int joueuractif, int* J1, int* J2) {
+void dessinerRectangleBleu(int x, int y, int cbleu, int crouge, int compteur, int joueuractif, int* J1, int* J2, BITMAP* dessprite2, BITMAP* dessprite3){
     for (int i = 0; i < compteur; i++) {
-        rectfill(screen, x, y, x + 100, y + 100, cbleu);
+        draw_sprite(screen, dessprite2, x, y);
         if (mouse_b) {
             if (mouse_x >= x && mouse_x <= x + 100 && mouse_y >= y && mouse_y <= y + 100) {
-                rectfill(screen, x, y, x + 100, y + 100, crouge); //taupe touchée
+                draw_sprite(screen, dessprite3,x,y); //taupe touchée
                 rest(500);
                 compteur = 0;
                 if (joueuractif == 1) {
@@ -84,9 +84,9 @@ int main(int argc, char *argv[]) {
     BITMAP *sprite3 = load_bitmap("../Projet_2/image_taupe2.bmp", NULL);
 
 
-    BITMAP *dessprite1 = create_bitmap(100, 100);
-    BITMAP *dessprite2 = create_bitmap(100, 100);
-    BITMAP *dessprite3 = create_bitmap(100, 100);
+    BITMAP *dessprite1 = create_bitmap(150, 150);
+    BITMAP *dessprite2 = create_bitmap(150, 150);
+    BITMAP *dessprite3 = create_bitmap(150, 150);
 
     if (!sprite1 || !sprite2 || !sprite3) {
         sprite1 = load_bitmap("Projet_2\\image_taupe0.bmp", NULL);
@@ -109,9 +109,9 @@ int main(int argc, char *argv[]) {
     int* J2 = 0;
 
     rectfill(screen, 0, 0, 800, 600, cvert);
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
-            draw_sprite(screen, dessprite1 ,130 + i * 150, 100 + j * 150);
+            draw_sprite(screen, dessprite1 ,120 + i * 200, 80 + j * 150);
         }
     }
     textprintf_ex(screen, font, 290, 300, cblanc, -1, "Le joueur 1 ce prépare pour jouer");
@@ -125,9 +125,9 @@ int main(int argc, char *argv[]) {
         int compteur = rand () % 6000 + 4000;
 
         //création des rectangles verts
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                draw_sprite(screen, dessprite1 ,130 + i * 150, 100 + j * 150);
+                draw_sprite(screen, dessprite1 ,120 + i * 200, 80 + j * 150);
             }
         }
         //verification du nbr de tours pour changer de joueur
@@ -154,40 +154,32 @@ int main(int argc, char *argv[]) {
         //affichage des rectangles bleus (taupe qui sortent)
         if (rectbleu == 1) {
             printf("rectbleu vaut 1\n");
-            dessinerRectangleBleu(130, 100, cbleu, crouge, compteur, joueuractif, J1, J2);
+            dessinerRectangleBleu(120, 80, cbleu, crouge, compteur, joueuractif, J1, J2, dessprite2, dessprite3);
         }else if (rectbleu == 2) {
             printf("rectbleu vaut 2\n");
-            dessinerRectangleBleu(280, 100, cbleu, crouge, compteur, joueuractif, J1, J2);
+            dessinerRectangleBleu(320, 80, cbleu, crouge, compteur, joueuractif, J1, J2, dessprite2, dessprite3);
         }else if (rectbleu == 3) {
             printf("rectbleu vaut 3\n");
-            dessinerRectangleBleu(430, 100, cbleu, crouge, compteur, joueuractif, J1, J2);
+            dessinerRectangleBleu(520, 80, cbleu, crouge, compteur, joueuractif, J1, J2, dessprite2, dessprite3);
         }else if (rectbleu == 4) {
             printf("rectbleu vaut 4\n");
-            dessinerRectangleBleu(580, 100, cbleu, crouge, compteur, joueuractif, J1, J2);
+            dessinerRectangleBleu(120, 230, cbleu, crouge, compteur, joueuractif, J1, J2, dessprite2, dessprite3);
         }else if (rectbleu == 5) {
             printf("rectbleu vaut 5\n");
-            dessinerRectangleBleu(130, 250, cbleu, crouge, compteur, joueuractif, J1, J2);
+            dessinerRectangleBleu(320, 230, cbleu, crouge, compteur, joueuractif, J1, J2, dessprite2, dessprite3);
         }else if (rectbleu == 6) {
             printf("rectbleu vaut 6\n");
-            dessinerRectangleBleu(280, 250, cbleu, crouge,  compteur, joueuractif, J1, J2);
+            dessinerRectangleBleu(520, 230, cbleu, crouge, compteur, joueuractif, J1, J2, dessprite2, dessprite3);
         }else if (rectbleu == 7) {
             printf("rectbleu vaut 7\n");
-            dessinerRectangleBleu(430, 250, cbleu, crouge, compteur, joueuractif, J1, J2);
+            dessinerRectangleBleu(120, 380, cbleu, crouge, compteur, joueuractif, J1, J2, dessprite2, dessprite3);
         }else if (rectbleu == 8) {
             printf("rectbleu vaut 8\n");
-            dessinerRectangleBleu(580, 250, cbleu, crouge,  compteur, joueuractif, J1, J2);
+            dessinerRectangleBleu(320, 380, cbleu, crouge, compteur, joueuractif, J1, J2, dessprite2, dessprite3);
         }else if (rectbleu == 9) {
             printf("rectbleu vaut 9\n");
-            dessinerRectangleBleu(130, 400, cbleu, crouge,  compteur, joueuractif, J1, J2);
-        }else if (rectbleu == 10) {
-            printf("rectbleu vaut 10\n");
-            dessinerRectangleBleu(280, 400, cbleu, crouge,   compteur, joueuractif, J1, J2);
-        }else if (rectbleu == 11) {
-            printf("rectbleu vaut 11\n");
-            dessinerRectangleBleu(430, 400, cbleu, crouge,   compteur, joueuractif, J1, J2);
-        }else if (rectbleu == 12) {
-            printf("rectbleu vaut 12\n");
-            dessinerRectangleBleu(580, 400, cbleu, crouge,   compteur, joueuractif, J1, J2);
+            dessinerRectangleBleu(520, 380, cbleu, crouge, compteur, joueuractif, J1, J2, dessprite2, dessprite3);
+
         }
     }
 
