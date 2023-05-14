@@ -10,52 +10,146 @@
 #include <stdio.h>
 #include <allegro.h>
 #include <stdbool.h>
+#include <time.h>
+
+#define NB_BACKGROUNDS 2
 
 
 typedef struct Player {
     int x;
     int y;
     bool life;
-    int y_speed;
+    int jump_speed;
 } Player;
+
+
+typedef struct {
+    int x;
+    int y;
+} Background;
 
 
 //? creation du joueur
 Player * creer_player() {
     Player * player = malloc(sizeof(Player));
     player->x = 200;
-    player->y = SCREEN_H - 50;
+    player->y = SCREEN_H - 400;
     player->life = true;
-    player->y_speed = 0;
+    player->jump_speed = 0;
     return player;
 }
 
 
-//? gestion du saut
-void jump(Player * player, BITMAP * level, BITMAP * player_sprite) {
-    int x = player->x;
-    if (player->y > SCREEN_H - 50) {
-        player->y_speed = 0;
-        player->y = SCREEN_H - 50;
+void slow() {
+    if (key[KEY_LSHIFT]) {
+        rest(100);
     }
-    else if (getpixel(level, x, player->y + 50) == makecol(255, 255, 255)) {
-        player->y_speed = 0;
-        player->y = player->y;
-    }
-    else {
-        player->y_speed += 1;
-        player->y += player->y_speed;
+}
+
+
+int get_ground_level(BITMAP * buffer, BITMAP * sprite, Player * player) {
+
+    int ground = makecol(0, 0, 255);
+    int ground_level = 0;
+
+
+    // entre le sol le plus bas et le sol le plus haut (gain de performances)
+    for (int y = SCREEN_H / 3; y < SCREEN_H - 263; y++) {
+        if (getpixel(buffer, player->x, y) == ground || getpixel(buffer, player->x + sprite->w, y) == ground) {
+            if (player->y + sprite->h > y) {
+                ground_level = y - sprite->h;
+                return ground_level;
+            }
+        }
     }
 
-    if (key[KEY_SPACE]) {
-        player->y_speed = -10;
-        player->y += player->y_speed;
+}
+
+
+//? gestion du saut
+void jump(Player * player, BITMAP * buffer, BITMAP * sprite, BITMAP * level_collisions) {
+
+    int spike  = makecol(255, 0, 0);
+    int air    = makecol(0, 255, 0);
+    int ground = makecol(0, 0, 255);
+
+    int ground_level = get_ground_level(buffer, sprite, player);
+
+    bool on_ground;
+    bool can_jump ;
+
+
+    // detection du sol et des piques
+    if (getpixel(buffer, player->x - 1, player->y + sprite->h + 1) == ground || getpixel(buffer, player->x + sprite->w + 1, player->y + sprite->h + 1) == ground) {
+
+        // sur le sol
+        if (getpixel(buffer, player->x - 1, player->y + sprite->h - 1) == air || getpixel(buffer, player->x + sprite->w + 1, player->y + sprite->h - 1) == air) {
+            on_ground = true;
+            can_jump = true;
+        }
+
+        // dans le sol
+        else if (getpixel(buffer, player->x - 1, player->y + sprite->h -1) == ground || getpixel(buffer, player->x + sprite->w + 1, player->y + sprite->h - 1) == ground) {
+            can_jump = false;
+        }
+    }
+
+    // dans l'air
+    else if (getpixel(buffer, player->x - 1, player->y + sprite->h + 1) == air || getpixel(buffer, player->x + sprite->w + 1, player->y + sprite->h + 1) == air) {
+        can_jump = false;
+    }
+
+    // sur un pique
+    else if (getpixel(buffer, player->x - 1, player->y + sprite->h - 1) == spike || getpixel(buffer, player->x + sprite->w + 1, player->y + sprite->h - 1) == spike) {
+        can_jump = false;
+    }
+
+
+    // gestion du saut
+    if (key[KEY_SPACE] && can_jump) {
+        player->jump_speed -= 18;
+    }
+
+
+    // collision avec le sol
+    if (player->y > ground_level) {
+        player->y = ground_level;
+        player->jump_speed = 0;
+    }
+
+    // appliquer la vitesse du saut
+    player->y += player->jump_speed;
+
+    // appliquer la gravité
+    if (player->y < ground_level) {
+        player->jump_speed++;
+    }
+}
+
+
+void show_background(BITMAP * buffer, BITMAP * level, Background bg[NB_BACKGROUNDS], int largeur) {
+
+    for (int i = 0; i < NB_BACKGROUNDS; ++i) {
+        stretch_blit(level, buffer, 0, 0, level->w, level->h, bg[i].x, bg[i].y, largeur, SCREEN_H);
+    }
+}
+
+
+void move_bcg(int compteur_frames, Background bg[NB_BACKGROUNDS], int largeur) {
+    if (compteur_frames % 2 == 0) {
+        for (int i = 0; i < NB_BACKGROUNDS; ++i) {
+            if (bg[i].x <= - largeur) {
+                bg[i].x = bg[(i+1)%NB_BACKGROUNDS].x + largeur;
+            }
+            bg[i].x -= 10;
+        }
     }
 }
 
 
 //? initialisation d'allegro
 void init_allegro() {
+
     allegro_init();
     install_mouse();
     install_keyboard();
@@ -77,18 +171,22 @@ int main () {
     init_allegro();
 
     //* charger les bitmaps
-    BITMAP * buffer = create_bitmap(SCREEN_W, SCREEN_H);
-    BITMAP * player_sprite = load_bitmap("../assets/geometry_dash/square.bmp", NULL);
-    BITMAP * player_bmp = create_bitmap(player_sprite->w, player_sprite->h);
-
+    BITMAP * player_sprite = load_bitmap("../assets/geometry_dash/square2.bmp", NULL);
     BITMAP * level = load_bitmap("../assets/geometry_dash/geometry_map.bmp", NULL);
-    SAMPLE * music = load_sample("../sounds/Stereo-Madness.wav");
+    BITMAP * level_collisions = load_bitmap("../assets/geometry_dash/geometry_map_collisions.bmp", NULL);
+    BITMAP * buffer = create_bitmap(SCREEN_W, SCREEN_H);
+    BITMAP * buffer2 = create_bitmap(SCREEN_W, SCREEN_H);
+    clear_bitmap(buffer);
+    clear_bitmap(buffer2);
+    SAMPLE * music = load_sample("../sounds/stereo_madness.wav");
 
-    if (!player_sprite || !level || !music) {
+    // If loading failed
+    if (!player_sprite || !level || !music || !level_collisions) {
         player_sprite = load_bitmap("assets\\geometry_dash\\square.bmp", NULL);
         level = load_bitmap("assets\\geometry_dash\\geometry_map.bmp", NULL);
-        music = load_sample("sounds\\Stereo-Madness.wav");
-        if (!player_sprite || !level || !music) {
+        level_collisions = load_bitmap("assets\\geometry_dash\\geometry_map_collisions.bmp", NULL);
+        music = load_sample("sounds\\stereo_madness.wav");
+        if (!player_sprite || !level || !music || !level_collisions) {
             allegro_message("LOADING ERROR");
             allegro_exit();
             exit(EXIT_FAILURE);
@@ -98,27 +196,42 @@ int main () {
     //* initialisation du joueur
     Player * player = creer_player();
 
-    show_mouse(screen);
+    Background bg[NB_BACKGROUNDS];
+    bg[0].x = 0;
+    bg[0].y = 0;
+    bg[1].x = SCREEN_W;
+    bg[1].y = 0;
+
 
     int largeur = level->w * SCREEN_H / level->h;
+    int compteur_frames = 0;
 
     bool game_over = false;
 
     //* musique
-    play_sample(music, 255, 128, 1000, 1);
+    play_sample(music, 100, 128, 1000, 1);
 
 
     //* boucle principale
     while (!key[KEY_ESC] || game_over) {
+        clear_bitmap(buffer);
 
-        jump(player, level, player_sprite);
+        show_background(buffer, level_collisions, bg, largeur);
+        show_background(buffer2, level, bg, largeur);
+        move_bcg(compteur_frames, bg, largeur);
+
+        jump(player, buffer, player_sprite, level_collisions);
 
         //* affichage
-        stretch_blit(level, buffer, 0, 0, level->w, level->h, 0, 0, largeur, SCREEN_H);
-        stretch_blit(player_sprite, buffer, 0, 0, player_sprite->w, player_sprite->h, player->x, player->y, 50, 50);
-        blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+        blit(player_sprite, buffer2, 0, 0, player->x, player->y, 50, 50);
+        blit(buffer2, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+        compteur_frames++;
+        slow();
+
+        if (player->life == false) {
+            game_over = true;
+        }
     }
 
-    readkey();
     return 0;
 }END_OF_MAIN();
