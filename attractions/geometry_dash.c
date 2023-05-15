@@ -55,7 +55,7 @@ int get_ground_level(BITMAP * buffer, BITMAP * sprite, Player * player) {
 
     // entre le sol le plus bas et le sol le plus haut (gain de performances)
     for (int y = SCREEN_H / 3; y < SCREEN_H - 263; y++) {
-        if (getpixel(buffer, player->x, y) == ground || getpixel(buffer, player->x + sprite->w, y) == ground) {
+        if (getpixel(buffer, player->x, y) == ground || getpixel(buffer, player->x + sprite->w/2, y) == ground) {
             if (player->y + sprite->h > y) {
                 ground_level = y - sprite->h;
                 return ground_level;
@@ -81,49 +81,38 @@ void jump(Player * player, BITMAP * buffer, BITMAP * sprite, BITMAP * level_coll
 
     // detection du sol et des piques
     if (getpixel(buffer, player->x - 1, player->y + sprite->h + 1) == ground || getpixel(buffer, player->x + sprite->w + 1, player->y + sprite->h + 1) == ground) {
-
         // sur le sol
         if (getpixel(buffer, player->x - 1, player->y + sprite->h - 1) == air || getpixel(buffer, player->x + sprite->w + 1, player->y + sprite->h - 1) == air) {
             on_ground = true;
             can_jump = true;
+            player->jump_speed = 0;
         }
-
         // dans le sol
-        else if (getpixel(buffer, player->x - 1, player->y + sprite->h -1) == ground || getpixel(buffer, player->x + sprite->w + 1, player->y + sprite->h - 1) == ground) {
+        else if (getpixel(buffer, player->x - 1, player->y + sprite->h - 1) == ground || getpixel(buffer, player->x + sprite->w + 1, player->y + sprite->h - 1) == ground) {
             can_jump = false;
+            player->y -= player->jump_speed;
+            player->jump_speed = 0;
         }
     }
-
     // dans l'air
     else if (getpixel(buffer, player->x - 1, player->y + sprite->h + 1) == air || getpixel(buffer, player->x + sprite->w + 1, player->y + sprite->h + 1) == air) {
         can_jump = false;
+        on_ground = false;
+        player->jump_speed++;
     }
-
     // sur un pique
-    else if (getpixel(buffer, player->x - 1, player->y + sprite->h - 1) == spike || getpixel(buffer, player->x + sprite->w + 1, player->y + sprite->h - 1) == spike) {
+    else if (getpixel(buffer, player->x + 5, player->y + sprite->h - 1) == spike || getpixel(buffer, player->x + sprite->w - 5, player->y + sprite->h - 1) == spike) {
         can_jump = false;
+        player->life = false;
     }
 
 
     // gestion du saut
     if (key[KEY_SPACE] && can_jump) {
-        player->jump_speed -= 18;
+        player->jump_speed -= 17;
     }
 
-
-    // collision avec le sol
-    if (player->y > ground_level) {
-        player->y = ground_level;
-        player->jump_speed = 0;
-    }
-
-    // appliquer la vitesse du saut
     player->y += player->jump_speed;
-
-    // appliquer la gravité
-    if (player->y < ground_level) {
-        player->jump_speed++;
-    }
 }
 
 
@@ -213,7 +202,7 @@ int main () {
 
 
     //* boucle principale
-    while (!key[KEY_ESC] || game_over) {
+    while (!key[KEY_ESC] || !game_over) {
         clear_bitmap(buffer);
 
         show_background(buffer, level_collisions, bg, largeur);
