@@ -130,6 +130,10 @@ void free_memory(BITMAP * buffer, BITMAP * stage, BITMAP * logo, BITMAP * backgr
     }
 }
 
+void bonjour() {
+    printf("Bonjour !\n");
+}
+
 
 Note * allouer_note(Note * note, int x, int color) {
     note->x = x;
@@ -366,5 +370,3 @@ int main() {
     exit(EXIT_SUCCESS);
     return 0;
 }END_OF_MAIN();
-
-// test resolution probleme de versionning git
