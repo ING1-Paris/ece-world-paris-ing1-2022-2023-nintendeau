@@ -1,23 +1,23 @@
 
 /*
- ! By Léon DALLE - ECE ING1 - TD13                                                                                                                      
+ ! By Léon DALLE - ECE ING1 - TD13
  *
  *
- * 
- * 
+ *
+ *
  *    ███████╗███╗   ██╗ █████╗ ██╗  ██╗███████╗
  *    ██╔════╝████╗  ██║██╔══██╗██║ ██╔╝██╔════╝
- *    ███████╗██╔██╗ ██║███████║█████╔╝ █████╗  
- *    ╚════██║██║╚██╗██║██╔══██║██╔═██╗ ██╔══╝  
+ *    ███████╗██╔██╗ ██║███████║█████╔╝ █████╗
+ *    ╚════██║██║╚██╗██║██╔══██║██╔═██╗ ██╔══╝
  *    ███████║██║ ╚████║██║  ██║██║  ██╗███████╗
- *    ╚══════╝╚═╝  ╚═══╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝  
- * 
- * 
- *                                                     
- * Jeu : Reproduction d'un Snake à deux joueurs sur Allegro 4 
+ *    ╚══════╝╚═╝  ╚═══╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝
+ *
+ *
+ *
+ * Jeu : Reproduction d'un Snake à deux joueurs sur Allegro 4
  * Objectif : Fluidité du jeu, gestion des collisions, gestion des scores sans fichier externe
  * Contrainte : Utilisation de listes chainées pour la gestion du serpent
- *                                                                                                                                                                                                                           
+ *
  */
 
 #include <stdio.h>
@@ -61,7 +61,7 @@ void init_allegro(){ //¤Initialisation des serpents (direction aléatoire)
         exit(EXIT_FAILURE);
     }
 }
-    
+
 void init_snake(snake *head, int x, int y) { //¤Initialisation de la nourriture (position aléatoire)
     head->x = x;
     head->y = y;
@@ -70,8 +70,8 @@ void init_snake(snake *head, int x, int y) { //¤Initialisation de la nourriture
     head->previous_pos_y = -30;
     head->is_head = true;
     head->next = NULL;
-} 
-    
+}
+
 void init_food(food *food) { //¤Affichage du serpent à partir de la tête
     food->x = rand() % (SCREEN_HEIGHT - BLOCK_SIZE);
     food->y = rand() % (SCREEN_HEIGHT - BLOCK_SIZE);
@@ -93,7 +93,7 @@ BITMAP* image_loader(const char* filepath){
     }
     return img;
 }
-    
+
 void lib_memoire(snake *head, food *Food, snake *head2, food *Food2, BITMAP *game, BITMAP *buffer) { //¤Fonction pour libérer la mémoire
     snake *current_block = head;
     snake *next_block = head->next;
@@ -116,7 +116,7 @@ void lib_memoire(snake *head, food *Food, snake *head2, food *Food2, BITMAP *gam
 }
 //*############################################################################################################################################
 
-//!Fonctions relatives au serpent et appelées souvent 
+//!Fonctions relatives au serpent et appelées souvent
 void draw_snake(snake *head, int color, BITMAP *game) { //¤Fonction pour libérer la mémoire
     snake *current_block = head;
     while (current_block != NULL) {
@@ -244,7 +244,7 @@ void gestion_mouvements(snake *head1, snake *head2){
     }else if (key[KEY_RIGHT] && head1->direction != 3) {
         head1->direction = 1;
     }
-    
+
     //move snake 2 with ZQSD (azerty keyboard)
     if (key[KEY_W] && head2->direction != 2) {
         head2->direction = 0;
@@ -261,13 +261,13 @@ void gestion_mouvements(snake *head1, snake *head2){
 
 int main(int argc, char *argv[]){
     init_allegro();
-    BITMAP *buffer = create_bitmap(SCREEN_WIDTH, SCREEN_HEIGHT); //buffer est la fenêtre où on affiche tous les texte et autres 
-    BITMAP *game = create_bitmap(SCREEN_HEIGHT, SCREEN_HEIGHT); //game is a square 
+    BITMAP *buffer = create_bitmap(SCREEN_WIDTH, SCREEN_HEIGHT); //buffer est la fenêtre où on affiche tous les texte et autres
+    BITMAP *game = create_bitmap(SCREEN_HEIGHT, SCREEN_HEIGHT); //game is a square
 
     BITMAP * logo_img = image_loader("assets/snake/logo.bmp");
     BITMAP * game_over_img = image_loader("assets/snake/game_over.bmp");
 
-    //?Initialisation des variables 
+    //?Initialisation des variables
     int game_over = 0;
     int score1 = 0;
     int score2 = 0;
@@ -315,7 +315,7 @@ int main(int argc, char *argv[]){
         //Gestion des collisions : si le serpent sort de l'écran, si le serpent se touche lui-même ou si la tête du serpent touche le corps du serpent
         int looser = collision_mort(head1, head2);
         if (looser != 0) {
-            if (looser == 1) {  
+            if (looser == 1) {
                 printf("Game Over ! first player loosed !\n");
             }else{
                 printf("Game Over ! second player loosed !\n");
