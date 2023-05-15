@@ -15,17 +15,18 @@ cmake-build-debug
 .idea
 # executable généré par le compilateur
 main.exe
-attractions/guiter_hero.exe
-attractions/snake.exe
-attractions/tag.exe
-attractions/guitar_hero.exe
-attractions/palais_des_glaces.exe
-attractions/paris_hippiques.exe
-attractions/jackpot.exe
-attractions/geometry_dash.exe
+attractionsexecsolo/guiter_hero.exe
+attractionsexecsolo/snake.exe
+attractionsexecsolo/tag.exe
+attractionsexecsolo/guitar_hero.exe
+attractionsexecsolo/palais_des_glaces.exe
+attractionsexecsolo/paris_hippiques.exe
+attractionsexecsolo/jackpot.exe
+attractionsexecsolo/geometry_dash.exe
 
 
 
 # fichiers générés par le compilateur
 saves/meilleurs_scores.txt
 
+attractions/tape_taupe.exe
