@@ -11,7 +11,8 @@ cmake-build-debug
 .vscode/settings.json
 .vscode/tasks.json
 .gitignore
-
+.build
+.idea
 # executable généré par le compilateur
 main.exe
 attractions/guiter_hero.exe
@@ -21,6 +22,8 @@ attractions/guitar_hero.exe
 attractions/palais_des_glaces.exe
 attractions/paris_hippiques.exe
 attractions/jackpot.exe
+attractions/geometry_dash.exe
+
 
 
 # fichiers générés par le compilateur
