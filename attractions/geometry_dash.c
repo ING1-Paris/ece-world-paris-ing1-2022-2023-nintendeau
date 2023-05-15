@@ -45,7 +45,7 @@ Player * creer_player() {
 }
 
 
-void jump_and_collide(Player * player, BITMAP * buffer, BITMAP * sprite, BITMAP * level_collisions, int key_jump) {
+void jump_and_collide(Player * player, BITMAP * buffer, BITMAP * sprite, BITMAP * level_collisions, int key_jump, SAMPLE * death_sound) {
 
     int spike  = makecol(255, 0, 0);
     int air    = makecol(0, 255, 0);
@@ -83,7 +83,7 @@ void jump_and_collide(Player * player, BITMAP * buffer, BITMAP * sprite, BITMAP 
     if (getpixel(buffer, player->x + sprite->w/2, player->y + sprite->h/2) == spike || player->x < - sprite->w) {
         can_jump = false;
         player->life = false;
-        printf("GAME OVER\n");
+        play_sample(death_sound, 255, 128, 1000, 0);
     }
 
     //* Collisions avec les murs
@@ -167,10 +167,10 @@ void init_allegro() {
 
 void show_start_menu(BITMAP * level, BITMAP * buffer, BITMAP * title, int largeur) {
     clear_bitmap(buffer);
-        stretch_blit(level, buffer, 0, 0, level->w, level->h, 0, 0, largeur, SCREEN_H);
-        masked_blit(title, buffer, 0, 0, SCREEN_W/2 - title->w/2, SCREEN_H/2 - title->h/2, title->w, title->h);
-        textprintf_ex(buffer, font, SCREEN_W/2 - 100, SCREEN_H/2 + 50, makecol(255, 255, 255), -1, "PRESS ENTER TO START");
-        blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+    stretch_blit(level, buffer, 0, 0, level->w, level->h, 0, 0, largeur, SCREEN_H);
+    masked_blit(title, buffer, 0, 0, SCREEN_W/2 - title->w/2, SCREEN_H/2 - title->h/2, title->w, title->h);
+    textprintf_ex(buffer, font, SCREEN_W/2 - 100, SCREEN_H/2 + 50, makecol(255, 255, 255), -1, "PRESS ENTER TO START");
+    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
 
 int main () {
@@ -188,9 +188,10 @@ int main () {
     BITMAP * buffer_2 = create_bitmap(SCREEN_W, SCREEN_H);
 
     SAMPLE * music = load_sample("../sounds/stereo_madness.wav");
+    SAMPLE * death_sound = load_sample("../sounds/gd_death.wav");
 
     //* vérifier que les fichiers ont bien été chargés (VS code et Clion ne chargent pas les fichiers de la meme maniere)
-    if (!player_sprite || !level || !music || !level_collisions || !game_over_text) {
+    if (!player_sprite || !level || !music || !level_collisions || !game_over_text || !title || !player_sprite_2 || !death_sound) {
 
         player_sprite = load_bitmap("assets\\geometry_dash\\square.bmp", NULL);
         level = load_bitmap("assets\\geometry_dash\\geometry_map.bmp", NULL);
@@ -198,8 +199,9 @@ int main () {
         game_over_text = load_bitmap("assets\\geometry_dash\\game_over.bmp", NULL);
         title = load_bitmap("assets\\geometry_dash\\title.bmp", NULL);
         music = load_sample("sounds\\stereo_madness.wav");
+        death_sound = load_sample("sounds\\gd_death.wav");
 
-        if (!player_sprite || !level || !music || !level_collisions || !game_over_text) {
+        if (!player_sprite || !level || !music || !level_collisions || !game_over_text || !title || !player_sprite_2 || !death_sound) {
             allegro_message("LOADING ERROR");
             allegro_exit();
             exit(EXIT_FAILURE);
@@ -252,12 +254,12 @@ int main () {
 
         //* Gérer les joueurs (s'ils sont en vie)
         if (player_1->life) {
-            jump_and_collide(player_1, buffer, player_sprite, level_collisions, UP);
+            jump_and_collide(player_1, buffer, player_sprite, level_collisions, UP, death_sound);
             move_player_to_default(player_1, compteur_frames);
             blit(player_sprite, buffer_2, 0, 0, player_1->x, player_1->y, 50, 50);
         }
         if (player_2->life) {
-            jump_and_collide(player_2, buffer, player_sprite, level_collisions, SPACE);
+            jump_and_collide(player_2, buffer, player_sprite, level_collisions, SPACE, death_sound);
             move_player_to_default(player_2, compteur_frames);
             blit(player_sprite_2, buffer_2, 0, 0, player_2->x, player_2->y, 50, 50);
         }

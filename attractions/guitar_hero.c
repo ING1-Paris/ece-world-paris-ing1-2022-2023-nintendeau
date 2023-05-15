@@ -157,8 +157,11 @@ void play_guitar(Note * note, int positions[4], SAMPLE * music) {
 }
 
 
-int guitar_hero() {
-    return 1;
+void show_start_menu(BITMAP * buffer, BITMAP * title) {
+    clear_bitmap(buffer);
+    masked_stretch_blit(title, buffer, 0, 0, title->w, title->h, SCREEN_W/2 - title->w, SCREEN_H/2 - title->h, title->w*2, title->h*2);
+    textprintf_ex(buffer, font, SCREEN_W/2 - 100, SCREEN_H/2 + 50, makecol(255, 255, 255), -1, "PRESS ENTER TO START");
+    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
 
 
@@ -194,18 +197,19 @@ int main() {
     BITMAP * background = load_bitmap("../assets/guitar_hero/background.bmp", NULL);
     BITMAP * logo = load_bitmap("../assets/guitar_hero/logo.bmp", NULL);
     BITMAP * game_over = load_bitmap("../assets/guitar_hero/game_over.bmp", NULL);
+    BITMAP * title = load_bitmap("../assets/guitar_hero/title.bmp", NULL);
 
-    if (!logo || !background || !game_over) {
+    if (!logo || !background || !game_over || !title) {
         game_over = load_bitmap("assets\\guitar_hero\\game_over.bmp", NULL);
         logo = load_bitmap("assets\\guitar_hero\\logo.bmp", NULL);
+        title = load_bitmap("assets\\guitar_hero\\title.bmp", NULL);
         background = load_bitmap("assets\\guitar_hero\\background.bmp", NULL);
-        if (!logo || !background || !game_over) {
+        if (!logo || !background || !game_over || !title) {
             allegro_message("IMAGE ERROR");
             allegro_exit();
             exit(EXIT_FAILURE);
         }
     }
-
 
     // charger le son
     SAMPLE * music = load_sample("../sounds/guitar.wav");
@@ -217,7 +221,6 @@ int main() {
         }
     }
 
-
     // variables
     int frame_counter = 0;
     int intervalle = MAX_INTERVALLE;
@@ -228,8 +231,12 @@ int main() {
     int positions[NB_CORDES] = {stage->w/5, stage->w*2/5, stage->w*3/5, stage->w*4/5, };
     int couleurs[NB_CORDES] = {makecol(103, 147, 52), makecol(195, 64, 60), makecol(228, 207, 76), makecol(90, 157, 188)};
 
-
     Note * ancre = NULL;
+
+    //* Afficher l'écran de démarrage
+    while (!key[KEY_ENTER]) {
+        show_start_menu(buffer, title);
+    }
 
     // on démarre le timer
     time(&start_time);
@@ -356,6 +363,7 @@ int main() {
     free_memory(buffer, stage, logo, background, game_over, player_1, player_2, player, ancre);
     destroy_sample(music);
     allegro_exit();
+    exit(EXIT_SUCCESS);
     return 0;
 }END_OF_MAIN();
 

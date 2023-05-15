@@ -26,7 +26,6 @@ typedef struct {
     int previous_x;
     int previous_y;
     int speed;
-    int temps;
 } Player;
 
 
@@ -38,18 +37,17 @@ typedef struct {
 } Cell;
 
 
-// fonction pour afficher la grille
 void show_grid(Cell *** cell_grid, BITMAP * maze, BITMAP * buffer) {
 
     // couleurs
     int wall_color = makecol(255, 255, 255);
     int cell_color = makecol(50, 50, 50);
 
-    // afficher les murs et les cases
+    //* Afficher chaque cellule
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE; j++) {
 
-            // mur du haut
+            //* Mur du haut
             if (cell_grid[i][j]->mur[0]) {
                 rectfill(maze, i * CELL_SIZE - 1, j*CELL_SIZE - 1, i*CELL_SIZE+CELL_SIZE, j*CELL_SIZE + 1, wall_color);
             }
@@ -57,7 +55,7 @@ void show_grid(Cell *** cell_grid, BITMAP * maze, BITMAP * buffer) {
                 rectfill(maze, i * CELL_SIZE + 2, j*CELL_SIZE - 1, i*CELL_SIZE+CELL_SIZE - 2, j*CELL_SIZE + 1, cell_color);
             }
 
-            // mur de droite
+            //* Mur de droite
             if (cell_grid[i][j]->mur[1]) {
                 rectfill(maze, i*CELL_SIZE+CELL_SIZE - 1, j*CELL_SIZE - 1, i*CELL_SIZE+CELL_SIZE + 1, j*CELL_SIZE+CELL_SIZE, wall_color);
             }
@@ -65,7 +63,7 @@ void show_grid(Cell *** cell_grid, BITMAP * maze, BITMAP * buffer) {
                 rectfill(maze, i*CELL_SIZE+CELL_SIZE - 1, j*CELL_SIZE + 2, i*CELL_SIZE+CELL_SIZE + 1, j*CELL_SIZE+CELL_SIZE, cell_color);
             }
 
-            // mur du bas
+            //* Mur du bas
             if (cell_grid[i][j]->mur[2]) {
                 rectfill(maze, i*CELL_SIZE - 1, j*CELL_SIZE+CELL_SIZE - 1, i*CELL_SIZE+CELL_SIZE + 1, j*CELL_SIZE+CELL_SIZE + 1, wall_color);
             }
@@ -73,7 +71,7 @@ void show_grid(Cell *** cell_grid, BITMAP * maze, BITMAP * buffer) {
                 rectfill(maze, i*CELL_SIZE  + 2, j*CELL_SIZE+CELL_SIZE - 1, i*CELL_SIZE+CELL_SIZE - 2, j*CELL_SIZE+CELL_SIZE + 1, cell_color);
             }
 
-            // mur de gauche
+            //* Mur de gauche
             if (cell_grid[i][j]->mur[3]) {
                 rectfill(maze, i*CELL_SIZE - 1, j*CELL_SIZE, i*CELL_SIZE + 1, j*CELL_SIZE+CELL_SIZE + 1, wall_color);
             }
@@ -86,7 +84,6 @@ void show_grid(Cell *** cell_grid, BITMAP * maze, BITMAP * buffer) {
 }
 
 
-// fonction pour creer une cellule
 Cell * creer_cellule(int x, int y) {
 
     Cell * new_cell = malloc(sizeof(Cell));
@@ -102,7 +99,6 @@ Cell * creer_cellule(int x, int y) {
 }
 
 
-// fonction pour créer un joueur
 Player * initialiser_joueur() {
 
     Player * player = malloc(sizeof(Player));
@@ -117,10 +113,8 @@ Player * initialiser_joueur() {
 }
 
 
-// fonction pour remplir la grille de cellules
 Cell *** remplir_grille(Cell *** cell_grid) {
 
-    // pour chaque cellule de la grille, on en crée une
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE ; j++) {
             Cell * new_cell = creer_cellule(j, i);
@@ -131,7 +125,8 @@ Cell *** remplir_grille(Cell *** cell_grid) {
 }
 
 
-// fonction pour liberer la grille de cellules et les cellules
+
+
 void free_grid(Cell *** cell_grid) {
 
     for (int i = 0; i < SIZE; i++) {
@@ -144,24 +139,21 @@ void free_grid(Cell *** cell_grid) {
 }
 
 
-// fonction pour regarder  les voisins d'une cellule et retourner un voisin aléatoire
 Cell * check_neighbours(Cell * cell, Cell *** cell_grid) {
 
-    // liste des voisins potentiels non visités
     Cell * neighbours[4];
     int nb_neighbours = 0;
 
-    // on récupère les coordonnées de la cellule
     int x = cell->x;
     int y = cell->y;
 
-    // on récupère les voisins
+    //*  On récupère les voisins
     Cell * top    = (y > 0) ?      cell_grid[y - 1][x] : NULL;
     Cell * right  = (x < SIZE-1) ? cell_grid[y][x + 1] : NULL;
     Cell * bottom = (y < SIZE-1) ? cell_grid[y + 1][x] : NULL;
     Cell * left   = (x > 0) ?      cell_grid[y][x - 1] : NULL;
 
-    // on vérifie si les voisins existent et non visités pour les ajouter a la liste
+    //* On vérifie s'il y a des voisins non visités et on les ajoute à la liste
     if (top && !top->visite) {
         neighbours[nb_neighbours] = top;
         nb_neighbours++;
@@ -179,26 +171,23 @@ Cell * check_neighbours(Cell * cell, Cell *** cell_grid) {
         nb_neighbours++;
     }
 
-    // si il y a des voisins non visités
+    //* S'il y a des voisins non visités
     if (nb_neighbours > 0) {
 
-        // on choisit un voisin au hasard
+        //* On choisit un voisin au hasard
         int random = rand() % nb_neighbours;
         Cell * chosen_neighbour = neighbours[random];
 
-        // on retourne le voisin
         return chosen_neighbour;
     }
 
-    // sinon on retourne NULL
     return NULL;
 }
 
 
-// fonction pour vérifier si toutes les cellules ont été visitées
 int check_visited(Cell *** cell_grid) {
 
-    // on parcourt la grille, des qu'on trouve une cellule non visitée on retourne 0
+    //* On parcourt la grille, des qu'on trouve une cellule non visitée on retourne 0
     for (int i = 0; i < SIZE; i++) {
         for (int j = 0; j < SIZE ; j++) {
             if (cell_grid[i][j]->visite == 0) {
@@ -206,33 +195,36 @@ int check_visited(Cell *** cell_grid) {
             }
         }
     }
-    // sinon on retourne 1
     return 1;
 }
 
 
-// fonction qui gere les collisions de la map
-//! (a corriger)
 void check_collision(Player * player, BITMAP * maze) {
 
-    // on récupère les coordonnées précédentes du joueur
+    //* On récupère les coordonnées précédentes du joueur
     int x = player->previous_x;
     int y = player->previous_y;
 
-    // couleur des murs
     int wall = makecol(255, 255, 255);
 
-    // collisions avec les murs
-    if (getpixel(maze, player->x, player->y - 10) == wall || getpixel(maze, player->x + player->size, player->y - 10) == wall || getpixel(maze, player->x, player->y + player->size) == wall || getpixel(maze, player->x + player->size, player->y + player->size) == wall) {
-        player->x = x;
-        player->y = y;
-    }
-    else {
-        player->previous_x = player->x;
-        player->previous_y = player->y;
+    //* Collisions avec les murs
+    for (int i = 0; i < player->size; i++) {
+        if (getpixel(maze, player->x + i, player->y) == wall || getpixel(maze, player->x + i, player->y + player->size) == wall) {
+            player->x = x;
+            player->y = y;
+        }
+        else if (getpixel(maze, player->x, player->y + i) == wall || getpixel(maze, player->x + player->size, player->y + i) == wall) {
+            player->x = x;
+            player->y = y;
+        }
+        else {
+            player->previous_x = player->x;
+            player->previous_y = player->y;
+        }
     }
 
-    // collisions avec les bords de la map
+
+    //* Collisions avec les bords de la map
     if (player->x < 0) {
         player->x = 0;
     }
@@ -248,9 +240,9 @@ void check_collision(Player * player, BITMAP * maze) {
 }
 
 
-// fonction pour déplacer les joueurs
 void move_players(Player * player_1, Player * player_2) {
 
+    //* Joueur 1
     if (key[KEY_UP]) {
         player_1->y -= player_1->speed;
     }
@@ -264,6 +256,7 @@ void move_players(Player * player_1, Player * player_2) {
         player_1->x += player_1->speed;
     }
 
+    //* Joueur 2
     if (key[KEY_W]) {
         player_2->y -= player_2->speed;
     }
@@ -280,14 +273,13 @@ void move_players(Player * player_1, Player * player_2) {
 }
 
 
-// fonction pour supprimer le mur entre deux cellules
 void remove_wall(Cell * current_cell, Cell * chosen_neighbour) {
 
-    // on récupère la différence entre les coordonnées des deux cellules
+    //* On récupère la différence entre les coordonnées des deux cellules
     int x_diff = current_cell->x - chosen_neighbour->x;
     int y_diff = current_cell->y - chosen_neighbour->y;
 
-    // on supprime le mur entre les deux cellules
+    //* On supprime le mur entre les deux cellules en fonction de la différence
     if (x_diff == 1) {
         current_cell->mur[0] = 0;
         chosen_neighbour->mur[2] = 0;
@@ -328,45 +320,60 @@ void init() {
 }
 
 
-void check_victory(Player * player_1, Player * player_2, time_t start_time_1, time_t start_time_2, time_t end_time_1, time_t end_time_2, BITMAP * buffer) {
+void wait_to_quit() {
 
-    if (player_1->x <= CELL_SIZE && player_1->y <= CELL_SIZE) {
-        time(&end_time_2);
-        clear_to_color(screen, makecol(0, 0, 0));
-        textprintf_ex(screen, font, 500, 400, makecol(255, 255, 255), -1, "PLAYER 1 WINS : %d", player_1->temps);
-        rest(1000);
-        allegro_exit();
-        EXIT_SUCCESS;
+    //* On affiche un message pour quitter le jeu
+    textprintf_ex(screen, font, 500, 430, makecol(255, 255, 255), -1, "PRESS ESC TO QUIT");
+    while (!key[KEY_ESC]) {
+        rest(1);
     }
-    else if (player_2->x <= CELL_SIZE && player_2->y <= CELL_SIZE) {
-        time(&end_time_1);
+    allegro_exit();
+    exit(EXIT_SUCCESS);
+}
+
+
+void check_victory(Player * player_1, Player * player_2, time_t start_time, time_t end_time, BITMAP * buffer, SAMPLE * win_music, SAMPLE * music, int * temps) {
+
+    //* Si un des joueurs arrive à la fin du labyrinthe, on affiche le temps qu'il a mis pour le finir
+    if (player_1->x <= CELL_SIZE && player_1->y <= CELL_SIZE || player_2->x <= CELL_SIZE && player_2->y <= CELL_SIZE) {
+        stop_sample(music);
+        play_sample(win_music, 255, 128, 1000, 0);
+        time(&end_time);
         clear_to_color(screen, makecol(0, 0, 0));
-        textprintf_ex(screen, font, 500, 400, makecol(255, 255, 255), -1, "PLAYER 2 WINS : %d", player_2->temps);
-        rest(1000);
+
+        if (player_1->x <= CELL_SIZE && player_1->y <= CELL_SIZE) {
+            textprintf_ex(screen, font, 500, 400, makecol(255, 255, 255), -1, "PLAYER 1 WINS : %d s", *temps);
+        }
+        else {
+            textprintf_ex(screen, font, 500, 400, makecol(255, 255, 255), -1, "PLAYER 2 WINS : %d s", *temps);
+        }
+
+        wait_to_quit();
         allegro_exit();
-        EXIT_SUCCESS;
+        exit(EXIT_SUCCESS);
     }
+
+    //* Sinon on affiche le temps des deux joueurs
     else {
-        time(&end_time_1);
-        time(&end_time_2);
-        player_1->temps = (int)difftime(end_time_1, start_time_1);
-        player_2->temps = (int)difftime(end_time_2, start_time_2);
-        textprintf_ex(buffer, font, 900, 200, makecol(255, 255, 255), -1, "PLAYER 1 : %d", player_1->temps);
-        textprintf_ex(buffer, font, 900, 300, makecol(255, 255, 255), -1, "PLAYER 2 : %d", player_2->temps);
+        time(&end_time);
+        (*temps) = (int)difftime(end_time, start_time);
+        textprintf_ex(buffer, font, 900, 200, makecol(255, 255, 255), -1, "TEMPS : %d s", *temps);
     }
 }
 
+
 void generer_labirynthe(Cell *** cell_grid, Cell * current_cell, Cell ** stack, int stack_size, BITMAP * maze, BITMAP * buffer) {
-    // génération du labyrinthe
+
+    //* Génération du labyrinthe
     while (!check_visited(cell_grid)) {
 
         current_cell->visite = 1;
         Cell * next_cell = check_neighbours(current_cell, cell_grid);
 
+        //* S'il ya un voisin pas visité
         if (next_cell) {
 
             next_cell->visite = 1;
-            // afficher la cellule courante en rouge en inversant x et y
             stack[stack_size] = current_cell;
             stack_size++;
             rectfill(maze, current_cell->y * CELL_SIZE + 2, current_cell->x * CELL_SIZE + 2, current_cell->y * CELL_SIZE + CELL_SIZE - 2, current_cell->x * CELL_SIZE + CELL_SIZE - 2, makecol(50, 50, 50));
@@ -376,6 +383,7 @@ void generer_labirynthe(Cell *** cell_grid, Cell * current_cell, Cell ** stack, 
 
         }
 
+        //* sinon, on remonte dans la pile
         else if (stack_size > 0) {
             stack_size--;
             rectfill(maze, current_cell->y * CELL_SIZE + 2, current_cell->x * CELL_SIZE + 2, current_cell->y * CELL_SIZE + CELL_SIZE - 2, current_cell->x * CELL_SIZE + CELL_SIZE - 2, makecol(50, 50, 50));
@@ -383,10 +391,30 @@ void generer_labirynthe(Cell *** cell_grid, Cell * current_cell, Cell ** stack, 
             rectfill(maze, current_cell->y * CELL_SIZE + 2, current_cell->x * CELL_SIZE + 2, current_cell->y * CELL_SIZE + CELL_SIZE - 2, current_cell->x * CELL_SIZE + CELL_SIZE - 2, makecol(255, 0, 0));
         }
 
+        //* On affiche le labyrinthe
         show_grid(cell_grid, maze, buffer);
         rectfill(maze, current_cell->y * CELL_SIZE + 2, current_cell->x * CELL_SIZE + 2, current_cell->y * CELL_SIZE + CELL_SIZE - 2, current_cell->x * CELL_SIZE + CELL_SIZE - 2, makecol(50, 50, 50));
         rest(10);
     }
+}
+
+
+void show_start_menu(BITMAP * buffer, BITMAP * titre) {
+
+    clear_bitmap(buffer);
+    masked_stretch_blit(titre, buffer, 0, 0, titre->w, titre->h, 300, SCREEN_H/2 - titre->h/2, 600, 100);
+    textprintf_ex(buffer, font, SCREEN_W/2 - 100, SCREEN_H/2 + 50, makecol(255, 255, 255), -1, "PRESS ENTER TO START");
+    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+}
+
+
+void show_distance_to_finish(Player * player_1, Player * player_2, BITMAP * buffer) {
+
+    int distance_1 = (int)sqrt(pow(player_1->x - CELL_SIZE, 2) + pow(player_1->y - CELL_SIZE, 2));
+    int distance_2 = (int)sqrt(pow(player_2->x - CELL_SIZE, 2) + pow(player_2->y - CELL_SIZE, 2));
+
+    textprintf_ex(buffer, font, 900, 100, makecol(255, 255, 255), -1, "Joueur 1 a %dm de la fin", distance_1);
+    textprintf_ex(buffer, font, 900, 150, makecol(255, 255, 255), -1, "Joueur 2 a %dm de la fin", distance_2);
 }
 
 
@@ -396,7 +424,7 @@ int main() {
 
     srand(time(NULL));
 
-    // on initialise les joueurs
+    //* On initialise les joueurs
     Player * player_1 = initialiser_joueur();
     player_1->x = SCREEN_H - CELL_SIZE/2;
     player_1->y = SCREEN_H - CELL_SIZE/2 - player_1->size;
@@ -405,17 +433,16 @@ int main() {
     player_2->x = SCREEN_H - CELL_SIZE/2 - player_1->size;
     player_2->y = SCREEN_H - CELL_SIZE/2;
 
-    // on initialise les BITMAPS
+    //* On initialise les BITMAPS
     BITMAP * buffer = create_bitmap(SCREEN_W, SCREEN_H);
     BITMAP * maze = create_bitmap(SCREEN_H, SCREEN_H);
     BITMAP * mask = create_bitmap(SCREEN_W, SCREEN_H);
-
     BITMAP * titre = load_bitmap("../assets/palais_des_glaces/maze_run.bmp", NULL);
 
     BITMAP * player_sprite_1 = load_bitmap("../assets/palais_des_glaces/player_1.bmp", NULL);
     BITMAP * player_sprite_2 = load_bitmap("../assets/palais_des_glaces/player_2.bmp", NULL);
 
-    // on vérifie que les BITMAPS ont bien été initialisés
+    //* On vérifie que les bitmaps ont bien été initialisés
     if (!titre || !player_sprite_1 || !player_sprite_2) {
 
         titre = load_bitmap("assets\\palais_des_glaces\\maze_run.bmp", NULL);
@@ -430,12 +457,14 @@ int main() {
         }
     }
 
-
-    // charger la musique de fond
+    //* Charger la musique de fond
     SAMPLE * bcg_music = load_sample("../sounds/Bubble-Bobble.wav");
+    SAMPLE * win_music = load_sample("../sounds/mario_victory.wav");
 
-    if (!bcg_music) {
+    // *Vérifier que la musique a bien été chargée
+    if (!bcg_music || !win_music) {
         bcg_music = load_sample("sounds\\Bubble-Bobble.wav");
+        win_music = load_sample("sounds\\mario_victory.wav");
         if (!bcg_music) {
             allegro_message("SAMPLE ERROR");
             allegro_exit();
@@ -443,10 +472,8 @@ int main() {
         }
     }
 
-
     // jouer la musique de fond
     play_sample(bcg_music, 255, 128, 1000, 1);
-
 
     // création du tableau de cellules (SIZE*SIZE)
     Cell *** cell_grid = malloc(sizeof(Cell**) * SIZE);
@@ -463,43 +490,50 @@ int main() {
     int stack_size = 0;
 
 
-    time_t start_time_1, start_time_2, end_time_1, end_time_2;
+    time_t start_time, end_time;
+    int temps = 0;
+    int ptemps = &temps;
 
     // génération du labyrinthe
     generer_labirynthe(cell_grid, current_cell, stack, stack_size, maze, buffer);
 
     // on demarre le chrono
-    time(&start_time_1);
-    time(&start_time_2);
+    time(&start_time);
+
+    while (!key[KEY_ENTER]) {
+        show_start_menu(buffer, titre);
+    }
 
     // main loop
     while (!key[KEY_ESC]) {
         clear(buffer);
 
         clear_to_color(mask, makecol(0, 0, 0));
-        circlefill(mask, player_1->x + player_1->size/2, player_1->y + player_1->size, 60, makecol(255, 0, 255));
-        circlefill(mask, player_2->x + player_2->size/2, player_2->y + player_2->size, 60, makecol(255, 0, 255));
+        circlefill(mask, player_1->x + player_1->size/2, player_1->y + player_1->size/2, 65, makecol(255, 0, 255));
+        circlefill(mask, player_2->x + player_2->size/2, player_2->y + player_2->size/2, 65, makecol(255, 0, 255));
 
-        // départ en haut a gauche et arrivée en bas a droite
+        //* Départ en haut a gauche et arrivée en bas a droite
         rectfill(maze, 2, 2, CELL_SIZE - 2, CELL_SIZE - 2, makecol(100, 200, 100));
         rectfill(maze, SCREEN_H - CELL_SIZE + 2, SCREEN_H - CELL_SIZE + 2, SCREEN_H - 2, SCREEN_H - 2, makecol(100, 100, 200));
 
+        //* Affichage du labyrinthe et des joueurs
         blit(maze, buffer, 0, 0, 0, 0, SCREEN_H, SCREEN_H);
         masked_stretch_blit(player_sprite_1, buffer, 0, 0, player_sprite_1->w, player_sprite_1->h, player_1->x, player_1->y - 10, player_1->size, player_1->size + 10);
         masked_stretch_blit(player_sprite_2, buffer, 0, 0, player_sprite_2->w, player_sprite_2->h, player_2->x, player_2->y - 10, player_2->size, player_2->size + 10);
 
-        // collisions et mouvements
+        //* Collisions et mouvements
         check_collision(player_1, maze);
         check_collision(player_2, maze);
         move_players(player_1, player_2);
 
-        check_victory(player_1, player_2, start_time_1, start_time_2, end_time_1, end_time_2, buffer);
 
-        // encore affichage
-        masked_stretch_blit(titre, buffer, 0, 0, titre->w, titre->h, 810, 10, 380, 50);
+        //* Encore affichage
         masked_blit(mask, buffer, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-        rectfill(buffer, SCREEN_W*2/3, 70, SCREEN_W, 70, makecol(255, 255, 255));
+        rectfill(buffer, SCREEN_W * 2/3, 70, SCREEN_W, 70, makecol(255, 255, 255));
         rectfill(buffer, SCREEN_H, 0, SCREEN_H, SCREEN_H, makecol(255, 255, 255));
+        check_victory(player_1, player_2, start_time, end_time, buffer, win_music, bcg_music, ptemps);
+        masked_stretch_blit(titre, buffer, 0, 0, titre->w, titre->h, 810, 10, 380, 50);
+        show_distance_to_finish(player_1, player_2, buffer);
         blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
     }
     free_grid(cell_grid);
