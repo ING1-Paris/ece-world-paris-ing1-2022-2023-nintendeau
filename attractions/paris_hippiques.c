@@ -28,7 +28,7 @@ int main() {
     textprintf_ex(accueil, font, 10, 340, makecol(255, 255, 255), -1, "Le premier joueur qui arrive à un solde de 0 ticket a perdu.");
     textprintf_ex(accueil, font, 10, 380, makecol(255, 255, 255), -1, "Appuyez sur ENTREE pour continuer.");
     while (!key[KEY_ENTER]) {
-        blit(accueil, screen, 0, 0, 0, 0, 800, 500); //affichage de l'image
+        blit(accueil, screen, 0, 0, 0, 0, 1500, 700); //affichage de l'image
         rest(20);
     }
     int choix1 = 0; //variable qui va permettre de choisir le cheval
@@ -191,16 +191,16 @@ int main() {
                 speed4 = rand() % 20 + 1;
             }
 
-            // Affichage du fond
+            //affichage du fond
             blit(background, page, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
             line(page, 100, 530, 100, 703, makecol(255, 255, 0));
             line(page, 1400, 530, 1400, 703, makecol(50, 0, 50));
 
 
-            // Déplacement du sprite 1
+            //déplacement du cheval 1
             x1 += speed1/10;
             if (x1 > 1410) {
-                bool gagne = true;
+                gagne = true;
                 if(choix1 == 1){
                     score1 ++;
                     soldeticket1 += 1;
@@ -219,10 +219,10 @@ int main() {
             }
             draw_sprite(page, sprite1[anim], x1, y1);
 
-            // Déplacement du sprite 2
+            //déplacement du cheval 2
             x2 += speed2/10;
             if (x2 > 1410) {
-                bool gagne = true;
+                gagne = true;
                 if (choix1 == 2) {
                     score1++;
                     soldeticket1 += 1;
@@ -245,7 +245,7 @@ int main() {
 
             x3 += speed3/10; //vitesse du cheval divisée par 10 pour ralentir le cheval
             if (x3 > 1410) {
-                bool gagne = true;
+                gagne = true;
                 if(choix1 == 3){
                     score1 ++;
                     soldeticket1 += 1;
@@ -267,7 +267,7 @@ int main() {
             //deplacement du cheval 4
             x4 += speed4/10;
             if (x4 > 1410) {
-                bool gagne = true;
+                gagne = true;
                 if(choix1 == 4){
                     score1 ++;
                     soldeticket1 += 1;
