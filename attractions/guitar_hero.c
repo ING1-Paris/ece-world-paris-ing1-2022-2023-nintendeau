@@ -217,9 +217,9 @@ int main() {
     }
 
     // charger le son
-    SAMPLE * music = load_sample("../sounds/guitar.wav");
+    SAMPLE * music = load_sample("../assets/guitar_hero/guitar.wav");
     if (!music) {
-        music = load_sample("sounds\\guitar.wav");
+        music = load_sample("sounds\\guitar_hero\\guitar.wav");
         if (!music) {
             allegro_message("SOUND ERROR");
             allegro_exit();

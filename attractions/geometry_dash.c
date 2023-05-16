@@ -187,8 +187,8 @@ int main () {
     BITMAP * buffer = create_bitmap(SCREEN_W, SCREEN_H);
     BITMAP * buffer_2 = create_bitmap(SCREEN_W, SCREEN_H);
 
-    SAMPLE * music = load_sample("../sounds/stereo_madness.wav");
-    SAMPLE * death_sound = load_sample("../sounds/gd_death.wav");
+    SAMPLE * music = load_sample("../assets/geometry_dash/stereo_madness.wav");
+    SAMPLE * death_sound = load_sample("../assets/geometry_dash/gd_death.wav");
 
     //* vérifier que les fichiers ont bien été chargés (VS code et Clion ne chargent pas les fichiers de la meme maniere)
     if (!player_sprite || !level || !music || !level_collisions || !game_over_text || !title || !player_sprite_2 || !death_sound) {
@@ -198,8 +198,8 @@ int main () {
         level_collisions = load_bitmap("assets\\geometry_dash\\geometry_map_collisions.bmp", NULL);
         game_over_text = load_bitmap("assets\\geometry_dash\\game_over.bmp", NULL);
         title = load_bitmap("assets\\geometry_dash\\title.bmp", NULL);
-        music = load_sample("sounds\\stereo_madness.wav");
-        death_sound = load_sample("sounds\\gd_death.wav");
+        music = load_sample("assets\\geometry_dash\\stereo_madness.wav");
+        death_sound = load_sample("assets\\geometry_dash\\gd_death.wav");
 
         if (!player_sprite || !level || !music || !level_collisions || !game_over_text || !title || !player_sprite_2 || !death_sound) {
             allegro_message("LOADING ERROR");

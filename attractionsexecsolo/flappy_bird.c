@@ -1,4 +1,4 @@
-#include <allegro.h>
+#include <llegro.h>
 #include <stdbool.h>
 
 #define SCREEN_W 640

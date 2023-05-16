@@ -459,13 +459,13 @@ int main() {
     }
 
     //* Charger la musique de fond
-    SAMPLE * bcg_music = load_sample("../sounds/Bubble-Bobble.wav");
-    SAMPLE * win_music = load_sample("../sounds/mario_victory.wav");
+    SAMPLE * bcg_music = load_sample("../assets/palais_des_glaces/Bubble-Bobble.wav");
+    SAMPLE * win_music = load_sample("../assets/palais_des_glaces/mario_victory.wav");
 
     // *Vérifier que la musique a bien été chargée
     if (!bcg_music || !win_music) {
-        bcg_music = load_sample("sounds\\Bubble-Bobble.wav");
-        win_music = load_sample("sounds\\mario_victory.wav");
+        bcg_music = load_sample("assets\\palais_des_glaces\\Bubble-Bobble.wav");
+        win_music = load_sample("assets\\palais_des_glaces\\mario_victory.wav");
         if (!bcg_music) {
             allegro_message("SAMPLE ERROR");
             allegro_exit();
@@ -493,7 +493,8 @@ int main() {
 
     time_t start_time, end_time;
     int temps;
-    int ptemps = &temps;
+    int * temps_ptr = &temps;
+    *temps_ptr = 0;
 
     // génération du labyrinthe
     generer_labirynthe(cell_grid, current_cell, stack, stack_size, maze, buffer);
@@ -532,7 +533,7 @@ int main() {
         masked_blit(mask, buffer, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
         rectfill(buffer, SCREEN_W * 2/3, 70, SCREEN_W, 70, makecol(255, 255, 255));
         rectfill(buffer, SCREEN_H, 0, SCREEN_H, SCREEN_H, makecol(255, 255, 255));
-        check_victory(player_1, player_2, start_time, end_time, buffer, win_music, bcg_music, ptemps);
+        check_victory(player_1, player_2, start_time, end_time, buffer, win_music, bcg_music, temps_ptr);
         masked_stretch_blit(titre, buffer, 0, 0, titre->w, titre->h, 810, 10, 380, 50);
         show_distance_to_finish(player_1, player_2, buffer);
         blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);

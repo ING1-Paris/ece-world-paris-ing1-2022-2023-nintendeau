@@ -52,20 +52,41 @@ void write_best_score(int score) {
 }
 
 
+void launch_game(int active) {
+    if (active) {
+        textprintf_ex(screen, font, SCREEN_W/2 - 50, SCREEN_H - 50, makecol(255, 255, 255), -1, "LAUNCH GAME");
+    }
+}
+
+
 // fonction qui gere les collisions de la map
 void check_collision(Player * player, BITMAP * calque_collisions, BITMAP * player_sprite) {
 
+    int active = 0;
+
     int x = player->previous_x;
     int y = player->previous_y;
-    int ground = makecol(0, 255, 0);
-    int wall = makecol(255, 0, 0);
-    int game = makecol(0, 0, 255);
-    int color_array[3] = {ground, wall, game};
 
-    for (int i = 0; i < 3; i++) {
+    int ground = makecol(0, 255, 0);
+    int wall   = makecol(255, 0, 0);
+
+    int palais_des_glaces_color = makecol(30, 124, 184);
+    int paris_hippiques_color   = makecol(127, 0, 127);
+    int geometry_dash_color     = makecol(0, 0, 127);
+    int tape_taupe_color        = makecol(255, 255, 0);
+    int guitar_hero_color       = makecol(127, 0, 0);
+    int jackpot_color           = makecol(0, 127, 127);
+    int tag_color               = makecol(127, 127, 127);
+    int snake_color             = makecol(0, 127, 0);
+    int flappy_bird_color       = makecol(0, 255, 255);
+
+    int color_array[11] = {ground, wall, palais_des_glaces_color, paris_hippiques_color, geometry_dash_color, tape_taupe_color, guitar_hero_color, jackpot_color, tag_color, snake_color , flappy_bird_color};
+
+    for (int i = 0; i < 11; i++) {
         // on regarde la couleur des pixels aux 4 coins de la hitbox du joueur
         if (getpixel(calque_collisions, (player->x)*calque_collisions->w/SCREEN_W, (player->y + player_sprite->h/1.3)*calque_collisions->h/SCREEN_H) == color_array[i] || getpixel(calque_collisions, (player->x + player_sprite->w)*calque_collisions->w/SCREEN_W, (player->y + player_sprite->h/1.3)*calque_collisions->h/SCREEN_H) == color_array[i] || getpixel(calque_collisions, (player->x)*calque_collisions->w/SCREEN_W, (player->y + player_sprite->h)*calque_collisions->h/SCREEN_H) == color_array[i] || getpixel(calque_collisions, (player->x + player_sprite->w)*calque_collisions->w/SCREEN_W, (player->y + player_sprite->h)*calque_collisions->h/SCREEN_H) == color_array[i]) {
             // si le joueur est sur une case mur, on le replace a sa position precedente
+            active = 0;
             if (color_array[i] == wall) {
                 player->x = x;
                 player->y = y;
@@ -73,9 +94,35 @@ void check_collision(Player * player, BITMAP * calque_collisions, BITMAP * playe
 
             // si le joueur est sur une case "game", on lance l'attraction correspondante, et on actualise sa position precedente
             else {
-                if (color_array[i] == game) {
-                    printf("game\n");
+                if (color_array[i] == palais_des_glaces_color) {
+                    printf("palais_des_glaces\n");
                 }
+                if (color_array[i] == paris_hippiques_color) {
+                    printf("paris_hippiques\n");
+                }
+                if (color_array[i] == geometry_dash_color) {
+                    printf("geometry_dash\n");
+                }
+                if (color_array[i] == tape_taupe_color) {
+                    printf("tape_taupe\n");
+                }
+                if (color_array[i] == guitar_hero_color) {
+                    printf("guitar_hero\n");
+                }
+                if (color_array[i] == jackpot_color) {
+                    printf("jackpot\n");
+                }
+                if (color_array[i] == tag_color) {
+                    printf("tag\n");
+                }
+                if (color_array[i] == snake_color) {
+                    printf("snake\n");
+                }
+                if (color_array[i] == flappy_bird_color) {
+                    printf("flappy_bird\n");
+                }
+                active = 1;
+                launch_game(active);
                 player->previous_x = player->x;
                 player->previous_y = player->y;
             }
@@ -171,7 +218,7 @@ int main() {
     //! CHARGEMENT DES BITMAPS
     BITMAP * buffer = create_bitmap(SCREEN_W, SCREEN_H);
     BITMAP * titre = load_bitmap("assets\\Titre.bmp", NULL);
-    BITMAP * map = load_bitmap("assets\\map_v2.bmp", NULL);
+    BITMAP * map = load_bitmap("assets\\map_v3.bmp", NULL);
     BITMAP * calque_collisions = load_bitmap("assets\\collision_v3.bmp", NULL);
     BITMAP * score_image = load_bitmap("assets\\score.bmp", NULL);
     BITMAP * player_sprite = load_bitmap("assets\\anim_player_bas\\frame_1.bmp", NULL);
@@ -180,7 +227,7 @@ int main() {
     // si le chemin d'acces ne fonctionne pas, on essaye avec un autre chemin d'acces (pour Clion et vscode)
     if (!map || !player_sprite || !titre || !score_image || !calque_collisions) {
 
-        map = load_bitmap("assets/map_v2.bmp", NULL);
+        map = load_bitmap("assets/map_v3.bmp", NULL);
         player_sprite = load_bitmap("../assets/anim_player_bas/frame_1.bmp", NULL);
         titre = load_bitmap("../assets/Titre.bmp", NULL);
         score_image = load_bitmap("../assets/score.bmp", NULL);

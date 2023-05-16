@@ -1,5 +1,5 @@
 //! Alfred de Vulpian - Groupe 13 - ECE Paris - 2023
-
+//
 //#     ____   _    _        _    ___ ____    ____  _____ ____     ____ _        _    ____ _____ ____
 //#    |  _ \ / \  | |      / \  |_ _/ ___|  |  _ \| ____/ ___|   / ___| |      / \  / ___| ____/ ___|
 //#   | |_) / _ \ | |     / _ \  | |\___ \  | | | |  _| \___ \  | |  _| |     / _ \| |   |  _| \___ \
@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <allegro.h>
 #include <time.h>
+#include <math.h>
 
 #define SIZE 10
 #define CELL_SIZE 800 / SIZE
@@ -491,8 +492,7 @@ int main() {
 
 
     time_t start_time, end_time;
-    int temps = 0;
-    int ptemps = &temps;
+    int temps;
 
     // génération du labyrinthe
     generer_labirynthe(cell_grid, current_cell, stack, stack_size, maze, buffer);
@@ -531,7 +531,7 @@ int main() {
         masked_blit(mask, buffer, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
         rectfill(buffer, SCREEN_W * 2/3, 70, SCREEN_W, 70, makecol(255, 255, 255));
         rectfill(buffer, SCREEN_H, 0, SCREEN_H, SCREEN_H, makecol(255, 255, 255));
-        check_victory(player_1, player_2, start_time, end_time, buffer, win_music, bcg_music, ptemps);
+        check_victory(player_1, player_2, start_time, end_time, buffer, win_music, bcg_music, &temps);
         masked_stretch_blit(titre, buffer, 0, 0, titre->w, titre->h, 810, 10, 380, 50);
         show_distance_to_finish(player_1, player_2, buffer);
         blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
