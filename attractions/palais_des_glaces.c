@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <allegro.h>
 #include <time.h>
+#include <math.h>
 
 #define SIZE 10
 #define CELL_SIZE 800 / SIZE
@@ -491,7 +492,7 @@ int main() {
 
 
     time_t start_time, end_time;
-    int temps = 0;
+    int temps;
     int ptemps = &temps;
 
     // génération du labyrinthe
