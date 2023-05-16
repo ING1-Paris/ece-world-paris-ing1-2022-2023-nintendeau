@@ -1,6 +1,6 @@
-#ifndef tag
-#define tag
+#ifndef TAG_H
+#define TAG_H
 
-int main();
+int tag();
 
 #endif // tag

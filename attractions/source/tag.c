@@ -37,6 +37,146 @@ typedef struct {
     int score;
 } Bonhomme;
 
+//définir chaque fonction : 
+void init_allegro();
+void lib_memory(BITMAP * buffer, BITMAP * calque_collision, BITMAP * background, BITMAP * bonhomme1, BITMAP * bonhomme2, BITMAP * torche1 , BITMAP * torche2, BITMAP * cheminee1, BITMAP * cheminee2, SAMPLE * jump, SAMPLE * music);
+void init_chat(Bonhomme *bonhomme1, Bonhomme *bonhomme2);
+BITMAP* image_loader(const char* filepath);
+void arrow_manager(BITMAP * buffer, Bonhomme bonhomme1, Bonhomme bonhomme2, int compteur, int * fleche_liste, int init);
+void mouvement(Bonhomme *bonhomme, BITMAP *calque_collision, int groundLevel, int HORIZONTAL_SPEED, int MAX_JUMP_HEIGHT, double GRAVITY, double MAX_FALL_SPEED, int UP, int RIGHT, int LEFT, SAMPLE * jump);
+void loadNumberBitmaps(BITMAP *numberBitmaps[10]);
+void displayNumber(BITMAP* destination, BITMAP* numberBitmaps[], int number, int x, int y);
+void draw_background_elements_animation(BITMAP *buffer, BITMAP *torche1, BITMAP *torche2, BITMAP *cheminee1, BITMAP *cheminee2, int compteur);
+
+int tag(){
+
+    //! Initialisation des paramètres
+    double GRAVITY = 0.4;
+    double MAX_FALL_SPEED = 20;
+    int HORIZONTAL_SPEED = 6;
+    int MAX_JUMP_HEIGHT = 14;
+    int groundLevel = SCREEN_HEIGHT - 39;
+    int counter_duration = 60;
+    //!##########################################
+
+    // Création du buffer
+    BITMAP *buffer = create_bitmap(SCREEN_WIDTH, SCREEN_HEIGHT);
+    BITMAP * map = image_loader("attractions/assets/tag/map.bmp");
+    BITMAP * calque_collisions = image_loader("attractions/assets/tag/map_collisions.bmp");
+    
+    // Création du bonhomme
+    Bonhomme bonhomme1 = {image_loader("attractions/assets/tag/player_1.bmp"), SCREEN_WIDTH/2, SCREEN_HEIGHT - 150, 0, 0, FALSE};
+    Bonhomme bonhomme2 = {image_loader("attractions/assets/tag/player_2.bmp"), SCREEN_WIDTH/3, SCREEN_HEIGHT - 150, 0, 0, FALSE};
+    init_chat(&bonhomme1, &bonhomme2);
+
+
+    //Variables pour la flèche
+    clock_t start;
+    int fleche_liste[20];
+    for (int i = 0; i < 20; ++i) {
+        fleche_liste[i] = i+1;
+    }
+    int compteur = 1;
+    bool reverse = FALSE;
+
+    //Variables pour le chronomètre
+    BITMAP* numberBitmaps[10];
+    loadNumberBitmaps(numberBitmaps);
+    int chrono = 1;
+    clock_t start_chrono = clock();
+
+    SAMPLE *music = load_sample("../attractions/assets/tag/music.wav");
+    if (!music) {
+        if (!music){
+            allegro_message("Failed to load music");
+            exit(1);
+        }
+    }
+    play_sample(music, 255, 127, 1000, 1);
+
+    SAMPLE *jump = load_sample("../attractions/assets/tag/jump.wav");
+    if (!jump) {
+        jump = load_sample("../assets/tag/jump.wav");
+        if (!jump){
+            allegro_message("Failed to load jump sound");
+            exit(1);
+        }
+    }
+
+    BITMAP *torche1 = image_loader("attractions/assets/tag/torche1.bmp");
+    BITMAP *torche2 = image_loader("attractions/assets/tag/torche2.bmp");
+    BITMAP *cheminee1 = image_loader("attractions/assets/tag/cheminee1.bmp");
+    BITMAP *cheminee2 = image_loader("attractions/assets/tag/cheminee2.bmp");
+
+    // Boucle principale
+    while (!key[KEY_ESC]) {
+        // Update bonhomme's position
+        mouvement(&bonhomme1, calque_collisions, groundLevel, HORIZONTAL_SPEED, MAX_JUMP_HEIGHT, GRAVITY, MAX_FALL_SPEED, KEY_UP, KEY_RIGHT, KEY_LEFT, jump);
+        mouvement(&bonhomme2, calque_collisions, groundLevel, HORIZONTAL_SPEED, MAX_JUMP_HEIGHT, GRAVITY, MAX_FALL_SPEED, KEY_W, KEY_D, KEY_A, jump);
+
+        
+        //when players touch themselves, reverse the chat role but only once every second, to avoid the chat to change every frame
+        //example of collision : (head1->x <= current_block->x + BLOCK_SIZE && current_block->x <= head1->x + BLOCK_SIZE && head1->y <= current_block->y + BLOCK_SIZE && current_block->y <= head1->y + BLOCK_SIZE)
+        if (bonhomme1.x <= bonhomme2.x + bonhomme2.sprite->w && bonhomme2.x <= bonhomme1.x + bonhomme1.sprite->w && bonhomme1.y <= bonhomme2.y + bonhomme2.sprite->h && bonhomme2.y <= bonhomme1.y + bonhomme1.sprite->h) {
+            //if the chat role has not been changed in the last second
+            if (clock() - start > 1000) {
+                //reverse the chat role
+                bonhomme1.isChat = !bonhomme1.isChat;
+                bonhomme2.isChat = !bonhomme2.isChat;
+                //reset the timer
+                start = clock();
+            }
+        }
+
+        //score++ of the player who is the chat
+        if (bonhomme1.isChat) {
+            bonhomme1.score++;
+        }
+        else {
+            bonhomme2.score++;
+        }
+        // Effacer l'écran précédent
+        clear(buffer);
+
+        // Draw bonhomme sprite at its updated position
+        stretch_blit(calque_collisions, buffer, 0, 0, calque_collisions->w, calque_collisions->h, 0, 0, buffer->w, buffer->h);
+        stretch_blit(map, buffer, 0, 0, map->w, map->h, 0, 0, buffer->w, buffer->h);
+        
+        //display the number of the chrono 
+        chrono = counter_duration - ((clock() - start_chrono) / CLOCKS_PER_SEC);
+        displayNumber(buffer, numberBitmaps, chrono, 10, 10);
+        arrow_manager(buffer, bonhomme1, bonhomme2, compteur, fleche_liste, reverse);
+        draw_background_elements_animation(buffer, torche1, torche2, cheminee1, cheminee2, chrono);
+        draw_sprite(buffer, bonhomme1.sprite, bonhomme1.x, bonhomme1.y);
+        draw_sprite(buffer, bonhomme2.sprite, bonhomme2.x, bonhomme2.y);
+
+        // Refresh screen
+        vsync();
+        blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+
+        // Update arrow counter
+        if (compteur == 19) {
+            reverse = TRUE;
+        }else if(compteur == 0){
+            reverse = FALSE;
+        }
+        (reverse)?compteur--:compteur++;
+
+        //if the chrono is over, the game is over
+        if (chrono == 0) {
+            break;
+        }
+    }
+
+    //Let's see who lost (who has the highest score)install_sound(DIGI_AUTODETECT, MIDI_AUTODETECT, NULL);
+    (bonhomme1.score > bonhomme2.score)? printf("Player 1 lost !\n"): printf("Player 2 lost !\n");
+
+    // Fermeture d'Allegro
+    lib_memory(buffer, calque_collisions, map, bonhomme1.sprite, bonhomme2.sprite, torche1, torche2, cheminee1, cheminee2, jump, music);
+    //allegro_exit();
+    return 0;
+}
+
 void init_allegro(){ //¤Initialisation des serpents (direction aléatoire)
     //Initialisation de la seed pour les nombres aléatoires
     srand(time(NULL));
@@ -81,14 +221,15 @@ void init_chat(Bonhomme *bonhomme1, Bonhomme *bonhomme2){
 
 BITMAP* image_loader(const char* filepath){
     // on vérifie que les BITMAPS ont bien été initialisés
-    char clion_filepath[100];
-    strcpy(clion_filepath, "../");
-    strcat(clion_filepath, filepath);
-    BITMAP *img = load_bitmap(clion_filepath, NULL);
+    BITMAP * img = load_bitmap(filepath, NULL);
     if (!img) {
-        img = load_bitmap(filepath, NULL);
+        char clion_filepath[100];
+        strcpy(clion_filepath, "../");
+        strcat(clion_filepath, filepath);
+        img = load_bitmap(clion_filepath, NULL);
+        
         if (!img) {
-            allegro_message("Erreur d'importation d'd'image");
+            allegro_message("Erreur d'importation d'image : %s", filepath);
             allegro_exit();
             exit(EXIT_FAILURE);
         }
@@ -97,10 +238,7 @@ BITMAP* image_loader(const char* filepath){
 }
 
 void arrow_manager(BITMAP * buffer, Bonhomme bonhomme1, Bonhomme bonhomme2, int compteur, int * fleche_liste, int init){
-    if (init){
-        
-    }
-    BITMAP * arrow = image_loader("assets/tag/arrow.bmp");
+    BITMAP * arrow = image_loader("attractions/assets/tag/arrow.bmp");
     //draw the arrow on top of the chat player and make like it is boucning up and down
     int currentindex = fleche_liste[compteur];
     if (bonhomme1.isChat) {
@@ -200,16 +338,16 @@ void mouvement(Bonhomme *bonhomme, BITMAP *calque_collision, int groundLevel, in
 
 void loadNumberBitmaps(BITMAP *numberBitmaps[10]) {
     // Load the bitmaps for numbers 0 to 9
-    numberBitmaps[0] = image_loader("assets/tag/0.bmp");
-    numberBitmaps[1] = image_loader("assets/tag/1.bmp");
-    numberBitmaps[2] = image_loader("assets/tag/2.bmp");
-    numberBitmaps[3] = image_loader("assets/tag/3.bmp");
-    numberBitmaps[4] = image_loader("assets/tag/4.bmp");
-    numberBitmaps[5] = image_loader("assets/tag/5.bmp");
-    numberBitmaps[6] = image_loader("assets/tag/6.bmp");
-    numberBitmaps[7] = image_loader("assets/tag/7.bmp");
-    numberBitmaps[8] = image_loader("assets/tag/8.bmp");
-    numberBitmaps[9] = image_loader("assets/tag/9.bmp");
+    numberBitmaps[0] = image_loader("attractions/assets/tag/0.bmp");
+    numberBitmaps[1] = image_loader("attractions/assets/tag/1.bmp");
+    numberBitmaps[2] = image_loader("attractions/assets/tag/2.bmp");
+    numberBitmaps[3] = image_loader("attractions/assets/tag/3.bmp");
+    numberBitmaps[4] = image_loader("attractions/assets/tag/4.bmp");
+    numberBitmaps[5] = image_loader("attractions/assets/tag/5.bmp");
+    numberBitmaps[6] = image_loader("attractions/assets/tag/6.bmp");
+    numberBitmaps[7] = image_loader("attractions/assets/tag/7.bmp");
+    numberBitmaps[8] = image_loader("attractions/assets/tag/8.bmp");
+    numberBitmaps[9] = image_loader("attractions/assets/tag/9.bmp");
 
     // Check if any bitmap loading failed
     for (int i = 0; i < 10; i++) {
@@ -237,7 +375,6 @@ void displayNumber(BITMAP* destination, BITMAP* numberBitmaps[], int number, int
     masked_stretch_blit(numberBitmaps[secondDigit], destination, 0, 0, numberBitmaps[secondDigit]->w, numberBitmaps[secondDigit]->h, x + 50, y, 50, 50);
 }
 
-
 void draw_background_elements_animation(BITMAP *buffer, BITMAP *torche1, BITMAP *torche2, BITMAP *cheminee1, BITMAP *cheminee2, int compteur){
     // Draw the background elements following random patterns to size
     if (compteur %2 == 0){
@@ -257,137 +394,7 @@ void draw_background_elements_animation(BITMAP *buffer, BITMAP *torche1, BITMAP 
     }
 }
 
-int main(){
-    // Initialisation d'Allegro
-    init_allegro();
 
-    //! Initialisation des paramètres
-    double GRAVITY = 0.4;
-    double MAX_FALL_SPEED = 20;
-    int HORIZONTAL_SPEED = 6;
-    int MAX_JUMP_HEIGHT = 14;
-    int groundLevel = SCREEN_HEIGHT - 39;
-    int counter_duration = 60;
-    //!##########################################
-
-    // Création du buffer
-    BITMAP *buffer = create_bitmap(SCREEN_WIDTH, SCREEN_HEIGHT);
-    BITMAP * map = image_loader("assets/tag/map.bmp");
-    BITMAP * calque_collisions = image_loader("assets/tag/map_collisions.bmp");
-    
-    // Création du bonhomme
-    Bonhomme bonhomme1 = {image_loader("assets/tag/player_1.bmp"), SCREEN_WIDTH/2, SCREEN_HEIGHT - 150, 0, 0, FALSE};
-    Bonhomme bonhomme2 = {image_loader("assets/tag/player_2.bmp"), SCREEN_WIDTH/3, SCREEN_HEIGHT - 150, 0, 0, FALSE};
-    init_chat(&bonhomme1, &bonhomme2);
-
-
-    //Variables pour la flèche
-    clock_t start;
-    int fleche_liste[20];
-    for (int i = 0; i < 20; ++i) {
-        fleche_liste[i] = i+1;
-    }
-    int compteur = 1;
-    bool reverse = FALSE;
-
-    //Variables pour le chronomètre
-    BITMAP* numberBitmaps[10];
-    loadNumberBitmaps(numberBitmaps);
-    int chrono = 1;
-    clock_t start_chrono = clock();
-
-    SAMPLE *music = load_sample("assets/tag/music.wav");
-    if (!music) {
-        music = load_sample("../assets/tag/music.wav");
-        if (!music){
-            allegro_message("Failed to load music");
-            exit(1);
-        }
-    }
-    play_sample(music, 255, 127, 1000, 1);
-
-    SAMPLE *jump = load_sample("assets/tag/jump.wav");
-    if (!jump) {
-        jump = load_sample("../assets/tag/jump.wav");
-        if (!jump){
-            allegro_message("Failed to load jump sound");
-            exit(1);
-        }
-    }
-
-    BITMAP *torche1 = image_loader("assets/tag/torche1.bmp");
-    BITMAP *torche2 = image_loader("assets/tag/torche2.bmp");
-    BITMAP *cheminee1 = image_loader("assets/tag/cheminee1.bmp");
-    BITMAP *cheminee2 = image_loader("assets/tag/cheminee2.bmp");
-
-    // Boucle principale
-    while (!key[KEY_ESC]) {
-        // Update bonhomme's position
-        mouvement(&bonhomme1, calque_collisions, groundLevel, HORIZONTAL_SPEED, MAX_JUMP_HEIGHT, GRAVITY, MAX_FALL_SPEED, KEY_UP, KEY_RIGHT, KEY_LEFT, jump);
-        mouvement(&bonhomme2, calque_collisions, groundLevel, HORIZONTAL_SPEED, MAX_JUMP_HEIGHT, GRAVITY, MAX_FALL_SPEED, KEY_W, KEY_D, KEY_A, jump);
-
-        
-        //when players touch themselves, reverse the chat role but only once every second, to avoid the chat to change every frame
-        //example of collision : (head1->x <= current_block->x + BLOCK_SIZE && current_block->x <= head1->x + BLOCK_SIZE && head1->y <= current_block->y + BLOCK_SIZE && current_block->y <= head1->y + BLOCK_SIZE)
-        if (bonhomme1.x <= bonhomme2.x + bonhomme2.sprite->w && bonhomme2.x <= bonhomme1.x + bonhomme1.sprite->w && bonhomme1.y <= bonhomme2.y + bonhomme2.sprite->h && bonhomme2.y <= bonhomme1.y + bonhomme1.sprite->h) {
-            //if the chat role has not been changed in the last second
-            if (clock() - start > 1000) {
-                //reverse the chat role
-                bonhomme1.isChat = !bonhomme1.isChat;
-                bonhomme2.isChat = !bonhomme2.isChat;
-                //reset the timer
-                start = clock();
-            }
-        }
-
-        //score++ of the player who is the chat
-        if (bonhomme1.isChat) {
-            bonhomme1.score++;
-        }
-        else {
-            bonhomme2.score++;
-        }
-        // Effacer l'écran précédent
-        clear(buffer);
-
-        // Draw bonhomme sprite at its updated position
-        stretch_blit(calque_collisions, buffer, 0, 0, calque_collisions->w, calque_collisions->h, 0, 0, buffer->w, buffer->h);
-        stretch_blit(map, buffer, 0, 0, map->w, map->h, 0, 0, buffer->w, buffer->h);
-        
-        //display the number of the chrono 
-        chrono = counter_duration - ((clock() - start_chrono) / CLOCKS_PER_SEC);
-        displayNumber(buffer, numberBitmaps, chrono, 10, 10);
-        arrow_manager(buffer, bonhomme1, bonhomme2, compteur, fleche_liste, reverse);
-        draw_background_elements_animation(buffer, torche1, torche2, cheminee1, cheminee2, chrono);
-        draw_sprite(buffer, bonhomme1.sprite, bonhomme1.x, bonhomme1.y);
-        draw_sprite(buffer, bonhomme2.sprite, bonhomme2.x, bonhomme2.y);
-
-        // Refresh screen
-        vsync();
-        blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-
-        // Update arrow counter
-        if (compteur == 19) {
-            reverse = TRUE;
-        }else if(compteur == 0){
-            reverse = FALSE;
-        }
-        (reverse)?compteur--:compteur++;
-
-        //if the chrono is over, the game is over
-        if (chrono == 0) {
-            break;
-        }
-    }
-
-    //Let's see who lost (who has the highest score)
-    (bonhomme1.score > bonhomme2.score)? printf("Player 1 lost !\n"): printf("Player 2 lost !\n");
-
-    // Fermeture d'Allegro
-    lib_memory(buffer, calque_collisions, map, bonhomme1.sprite, bonhomme2.sprite, torche1, torche2, cheminee1, cheminee2, jump, music);
-    allegro_exit();
-    return 0;
-}END_OF_MAIN();
 
 
 

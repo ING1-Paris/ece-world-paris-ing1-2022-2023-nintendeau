@@ -13,6 +13,7 @@ cmake-build-debug
 .gitignore
 .build
 .idea
+
 # executable généré par le compilateur
 main.exe
 attractionsexecsolo/guiter_hero.exe

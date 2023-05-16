@@ -115,6 +115,7 @@ void check_collision(Player * player, BITMAP * calque_collisions, BITMAP * playe
                 }
                 if (color_array[i] == tag_color) {
                     printf("tag\n");
+                    tag();
                 }
                 if (color_array[i] == snake_color) {
                     printf("snake\n");
@@ -202,6 +203,10 @@ int main() {
     allegro_init();
     install_keyboard();
     install_mouse();
+    install_sound(DIGI_AUTODETECT, MIDI_AUTODETECT, NULL);
+
+    //Initialisation de la seed pour les nombres aléatoires
+    srand(time(NULL));
 
     set_window_title("Projet Algo S2");
     set_color_depth(desktop_color_depth());
@@ -228,11 +233,11 @@ int main() {
     // si le chemin d'acces ne fonctionne pas, on essaye avec un autre chemin d'acces (pour Clion et vscode)
     if (!map || !player_sprite || !titre || !score_image || !calque_collisions) {
 
-        map = load_bitmap("assets/map_v3.bmp", NULL);
-        player_sprite = load_bitmap("../assets/anim_player_bas/frame_1.bmp", NULL);
-        titre = load_bitmap("../assets/Titre.bmp", NULL);
-        score_image = load_bitmap("../assets/score.bmp", NULL);
-        calque_collisions = load_bitmap("../assets/collision_v3.bmp", NULL);
+        map = load_bitmap("../attractions/assets/map_v3.bmp", NULL);
+        player_sprite = load_bitmap("../attractions/assets/anim_player_bas/frame_1.bmp", NULL);
+        titre = load_bitmap("../attractions/assets/Titre.bmp", NULL);
+        score_image = load_bitmap("../attractions/assets/score.bmp", NULL);
+        calque_collisions = load_bitmap("../attractions/assets/collision_v3.bmp", NULL);
 
         if (!map || !player_sprite) {
             allegro_message("BITMAP ERROR");
@@ -261,7 +266,7 @@ int main() {
         }
 
         // ecrire le score dans le fichier
-        write_best_score(player.score);
+        //write_best_score(player.score);
 
         show_mouse(screen);
 
