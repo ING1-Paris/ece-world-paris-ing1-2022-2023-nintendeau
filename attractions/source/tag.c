@@ -20,6 +20,8 @@
 #include <time.h>
 #include <stdbool.h>
 #include <unistd.h>
+//include the header located at attractions/header/tag.h
+#include "../header/tag.h"
 
 #define SCREEN_WIDTH 1200
 #define SCREEN_HEIGHT 800
@@ -255,8 +257,7 @@ void draw_background_elements_animation(BITMAP *buffer, BITMAP *torche1, BITMAP 
     }
 }
 
-int main()
-{
+int main(){
     // Initialisation d'Allegro
     init_allegro();
 

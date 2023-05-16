@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <Allegro.h>
+#include "attractions/header/tag.h"
 
 
 // Structure Player qui contient les informations du joueur
