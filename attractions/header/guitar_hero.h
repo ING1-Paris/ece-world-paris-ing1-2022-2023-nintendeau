@@ -1,6 +1,6 @@
-#ifndef guitar_hero_h
-#define guitar_hero_h
+#ifndef GUITAR_HERO_H
+#define GUITAR_HERO_H
 
-void bonjour();
+int guitar_hero();
 
-#endif
+#endif //  guitar_hero

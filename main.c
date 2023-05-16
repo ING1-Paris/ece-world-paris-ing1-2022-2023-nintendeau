@@ -12,6 +12,9 @@
 #include <stdio.h>
 #include <Allegro.h>
 #include "attractions/header/tag.h"
+#include "attractions/header/geometry_dash.h"
+#include "attractions/header/guitar_hero.h"
+#include "attractions/header/guitar_hero.h"
 
 
 // Structure Player qui contient les informations du joueur
@@ -61,7 +64,7 @@ void launch_game(int active) {
 
 
 // fonction qui gere les collisions de la map
-void check_collision(Player * player, BITMAP * calque_collisions, BITMAP * player_sprite) {
+void check_collision(Player * player, BITMAP * calque_collisions, BITMAP * player_sprite, SAMPLE * music_main) {
 
     int active = 0;
 
@@ -93,41 +96,45 @@ void check_collision(Player * player, BITMAP * calque_collisions, BITMAP * playe
                 player->y = y;
             }
 
-            // si le joueur est sur une case "game", on lance l'attraction correspondante, et on actualise sa position precedente
-            else {
+            // si le joueur est sur un jeu, on lance l'attraction correspondante
+            else if (color_array[i] != ground) {
                 if (color_array[i] == palais_des_glaces_color) {
                     printf("palais_des_glaces\n");
                 }
-                if (color_array[i] == paris_hippiques_color) {
+                else if (color_array[i] == paris_hippiques_color) {
                     printf("paris_hippiques\n");
                 }
-                if (color_array[i] == geometry_dash_color) {
+                else if (color_array[i] == geometry_dash_color) {
                     printf("geometry_dash\n");
+                    geometry_dash();
                 }
-                if (color_array[i] == tape_taupe_color) {
+                else if (color_array[i] == tape_taupe_color) {
                     printf("tape_taupe\n");
                 }
-                if (color_array[i] == guitar_hero_color) {
+                else if (color_array[i] == guitar_hero_color) {
                     printf("guitar_hero\n");
+                    stop_sample(music_main);
+                    guitar_hero();
                 }
-                if (color_array[i] == jackpot_color) {
+                else if (color_array[i] == jackpot_color) {
                     printf("jackpot\n");
                 }
-                if (color_array[i] == tag_color) {
+                else if (color_array[i] == tag_color) {
                     printf("tag\n");
                     tag();
+
                 }
-                if (color_array[i] == snake_color) {
+                else if (color_array[i] == snake_color) {
                     printf("snake\n");
                 }
-                if (color_array[i] == flappy_bird_color) {
+                else if (color_array[i] == flappy_bird_color) {
                     printf("flappy_bird\n");
                 }
-                active = 1;
-                launch_game(active);
-                player->previous_x = player->x;
-                player->previous_y = player->y;
+                player->y = 300;
+                player->x = 300;
             }
+            player->previous_x = player->x;
+            player->previous_y = player->y;
         }
 
         // collisions avec les bordures de la fenetre
@@ -166,7 +173,7 @@ void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player
     masked_stretch_blit(titre, buffer, 0, 0, titre->w, titre->h, SCREEN_W/2 - titre->w/1.35, SCREEN_H/2 - titre->h*1.5, titre->w*1.5, titre->h*1.5);
 
     // enlever le titre si la souris est clique
-    if (mouse_b & 1) {
+    if (key[KEY_SPACE] || mouse_b & 1) {
         clear_to_color(titre, makecol(255, 0, 255));
         *can_move = 1;
     }
@@ -216,6 +223,7 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
+    show_mouse(screen);
 
     //! VARIABLES
     int frame_count = 0;
@@ -223,23 +231,24 @@ int main() {
 
     //! CHARGEMENT DES BITMAPS
     BITMAP * buffer = create_bitmap(SCREEN_W, SCREEN_H);
-    BITMAP * titre = load_bitmap("assets\\Titre.bmp", NULL);
-    BITMAP * map = load_bitmap("assets\\map_v3.bmp", NULL);
-    BITMAP * calque_collisions = load_bitmap("assets\\collision_v3.bmp", NULL);
-    BITMAP * score_image = load_bitmap("assets\\score.bmp", NULL);
-    BITMAP * player_sprite = load_bitmap("assets\\anim_player_bas\\frame_1.bmp", NULL);
-
+    BITMAP * titre = load_bitmap("attractions\\assets\\Titre.bmp", NULL);
+    BITMAP * map = load_bitmap("attractions\\assets\\map_v3.bmp", NULL);
+    BITMAP * calque_collisions = load_bitmap("attractions\\assets\\collision_v3.bmp", NULL);
+    BITMAP * score_image = load_bitmap("attractions\\assets\\score.bmp", NULL);
+    BITMAP * player_sprite = load_bitmap("attractions\\assets\\anim_player_bas\\frame_1.bmp", NULL);
+    SAMPLE * music_main = load_wav("attractions\\assets\\music_main.wav");
 
     // si le chemin d'acces ne fonctionne pas, on essaye avec un autre chemin d'acces (pour Clion et vscode)
-    if (!map || !player_sprite || !titre || !score_image || !calque_collisions) {
+    if (!map || !player_sprite || !titre || !score_image || !calque_collisions || !music_main) {
 
         map = load_bitmap("../attractions/assets/map_v3.bmp", NULL);
         player_sprite = load_bitmap("../attractions/assets/anim_player_bas/frame_1.bmp", NULL);
         titre = load_bitmap("../attractions/assets/Titre.bmp", NULL);
         score_image = load_bitmap("../attractions/assets/score.bmp", NULL);
         calque_collisions = load_bitmap("../attractions/assets/collision_v3.bmp", NULL);
+        music_main = load_wav("../attractions/assets/music_main.wav");
 
-        if (!map || !player_sprite) {
+        if (!map || !player_sprite || !titre || !score_image || !calque_collisions || !music_main) {
             allegro_message("BITMAP ERROR");
             allegro_exit();
             exit(EXIT_FAILURE);
@@ -250,11 +259,12 @@ int main() {
     // fait apparaitre le joueur au centre de l'ecran
     Player player = {200, 200, 4, 0, 5}; //!{x, y, width, height, speed, score}
 
+    play_sample(music_main, 255, 128, 1000, 1);
 
     //& boucle principale du menu (carte du parc)
-    while (!key[KEY_ESC]) {
+    while (!key[KEY_M]) {
 
-        check_collision(&player, calque_collisions, player_sprite);
+        check_collision(&player, calque_collisions, player_sprite, music_main);
 
         if (can_move) {
             move_player(&player);
@@ -267,8 +277,6 @@ int main() {
 
         // ecrire le score dans le fichier
         //write_best_score(player.score);
-
-        show_mouse(screen);
 
         // passer a la frame suivante de l'animation du joueur (4 frames)
         frame_count = (frame_count + 1) % 4;

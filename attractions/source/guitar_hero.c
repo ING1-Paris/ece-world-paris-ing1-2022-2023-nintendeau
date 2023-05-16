@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <allegro.h>
 #include <time.h>
+#include "../header/guitar_hero.h"
 
 #define BPM 30
 #define MAX_INTERVALLE 2 * BPM // (1 bpm = 2 temps)
@@ -15,200 +16,53 @@ typedef struct {
 } Player;
 
 
-typedef struct {
+typedef struct note {
     int x;
     int y;
     int y_speed;
     int color;
     int alive;
-    struct Note * next;
+    struct note * next;
 } Note;
 
 
-// afficher le temps de jeu et le nombre de vies restantes
-void afficher_stats(Player * player, BITMAP * buffer, int duration) {
-    textprintf_ex(buffer, font, 10, 10, makecol(255, 255, 255), -1, "player : %d", player->id);
-    textprintf_ex(buffer, font, 10, 30, makecol(255, 255, 255), -1, "life : %d", player->life);
-    textprintf_ex(buffer, font, 10, 50, makecol(255, 255, 255), -1, "duration : %d s", duration);
-}
+void afficher_stats(Player * player, BITMAP * buffer, int duration);
+void afficher_boutons(BITMAP * stage, int positions[5], int couleurs[5]);
+void afficher_final_screen(int duration, BITMAP * buffer, BITMAP * game_over);
+Player * creer_joueur(int id);
+int victory (int temps_1, int temps_2);
+void fin_partie(BITMAP * buffer, int gagnant);
+void afficher(BITMAP * buffer, BITMAP * stage, int positions[4], int couleurs[4]);
+void afficher_cordes(BITMAP * stage, int positions[4], int couleurs[4]);
+void afficher_note(BITMAP * stage, Note * note);
+void free_memory(BITMAP * buffer, BITMAP * stage, BITMAP * logo, BITMAP * background, BITMAP * game_over, Player * player_1, Player * player_2, Player * player, Note * ancre);
+Note * allouer_note(Note * note, int x, int color);
+void play_guitar(Note * note, int positions[4], SAMPLE * music);
+void afficher_start_menu(BITMAP * buffer, BITMAP * title);
 
-
-// afficher les boutons en bas du stage
-void afficher_boutons(BITMAP * stage, int positions[5], int couleurs[5]) {
-    for (int i = 0; i < NB_CORDES; i++) {
-        // cercle pour chaque position de la liste posisions en bas du stage
-        int hauteur = SCREEN_H - 100;
-        circlefill(stage, positions[i], hauteur, 20, makecol(255, 255, 255));
-        circlefill(stage, positions[i], hauteur, 18, couleurs[i]);
-        circle(stage, positions[i], hauteur, 8, makecol(0, 0, 0));
-    }
-
-    // deux lignes horizontales pour delimiter la zone de pression
-    rectfill(stage, 0, SCREEN_H - 78, stage->w, SCREEN_H - 78, makecol(255, 255, 255));
-    rectfill(stage, 0, SCREEN_H - 122, stage->w, SCREEN_H - 122, makecol(255, 255, 255));
-}
-
-
-// afficher l'écran de fin de partie
-void afficher_final_screen(int duration, BITMAP * buffer, BITMAP * game_over) {
-    clear(buffer);
-    textprintf_ex(buffer, font, SCREEN_W/2 - 50, SCREEN_H/2  + 50, makecol(255, 255, 255), -1, "time : %d s", duration);
-    textprintf_ex(buffer, font, SCREEN_W/2 - 140, SCREEN_H/2  + 65, makecol(255, 255, 255), -1, "Appuyer sur ENTER pour continuer");
-    masked_stretch_blit(game_over, buffer, 0, 0, game_over->w, game_over->h, SCREEN_W/2 - game_over->w, SCREEN_H/2 - game_over->h, game_over->w*2, game_over->h*2);
-    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-}
-
-
-Player * creer_player (int id) {
-    Player * player = malloc(sizeof(Player));
-    player->id = id;
-    player->life = 10;
-    player->temps = 0;
-    return player;
-}
-
-// déterminer le vainqueur
-int victory (int temps_1, int temps_2) {
-    return (temps_1 > temps_2) ? 1 : (temps_2 > temps_1) ? 2 : 0;
-}
-
-
-// fonction pour gérer le gagnant en fin de partie
-void fin_partie(BITMAP * buffer, int gagnant) {
-
-    if (gagnant != 0) {
-        textprintf_ex(buffer, font, SCREEN_W / 2 - 70, SCREEN_H / 2 + 80, makecol(255, 255, 255), -1,"Joueur %d gagne !", gagnant);
-    }
-    else {
-        textprintf_ex(buffer, font, SCREEN_W / 2 - 47, SCREEN_H / 2 + 80, makecol(255, 255, 255), -1, "Egalite !");
-    }
-
-    textprintf_ex(buffer, font, SCREEN_W / 2 - 90, SCREEN_H / 2 + 100, makecol(255, 255, 255), -1, "MERCI D'AVOIR JOUE !");
-    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-    rest(2000);
-    allegro_exit();
-    exit(EXIT_SUCCESS);
-}
-
-// fonction pour afficher les boutons et
-void afficher(BITMAP * buffer, BITMAP * stage, int positions[4], int couleurs[4]) {
-    afficher_boutons(stage, positions, couleurs);
-    blit(stage, buffer, 0, 0, SCREEN_W/3, 0, SCREEN_W, SCREEN_H);
-    rectfill(buffer, SCREEN_W*2/3, 0, SCREEN_W*2/3 + 2, SCREEN_H, makecol(0, 0, 0));
-    rectfill(buffer, SCREEN_W/3, 0, SCREEN_W/3 - 2, SCREEN_H, makecol(0, 0, 0));
-    rectfill(buffer, 0, 70, SCREEN_W/3, 71, makecol(255, 255, 255));
-}
-
-// fonction pour afficher les cordes
-void afficher_cordes(BITMAP * stage, int positions[4], int couleurs[4]) {
-    for (int i = 0; i < NB_CORDES; i++) {
-        rectfill(stage, positions[i], 0, positions[i] + 1, SCREEN_H, couleurs[i]);
-    }
-}
-
-
-void afficher_note(BITMAP * stage, Note * note) {
-    circlefill(stage, note->x, note->y, 20, note->color);
-}
-
-
-// fonction pour libérer la mémoire
-void free_memory(BITMAP * buffer, BITMAP * stage, BITMAP * logo, BITMAP * background, BITMAP * game_over, Player * player_1, Player * player_2, Player * player, Note * ancre) {
-
-    destroy_bitmap(buffer);
-    destroy_bitmap(stage);
-    destroy_bitmap(logo);
-    destroy_bitmap(background);
-    free(player_1);
-    free(player_2);
-    free(player);
-
-    Note * current = ancre;
-    while (current->next != NULL) {
-        Note * tmp = current;
-        free(tmp);
-        current = current->next;
-    }
-}
-
-void bonjour() {
-    printf("Bonjour !\n");
-}
-
-
-Note * allouer_note(Note * note, int x, int color) {
-    note->x = x;
-    note->y = 0;
-    note->y_speed = 4;
-    note->color = color;
-    note->alive = 1;
-    note->next = NULL;
-    return note;
-}
-
-
-void play_guitar(Note * note, int positions[4], SAMPLE * music) {
-    if (key[KEY_D] && note->x == positions[0])
-        play_sample(music,255, 128, positions[0] * 5, 1);
-
-    if (key[KEY_F] && note->x == positions[1])
-        play_sample(music,255, 128, positions[1] * 5, 1);
-
-    if (key[KEY_J] && note->x == positions[2])
-        play_sample(music,255, 128, positions[2] * 5, 1);
-
-    if (key[KEY_K] && note->x == positions[3])
-        play_sample(music,255, 128, positions[3] * 5, 1);
-}
-
-
-void show_start_menu(BITMAP * buffer, BITMAP * title) {
-    clear_bitmap(buffer);
-    masked_stretch_blit(title, buffer, 0, 0, title->w, title->h, SCREEN_W/2 - title->w, SCREEN_H/2 - title->h, title->w*2, title->h*2);
-    textprintf_ex(buffer, font, SCREEN_W/2 - 100, SCREEN_H/2 + 50, makecol(255, 255, 255), -1, "PRESS ENTER TO START");
-    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-}
-
-
-int main() {
-
-    allegro_init();
-    install_mouse();
-    install_keyboard();
-    install_timer();
-    install_sound(DIGI_AUTODETECT, MIDI_AUTODETECT, NULL);
-    set_window_title("GUITAR HERO");
-
-    set_color_depth(desktop_color_depth());
-    if (set_gfx_mode(GFX_AUTODETECT_WINDOWED, 1200, 800, 0, 0) != 0) {
-        allegro_message("GFX ERROR");
-        allegro_exit();
-        exit(EXIT_FAILURE);
-    }
+int guitar_hero() {
 
     srand(time(NULL));
 
     // initialisation des joueurs
-    Player * player_1 = creer_player(1);
-
-    Player * player_2 = creer_player(2);
-
+    Player * player_1 = creer_joueur(1);
+    Player * player_2 = creer_joueur(2);
     Player * player = player_1;
 
     // initialisation et chargement des bitmaps
     BITMAP * buffer = create_bitmap(SCREEN_W, SCREEN_H);
     BITMAP * stage = create_bitmap(SCREEN_W/3, SCREEN_H);
 
-    BITMAP * background = load_bitmap("../assets/guitar_hero/background.bmp", NULL);
-    BITMAP * logo = load_bitmap("../assets/guitar_hero/logo.bmp", NULL);
-    BITMAP * game_over = load_bitmap("../assets/guitar_hero/game_over.bmp", NULL);
-    BITMAP * title = load_bitmap("../assets/guitar_hero/title.bmp", NULL);
+    BITMAP * background = load_bitmap("../attractions/assets/guitar_hero/background.bmp", NULL);
+    BITMAP * logo = load_bitmap("../attractions/assets/guitar_hero/logo.bmp", NULL);
+    BITMAP * game_over = load_bitmap("../attractions/assets/guitar_hero/game_over.bmp", NULL);
+    BITMAP * title = load_bitmap("../attractions/assets/guitar_hero/title.bmp", NULL);
 
     if (!logo || !background || !game_over || !title) {
-        game_over = load_bitmap("assets\\guitar_hero\\game_over.bmp", NULL);
-        logo = load_bitmap("assets\\guitar_hero\\logo.bmp", NULL);
-        title = load_bitmap("assets\\guitar_hero\\title.bmp", NULL);
-        background = load_bitmap("assets\\guitar_hero\\background.bmp", NULL);
+        game_over = load_bitmap("attractions\\assets\\guitar_hero\\game_over.bmp", NULL);
+        logo = load_bitmap("attractions\\assets\\guitar_hero\\logo.bmp", NULL);
+        title = load_bitmap("attractions\\assets\\guitar_hero\\title.bmp", NULL);
+        background = load_bitmap("attractions\\assets\\guitar_hero\\background.bmp", NULL);
         if (!logo || !background || !game_over || !title) {
             allegro_message("IMAGE ERROR");
             allegro_exit();
@@ -217,9 +71,9 @@ int main() {
     }
 
     // charger le son
-    SAMPLE * music = load_sample("../sounds/guitar.wav");
+    SAMPLE * music = load_sample("../attractions/assets/guitar_hero/guitar.wav");
     if (!music) {
-        music = load_sample("sounds\\guitar.wav");
+        music = load_sample("attractions\\assets\\guitar_hero\\guitar.wav");
         if (!music) {
             allegro_message("SOUND ERROR");
             allegro_exit();
@@ -240,14 +94,15 @@ int main() {
 
     //* Afficher l'écran de démarrage
     while (!key[KEY_ENTER]) {
-        show_start_menu(buffer, title);
+        afficher_start_menu(buffer, title);
     }
 
     // on démarre le timer
     time(&start_time);
+    int gagnant = 0;
 
     // boucle principale
-    while (!key[KEY_ESC]) {
+    while (!key[KEY_ESC] || gagnant != 0) {
 
         //réinitialiser le buffer et le stage
         clear_bitmap(buffer);
@@ -327,7 +182,7 @@ int main() {
         afficher_stats(player, buffer, duration);
 
         // si le joueur n'a plus de vie, on affiche l'écran de fin
-        if (player->life == 0) {
+        if (player->life <= 0) {
             player->temps = duration;
             afficher_final_screen(duration, buffer, game_over);
 
@@ -349,8 +204,9 @@ int main() {
             else {
                 player_2 = player;
                 player_2->id = 2;
-                int gagnant = victory(player_1->temps, player_2->temps);
+                gagnant = victory(player_1->temps, player_2->temps);
                 fin_partie(buffer, gagnant);
+                return 0;
             }
         }
 
@@ -367,7 +223,139 @@ int main() {
     // on libère la memoire allouée
     free_memory(buffer, stage, logo, background, game_over, player_1, player_2, player, ancre);
     destroy_sample(music);
-    allegro_exit();
-    exit(EXIT_SUCCESS);
     return 0;
-}END_OF_MAIN();
+}
+
+
+void afficher_stats(Player * player, BITMAP * buffer, int duration) {
+    textprintf_ex(buffer, font, 10, 10, makecol(255, 255, 255), -1, "player : %d", player->id);
+    textprintf_ex(buffer, font, 10, 30, makecol(255, 255, 255), -1, "life : %d", player->life);
+    textprintf_ex(buffer, font, 10, 50, makecol(255, 255, 255), -1, "duration : %d s", duration);
+}
+
+
+void afficher_boutons(BITMAP * stage, int positions[5], int couleurs[5]) {
+    for (int i = 0; i < NB_CORDES; i++) {
+        // cercle pour chaque position de la liste posisions en bas du stage
+        int hauteur = SCREEN_H - 100;
+        circlefill(stage, positions[i], hauteur, 20, makecol(255, 255, 255));
+        circlefill(stage, positions[i], hauteur, 18, couleurs[i]);
+        circle(stage, positions[i], hauteur, 8, makecol(0, 0, 0));
+    }
+
+    // deux lignes horizontales pour delimiter la zone de pression
+    rectfill(stage, 0, SCREEN_H - 78, stage->w, SCREEN_H - 78, makecol(255, 255, 255));
+    rectfill(stage, 0, SCREEN_H - 122, stage->w, SCREEN_H - 122, makecol(255, 255, 255));
+}
+
+
+void afficher_final_screen(int duration, BITMAP * buffer, BITMAP * game_over) {
+    clear(buffer);
+    textprintf_ex(buffer, font, SCREEN_W/2 - 50, SCREEN_H/2  + 50, makecol(255, 255, 255), -1, "time : %d s", duration);
+    textprintf_ex(buffer, font, SCREEN_W/2 - 140, SCREEN_H/2  + 65, makecol(255, 255, 255), -1, "Appuyer sur ENTER pour continuer");
+    masked_stretch_blit(game_over, buffer, 0, 0, game_over->w, game_over->h, SCREEN_W/2 - game_over->w, SCREEN_H/2 - game_over->h, game_over->w*2, game_over->h*2);
+    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+}
+
+
+Player * creer_joueur(int id) {
+    Player * player = malloc(sizeof(Player));
+    player->id = id;
+    player->life = 10;
+    player->temps = 0;
+    return player;
+}
+
+
+int victory (int temps_1, int temps_2) {
+    return (temps_1 > temps_2) ? 1 : (temps_2 > temps_1) ? 2 : 0;
+}
+
+
+void fin_partie(BITMAP * buffer, int gagnant) {
+
+    if (gagnant != 0) {
+        textprintf_ex(buffer, font, SCREEN_W / 2 - 70, SCREEN_H / 2 + 80, makecol(255, 255, 255), -1,"Joueur %d gagne !", gagnant);
+    }
+    else {
+        textprintf_ex(buffer, font, SCREEN_W / 2 - 47, SCREEN_H / 2 + 80, makecol(255, 255, 255), -1, "Egalite !");
+    }
+
+    textprintf_ex(buffer, font, SCREEN_W / 2 - 90, SCREEN_H / 2 + 100, makecol(255, 255, 255), -1, "MERCI D'AVOIR JOUE !");
+    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+    rest(2000);
+}
+
+
+void afficher(BITMAP * buffer, BITMAP * stage, int positions[4], int couleurs[4]) {
+    afficher_boutons(stage, positions, couleurs);
+    blit(stage, buffer, 0, 0, SCREEN_W/3, 0, SCREEN_W, SCREEN_H);
+    rectfill(buffer, SCREEN_W*2/3, 0, SCREEN_W*2/3 + 2, SCREEN_H, makecol(0, 0, 0));
+    rectfill(buffer, SCREEN_W/3, 0, SCREEN_W/3 - 2, SCREEN_H, makecol(0, 0, 0));
+    rectfill(buffer, 0, 70, SCREEN_W/3, 71, makecol(255, 255, 255));
+}
+
+
+void afficher_cordes(BITMAP * stage, int positions[4], int couleurs[4]) {
+    for (int i = 0; i < NB_CORDES; i++) {
+        rectfill(stage, positions[i], 0, positions[i] + 1, SCREEN_H, couleurs[i]);
+    }
+}
+
+
+void afficher_note(BITMAP * stage, Note * note) {
+    circlefill(stage, note->x, note->y, 20, note->color);
+}
+
+
+void free_memory(BITMAP * buffer, BITMAP * stage, BITMAP * logo, BITMAP * background, BITMAP * game_over, Player * player_1, Player * player_2, Player * player, Note * ancre) {
+
+    destroy_bitmap(buffer);
+    destroy_bitmap(stage);
+    destroy_bitmap(logo);
+    destroy_bitmap(background);
+    free(player_1);
+    free(player_2);
+    free(player);
+
+    Note * current = ancre;
+    while (current->next != NULL) {
+        Note * tmp = current;
+        free(tmp);
+        current = current->next;
+    }
+}
+
+
+Note * allouer_note(Note * note, int x, int color) {
+    note->x = x;
+    note->y = 0;
+    note->y_speed = 4;
+    note->color = color;
+    note->alive = 1;
+    note->next = NULL;
+    return note;
+}
+
+
+void play_guitar(Note * note, int positions[4], SAMPLE * music) {
+    if (key[KEY_D] && note->x == positions[0])
+        play_sample(music,255, 128, positions[0] * 5, 1);
+
+    if (key[KEY_F] && note->x == positions[1])
+        play_sample(music,255, 128, positions[1] * 5, 1);
+
+    if (key[KEY_J] && note->x == positions[2])
+        play_sample(music,255, 128, positions[2] * 5, 1);
+
+    if (key[KEY_K] && note->x == positions[3])
+        play_sample(music,255, 128, positions[3] * 5, 1);
+}
+
+
+void afficher_start_menu(BITMAP * buffer, BITMAP * title) {
+    clear_bitmap(buffer);
+    masked_stretch_blit(title, buffer, 0, 0, title->w, title->h, SCREEN_W/2 - title->w, SCREEN_H/2 - title->h, title->w*2, title->h*2);
+    textprintf_ex(buffer, font, SCREEN_W/2 - 100, SCREEN_H/2 + 50, makecol(255, 255, 255), -1, "PRESS ENTER TO START");
+    blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+}
