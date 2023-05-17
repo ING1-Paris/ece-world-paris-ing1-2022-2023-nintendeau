@@ -9,10 +9,7 @@
 *.pdf
 
 # CMake files and json files for vscode
-.vscode/c_cpp_properties.json
-.vscode/launch.json
-.vscode/settings.json
-.vscode/tasks.json
+.vscode/
 
 
 # executable généré par le compilateur
