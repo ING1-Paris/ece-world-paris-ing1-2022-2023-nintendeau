@@ -13,20 +13,11 @@ int main() {
     install_keyboard();
     set_color_depth(32);
 
-    set_gfx_mode(GFX_AUTODETECT_WINDOWED, SCREEN_W, SCREEN_H, 0 , 0); //
+    set_gfx_mode(GFX_AUTODETECT_WINDOWED, SCREEN_W, SCREEN_H, 0 , 0);
 
-    BITMAP *accueil = create_bitmap(SCREEN_W, SCREEN_H); //création d'un bitmap
-    //titre
-    textprintf_ex(accueil, font, 900, 20, makecol(255, 255, 255), -1, "BIENVENUE DANS LE JEU PARIS HIPPIQUES");
+    BITMAP *accueil = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\accueil.bmp",NULL); //création d'un bitmap
+    BITMAP *choixjoueur1 = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\choixjoueur1.bmp",NULL);
 
-    //texte
-    textprintf_ex(accueil, font, 10, 80, makecol(255, 255, 255), -1, "Vous serez 2 JOUEURS et vous allez devoir choisir un cheval parmi les 4 qui vous sont proposés.");
-    textprintf_ex(accueil, font, 10, 140, makecol(255, 255, 255), -1, "Vous allez ensuite miser un ticket sur ce cheval.");
-    textprintf_ex(accueil, font, 10, 200, makecol(255, 255, 255), -1, "Si votre cheval gagne, vous remportez un ticket.");
-    textprintf_ex(accueil, font, 10, 260, makecol(255, 255, 255), -1, "Mais si vous perdez, vous perdez un ticket.");
-    textprintf_ex(accueil, font, 10, 320, makecol(255, 255, 255), -1, "Chaque joueur commence avec un solde de 5 tickets.");
-    textprintf_ex(accueil, font, 10, 340, makecol(255, 255, 255), -1, "Le premier joueur qui arrive à un solde de 0 ticket a perdu.");
-    textprintf_ex(accueil, font, 10, 380, makecol(255, 255, 255), -1, "Appuyez sur ENTREE pour continuer.");
     while (!key[KEY_ENTER]) {
         blit(accueil, screen, 0, 0, 0, 0, 1500, 700); //affichage de l'image
         rest(20);
@@ -35,14 +26,11 @@ int main() {
     int choix2 = 0; //variable qui va permettre de choisir le cheval
     if (key[KEY_ENTER]) {
         clear(accueil);
-        textprintf_ex(accueil, font, 10, 10, makecol(255, 255, 255), -1, "JOUEUR 1,CHOISISSEZ VOTRE CHEVAL"); //affichage du texte
-        textprintf_ex(accueil, font, 10, 30, makecol(255, 0, 0), -1, "1. CHEVAL 1");
-        textprintf_ex(accueil, font, 10, 50, makecol(0, 128, 0), -1, "2. CHEVAL 2");
-        textprintf_ex(accueil, font, 10, 70, makecol(255, 255, 0), -1, "3. CHEVAL 3");
-        textprintf_ex(accueil, font, 10, 90, makecol(128, 0, 128), -1, "4. CHEVAL 4");
-        textprintf_ex(accueil, font, 10, 110, makecol(255, 255, 255), -1, "5. QUITTER");
-        blit(accueil, screen, 0, 0, 0, 0, 800, 500);
+        destroy_bitmap(accueil);
+        BITMAP *choixjoueur1 = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\choixjoueur1.bmp",NULL);
+        blit(choixjoueur1, screen, 0, 0, 0, 0, 1500, 700);
     }
+
     while (choix1 == 0) {
         if (key[KEY_1]) {
             choix1 = 1;
@@ -63,16 +51,12 @@ int main() {
     if (choix1 == 5) {
         allegro_exit();
     }
-    rest(3000);
-    clear(accueil);
-    textprintf_ex(accueil, font, 10, 10, makecol(255, 255, 255), -1, "JOUEUR 2,CHOISISSEZ VOTRE CHEVAL");
-    textprintf_ex(accueil, font, 10, 30, makecol(255, 0, 0), -1, "1. CHEVAL 1");
-    textprintf_ex(accueil, font, 10, 50, makecol(0, 128, 0), -1, "2. CHEVAL 2");
-    textprintf_ex(accueil, font, 10, 70, makecol(255, 255, 0), -1, "3. CHEVAL 3");
-    textprintf_ex(accueil, font, 10, 90, makecol(128, 0, 128), -1, "4. CHEVAL 4");
-    textprintf_ex(accueil, font, 10, 110, makecol(255, 255, 255), -1, "5. QUITTER");
-    blit(accueil, screen, 0, 0, 0, 0, 800, 500);
+    rest(2000);
+    clear_bitmap(choixjoueur1);
+    destroy_bitmap(choixjoueur1);
 
+    BITMAP *choixjoueur2 = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\choixjoueur2.bmp",NULL);
+    blit(choixjoueur2, screen, 0, 0, 0, 0, 1500, 700);
     while (choix2 == 0) {
         if (key[KEY_1]) {
             choix2 = 1;
@@ -90,32 +74,32 @@ int main() {
             choix2 = 5;
         }
     }
-    if (choix2 == 5) {
+        if (choix2 == 5) {
         allegro_exit();
-    }
+        }
+
     if (choix1== choix2){
-        clear(accueil);
-        textprintf_ex(accueil, font, 10, 10, makecol(255, 255, 255), -1, "VOUS AVEZ CHOISI LE MEME CHEVAL");
-        textprintf_ex(accueil, font, 10, 30, makecol(255, 255, 255), -1, "Appuyez sur ENTREE pour recommencer.");
-        blit(accueil, screen, 0, 0, 0, 0, 800, 500);
+        textprintf_ex(choixjoueur2, font, 10, 10, makecol(255, 255, 255), -1, "VOUS AVEZ CHOISI LE MEME CHEVAL");
+        textprintf_ex(choixjoueur2, font, 10, 30, makecol(255, 255, 255), -1, "Appuyez sur ENTREE pour recommencer.");
+        blit(choixjoueur2, screen, 0, 0, 0, 0, 1500, 700);
         while (!key[KEY_ENTER]) {
-            blit(accueil, screen, 0, 0, 0, 0, 800, 500);
+            blit(choixjoueur2, screen, 0, 0, 0, 0, 1500, 700);
         }
         if (key[KEY_ENTER]){
             choix();
 
         }
     }
-    clear(accueil);
-    textprintf_ex(accueil, font, 10, 10, makecol(255, 255, 255), -1, "JOUEUR 1,VOUS AVEZ CHOISI LE CHEVAL %d", choix1);
-    textprintf_ex(accueil, font, 10, 30, makecol(255, 255, 255), -1, "JOUEUR 2,VOUS AVEZ CHOISI LE CHEVAL %d", choix2);
-    textprintf_ex(accueil, font, 10, 50, makecol(255, 255, 255), -1, "Appuyez sur ENTREE pour commencer la course.");
-    blit(accueil, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+    textprintf_ex(choixjoueur2, font, 600, 620, makecol(0, 55, 255), -1, "JOUEUR 1,VOUS AVEZ CHOISI LE CHEVAL %d", choix1);
+    textprintf_ex(choixjoueur2, font, 600, 650, makecol(0, 0, 0), -1, "JOUEUR 2,VOUS AVEZ CHOISI LE CHEVAL %d", choix2);
+    textprintf_ex(choixjoueur2, font, 570, 680, makecol(255, 0, 0), -1, "Appuyez sur ENTREE pour commencer la course.");
+    blit(choixjoueur2, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
     while (!key[KEY_ENTER]) {
-        blit(accueil, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+        blit(choixjoueur2, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
     }
-    clear(accueil);
-    blit(accueil, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+    clear(choixjoueur2);
+    blit(choixjoueur2, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+
     if (key[KEY_ENTER]){
 
         //DECLARATION DES VARIABLES
@@ -126,11 +110,16 @@ int main() {
         int score2 = 0; //variable qui permet de cumuler les points du joueur 2
         int soldeticket1 = 5; //variable qui permet de savoir combien de tickets le joueur 1 a acheté
         int soldeticket2 = 5; //variable qui permet de savoir combien de tickets le joueur 2 a acheté
-        srand(time(NULL));
 
-        BITMAP* background = load_bitmap("../images/coursefinal.bmp", NULL);
-        BITMAP*page = create_bitmap(SCREEN_W, SCREEN_H);
-        BITMAP* sprite1[3];
+        srand(time(NULL)); //initialisation de la fonction random pour l'attribution des vitesses des chevaux de maniere aleatoire
+
+        BITMAP *background = load_bitmap("../images/coursefinal.bmp", NULL);
+        if (!background) {
+            allegro_message("Erreur lors du chargement de l'image");
+            exit(EXIT_FAILURE);
+        }
+        BITMAP *page = create_bitmap(SCREEN_W, SCREEN_H);
+        BITMAP *sprite1[3];
         sprite1[0] = load_bitmap("../images/applejack1.bmp", NULL);
         sprite1[1] = load_bitmap("../images/applejack2.bmp", NULL);
         sprite1[2] = load_bitmap("../images/applejack3.bmp", NULL);
@@ -168,7 +157,22 @@ int main() {
         float x3 = 99, y3 = 520, speed3 = rand() % 20 + 1;
         float x4 = 99, y4 = 490, speed4 = rand() % 20 + 1;
 
-        //boucle de jeu
+        textprintf_ex(background, font, SCREEN_W/2, SCREEN_H/2, makecol(255, 255, 255), -1, "3");
+        blit(background, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+        rest(1000);
+        textprintf_ex(background, font, SCREEN_W/2, SCREEN_H/2, makecol(255, 255, 255), -1, "2");
+        blit(background, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+        rest(1000);
+        textprintf_ex(background, font, SCREEN_W/2, SCREEN_H/2, makecol(255, 255, 255), -1, "1");
+        blit(background, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+        rest(1000);
+        textprintf_ex(background, font, SCREEN_W/2, SCREEN_H/2, makecol(255, 255, 255), -1, "GO !");
+        blit(background, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+        rest(1000);
+
+
+
+        //boucle de jeu principal
         while (!key[KEY_ESC]) {
             compteur++;
             if(compteur % 4==0){ //changer d'image toutes les 4 frames (pour ralentir l'animation)
@@ -193,8 +197,8 @@ int main() {
 
             //affichage du fond
             blit(background, page, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-            line(page, 100, 530, 100, 703, makecol(255, 255, 0));
-            line(page, 1400, 530, 1400, 703, makecol(50, 0, 50));
+            line(page, 100, 530, 100, 703, makecol(255, 255, 255));
+            line(page, 1400, 530, 1400, 703, makecol(255, 255, 255));
 
 
             //déplacement du cheval 1
@@ -242,7 +246,6 @@ int main() {
             draw_sprite(page, sprite2[anim], x2, y2);
 
             //déplacement du cheval 3
-
             x3 += speed3/10; //vitesse du cheval divisée par 10 pour ralentir le cheval
             if (x3 > 1410) {
                 gagne = true;
@@ -295,33 +298,22 @@ int main() {
 
 void choix(){
 
-    BITMAP *accueil = create_bitmap(1500, 700);
-    //titre
-    textprintf_ex(accueil, font, 900, 20, makecol(255, 255, 255), -1, "BIENVENUE DANS LE JEU PARIS HIPPIQUES");
+    BITMAP *accueil = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\accueil.bmp",NULL); //création d'un bitmap
+    BITMAP *choixjoueur1 = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\choixjoueur1.bmp",NULL);
 
-    //texte
-    textprintf_ex(accueil, font, 10, 80, makecol(255, 255, 255), -1, "Vous serez 2 JOUEURS et vous allez devoir choisir un cheval parmi les 4 qui vous sont proposés.");
-    textprintf_ex(accueil, font, 10, 140, makecol(255, 255, 255), -1, "Vous allez ensuite miser un ticket sur ce cheval.");
-    textprintf_ex(accueil, font, 10, 200, makecol(255, 255, 255), -1, "Si votre cheval gagne, vous remportez un ticket.");
-    textprintf_ex(accueil, font, 10, 260, makecol(255, 255, 255), -1, "Mais si vous perdez, vous perdez un ticket.");
-    textprintf_ex(accueil, font, 10, 320, makecol(255, 255, 255), -1, "Chaque joueur commence avec un solde de 5 tickets.");
-    textprintf_ex(accueil, font, 10, 340, makecol(255, 255, 255), -1, "Le premier joueur qui arrive à un solde de 0 ticket a perdu.");
-    textprintf_ex(accueil, font, 10, 380, makecol(255, 255, 255), -1, "Appuyez sur ENTREE pour continuer.");
     while (!key[KEY_ENTER]) {
-        blit(accueil, screen, 0, 0, 0, 0, 800, 500);
+        blit(accueil, screen, 0, 0, 0, 0, 1500, 700); //affichage de l'image
+        rest(20);
     }
-    int choix1 = 0;
-    int choix2 = 0;
+    int choix1 = 0; //variable qui va permettre de choisir le cheval
+    int choix2 = 0; //variable qui va permettre de choisir le cheval
     if (key[KEY_ENTER]) {
         clear(accueil);
-        textprintf_ex(accueil, font, 10, 10, makecol(255, 255, 255), -1, "JOUEUR 1,CHOISISSEZ VOTRE CHEVAL");
-        textprintf_ex(accueil, font, 10, 30, makecol(255, 0, 0), -1, "1. CHEVAL 1");
-        textprintf_ex(accueil, font, 10, 50, makecol(0, 128, 0), -1, "2. CHEVAL 2");
-        textprintf_ex(accueil, font, 10, 70, makecol(255, 255, 0), -1, "3. CHEVAL 3");
-        textprintf_ex(accueil, font, 10, 90, makecol(128, 0, 128), -1, "4. CHEVAL 4");
-        textprintf_ex(accueil, font, 10, 110, makecol(255, 255, 255), -1, "5. QUITTER");
-        blit(accueil, screen, 0, 0, 0, 0, 800, 500);
+        destroy_bitmap(accueil);
+        BITMAP *choixjoueur1 = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\choixjoueur1.bmp",NULL);
+        blit(choixjoueur1, screen, 0, 0, 0, 0, 1500, 700);
     }
+
     while (choix1 == 0) {
         if (key[KEY_1]) {
             choix1 = 1;
@@ -342,16 +334,12 @@ void choix(){
     if (choix1 == 5) {
         allegro_exit();
     }
-    rest(3000);
-    clear(accueil);
-    textprintf_ex(accueil, font, 10, 10, makecol(255, 255, 255), -1, "JOUEUR 2,CHOISISSEZ VOTRE CHEVAL");
-    textprintf_ex(accueil, font, 10, 30, makecol(255, 0, 0), -1, "1. CHEVAL 1");
-    textprintf_ex(accueil, font, 10, 50, makecol(0, 128, 0), -1, "2. CHEVAL 2");
-    textprintf_ex(accueil, font, 10, 70, makecol(255, 255, 0), -1, "3. CHEVAL 3");
-    textprintf_ex(accueil, font, 10, 90, makecol(128, 0, 128), -1, "4. CHEVAL 4");
-    textprintf_ex(accueil, font, 10, 110, makecol(255, 255, 255), -1, "5. QUITTER");
-    blit(accueil, screen, 0, 0, 0, 0, 800, 500);
+    rest(2000);
+    clear_bitmap(choixjoueur1);
+    destroy_bitmap(choixjoueur1);
 
+    BITMAP *choixjoueur2 = load_bitmap("C:\\Users\\shaïma\\CLionProjects\\parishippiques\\images\\choixjoueur2.bmp",NULL);
+    blit(choixjoueur2, screen, 0, 0, 0, 0, 1500, 700);
     while (choix2 == 0) {
         if (key[KEY_1]) {
             choix2 = 1;
@@ -372,17 +360,26 @@ void choix(){
     if (choix2 == 5) {
         allegro_exit();
     }
+
     if (choix1== choix2){
-        clear(accueil);
-        textprintf_ex(accueil, font, 10, 10, makecol(255, 255, 255), -1, "VOUS AVEZ CHOISI LE MEME CHEVAL");
-        textprintf_ex(accueil, font, 10, 30, makecol(255, 255, 255), -1, "Appuyez sur ENTREE pour recommencer.");
-        blit(accueil, screen, 0, 0, 0, 0, 800, 500);
+        textprintf_ex(choixjoueur2, font, 10, 10, makecol(255, 255, 255), -1, "VOUS AVEZ CHOISI LE MEME CHEVAL");
+        textprintf_ex(choixjoueur2, font, 10, 30, makecol(255, 255, 255), -1, "Appuyez sur ENTREE pour recommencer.");
+        blit(choixjoueur2, screen, 0, 0, 0, 0, 1500, 700);
         while (!key[KEY_ENTER]) {
-            blit(accueil, screen, 0, 0, 0, 0, 800, 500);
+            blit(choixjoueur2, screen, 0, 0, 0, 0, 1500, 700);
         }
         if (key[KEY_ENTER]){
             choix();
 
         }
     }
+    textprintf_ex(choixjoueur2, font, 10, 10, makecol(255, 255, 255), -1, "JOUEUR 1,VOUS AVEZ CHOISI LE CHEVAL %d", choix1);
+    textprintf_ex(choixjoueur2, font, 10, 30, makecol(0, 0, 0), -1, "JOUEUR 2,VOUS AVEZ CHOISI LE CHEVAL %d", choix2);
+    textprintf_ex(choixjoueur2, font, 10, 50, makecol(0, 0, 0), -1, "Appuyez sur ENTREE pour commencer la course.");
+    blit(choixjoueur2, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+    while (!key[KEY_ENTER]) {
+        blit(choixjoueur2, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+    }
+    clear(choixjoueur2);
+    blit(choixjoueur2, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 }
