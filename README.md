@@ -2,7 +2,7 @@
 
 **Projet d'informatique avec Allegro 4 du second semestre (ECE ING1)** 
 
-*Liens : [Sujet](sujet.pdf) / [Barème](bareme.xlsx) *
+Liens : [Sujet](presentation/sujet/sujet.pdf) / [Barème](presentation/sujet/bareme.xlsx)
 
 ## Énoncé
 
