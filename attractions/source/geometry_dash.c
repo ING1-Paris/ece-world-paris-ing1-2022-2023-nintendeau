@@ -12,6 +12,7 @@
 #include <stdbool.h>
 #include <time.h>
 #include "../header/geometry_dash.h"
+#include "../header/loader.h"
 
 #define NB_BACKGROUNDS 2
 #define BCG_SPEED 10
@@ -22,9 +23,9 @@ typedef struct Player {
 
     int x;
     int y;
-    bool life;
     int jump_speed;
     int time;
+    bool life;
 } Player;
 
 
@@ -46,36 +47,22 @@ void show_start_menu_geometry_dash(BITMAP * level, BITMAP * buffer, BITMAP * tit
 
 int geometry_dash() {
 
+    set_window_title("Geometry Dash");
+
     //* charger les fichiers nécessaires
-    BITMAP * player_sprite = load_bitmap("../attractions/assets/geometry_dash/square_1.bmp", NULL);
-    BITMAP * player_sprite_2 = load_bitmap("../attractions/assets/geometry_dash/square_2.bmp", NULL);
-    BITMAP * level = load_bitmap("../attractions/assets/geometry_dash/geometry_map.bmp", NULL);
-    BITMAP * level_collisions = load_bitmap("../attractions/assets/geometry_dash/geometry_map_collisions.bmp", NULL);
-    BITMAP * game_over_text = load_bitmap("../attractions/assets/geometry_dash/game_over.bmp", NULL);
-    BITMAP * title = load_bitmap("../attractions/assets/geometry_dash/title.bmp", NULL);
-    BITMAP * buffer = create_bitmap(SCREEN_W, SCREEN_H);
-    BITMAP * buffer_2 = create_bitmap(SCREEN_W, SCREEN_H);
+    BITMAP * player_sprite    = image_loader("attractions/assets/geometry_dash/square_1.bmp");
+    BITMAP * player_sprite_2  = image_loader("attractions/assets/geometry_dash/square_2.bmp");
+    BITMAP * level            = image_loader("attractions/assets/geometry_dash/geometry_map.bmp");
+    BITMAP * level_collisions = image_loader("attractions/assets/geometry_dash/geometry_map_collisions.bmp");
+    BITMAP * game_over_text   = image_loader("attractions/assets/geometry_dash/game_over.bmp");
+    BITMAP * title            = image_loader("attractions/assets/geometry_dash/title.bmp");
 
-    SAMPLE * music = load_sample("../attractions/assets/geometry_dash/stereo_madness.wav");
-    SAMPLE * death_sound = load_sample("../attractions/assets/geometry_dash/gd_death.wav");
+    SAMPLE * music            = sound_loader("attractions/assets/geometry_dash/stereo_madness.wav");
+    SAMPLE * death_sound      = sound_loader("attractions/assets/geometry_dash/gd_death.wav");
 
-    //* vérifier que les fichiers ont bien été chargés (VS code et Clion ne chargent pas les fichiers de la meme maniere)
-    if (!player_sprite || !level || !music || !level_collisions || !game_over_text || !title || !player_sprite_2 || !death_sound) {
+    BITMAP * buffer           = create_bitmap(SCREEN_W, SCREEN_H);
+    BITMAP * buffer_2         = create_bitmap(SCREEN_W, SCREEN_H);
 
-        player_sprite = load_bitmap("attractions\\assets\\geometry_dash\\square.bmp", NULL);
-        level = load_bitmap("attractions\\assets\\geometry_dash\\geometry_map.bmp", NULL);
-        level_collisions = load_bitmap("attractions\\assets\\geometry_dash\\geometry_map_collisions.bmp", NULL);
-        game_over_text = load_bitmap("assets\\geometry_dash\\game_over.bmp", NULL);
-        title = load_bitmap("attractions\\assets\\geometry_dash\\title.bmp", NULL);
-        music = load_sample("attractions\\assets\\geometry_dash\\stereo_madness.wav");
-        death_sound = load_sample("attractions\\assets\\geometry_dash\\gd_death.wav");
-
-        if (!player_sprite || !level || !music || !level_collisions || !game_over_text || !title || !player_sprite_2 || !death_sound) {
-            allegro_message("LOADING ERROR");
-            allegro_exit();
-            exit(EXIT_FAILURE);
-        }
-    }
 
     //* Initialisation du joueur et du background
     Player * player_1 = creer_player();
@@ -109,7 +96,7 @@ int geometry_dash() {
     start = clock();
 
     //* Boucle principale
-    while (!game_over) {
+    while (!key[KEY_ESC] || !game_over) {
 
         end = clock();
         time_spent = (double)(end - start) / CLOCKS_PER_SEC;

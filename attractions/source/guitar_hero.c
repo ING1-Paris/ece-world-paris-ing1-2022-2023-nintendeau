@@ -3,6 +3,7 @@
 #include <allegro.h>
 #include <time.h>
 #include "../header/guitar_hero.h"
+#include "../header/loader.h"
 
 #define BPM 30
 #define MAX_INTERVALLE 2 * BPM // (1 bpm = 2 temps)
@@ -42,53 +43,36 @@ void show_start_menu_guitar_hero(BITMAP * buffer, BITMAP * title);
 
 int guitar_hero() {
 
+    set_window_title("Guitar Hero");
+
     srand(time(NULL));
 
     // initialisation des joueurs
     Player * player_1 = creer_joueur(1);
     Player * player_2 = creer_joueur(2);
-    Player * player = player_1;
+    Player * player   = player_1;
 
     // initialisation et chargement des bitmaps
-    BITMAP * buffer = create_bitmap(SCREEN_W, SCREEN_H);
-    BITMAP * stage = create_bitmap(SCREEN_W/3, SCREEN_H);
 
-    BITMAP * background = load_bitmap("../attractions/assets/guitar_hero/background.bmp", NULL);
-    BITMAP * logo = load_bitmap("../attractions/assets/guitar_hero/logo.bmp", NULL);
-    BITMAP * game_over = load_bitmap("../attractions/assets/guitar_hero/game_over.bmp", NULL);
-    BITMAP * title = load_bitmap("../attractions/assets/guitar_hero/title.bmp", NULL);
+    BITMAP * background = image_loader("attractions/assets/guitar_hero/background.bmp");
+    BITMAP * logo       = image_loader("attractions/assets/guitar_hero/logo.bmp");
+    BITMAP * game_over  = image_loader("attractions/assets/guitar_hero/game_over.bmp");
+    BITMAP * title      = image_loader("attractions/assets/guitar_hero/title.bmp");
 
-    if (!logo || !background || !game_over || !title) {
-        game_over = load_bitmap("attractions\\assets\\guitar_hero\\game_over.bmp", NULL);
-        logo = load_bitmap("attractions\\assets\\guitar_hero\\logo.bmp", NULL);
-        title = load_bitmap("attractions\\assets\\guitar_hero\\title.bmp", NULL);
-        background = load_bitmap("attractions\\assets\\guitar_hero\\background.bmp", NULL);
-        if (!logo || !background || !game_over || !title) {
-            allegro_message("IMAGE ERROR");
-            allegro_exit();
-            exit(EXIT_FAILURE);
-        }
-    }
+    SAMPLE * music      = sound_loader("attractions/assets/guitar_hero/guitar.wav");
 
-    // charger le son
-    SAMPLE * music = load_sample("../attractions/assets/guitar_hero/guitar.wav");
-    if (!music) {
-        music = load_sample("attractions\\assets\\guitar_hero\\guitar.wav");
-        if (!music) {
-            allegro_message("SOUND ERROR");
-            allegro_exit();
-        }
-    }
+    BITMAP * buffer     = create_bitmap(SCREEN_W, SCREEN_H);
+    BITMAP * stage      = create_bitmap(SCREEN_W/3, SCREEN_H);
 
     // variables
-    int frame_counter = 0;
-    int intervalle = MAX_INTERVALLE;
+    int frame_counter    = 0;
+    int intervalle       = MAX_INTERVALLE;
     int liste_boutons[4] = {0};
+    int duration         = 0;
     time_t start_time, end_time;
-    int duration = 0;
 
     int positions[NB_CORDES] = {stage->w/5, stage->w*2/5, stage->w*3/5, stage->w*4/5, };
-    int couleurs[NB_CORDES] = {makecol(103, 147, 52), makecol(195, 64, 60), makecol(228, 207, 76), makecol(90, 157, 188)};
+    int couleurs[NB_CORDES]  = {makecol(103, 147, 52), makecol(195, 64, 60), makecol(228, 207, 76), makecol(90, 157, 188)};
 
     Note * ancre = NULL;
 
@@ -126,7 +110,7 @@ int guitar_hero() {
             }
             else {
                 nouvelle_note->next = *&ancre;
-                *&ancre =nouvelle_note;
+                *&ancre = nouvelle_note;
             }
         }
 

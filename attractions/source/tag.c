@@ -1,17 +1,17 @@
 
 /*
- ! By Léon DALLE - ECE ING1 - TD13 
+ ! By Léon DALLE - ECE ING1 - TD13
  *
- *    ████████╗███╗   ██╗████████╗    ████████╗ █████╗  ██████╗ 
- *    ╚══██╔══╝████╗  ██║╚══██╔══╝    ╚══██╔══╝██╔══██╗██╔════╝ 
+ *    ████████╗███╗   ██╗████████╗    ████████╗ █████╗  ██████╗
+ *    ╚══██╔══╝████╗  ██║╚══██╔══╝    ╚══██╔══╝██╔══██╗██╔════╝
  *       ██║   ██╔██╗ ██║   ██║          ██║   ███████║██║  ███╗
  *       ██║   ██║╚██╗██║   ██║          ██║   ██╔══██║██║   ██║
  *       ██║   ██║ ╚████║   ██║          ██║   ██║  ██║╚██████╔╝
- *       ╚═╝   ╚═╝  ╚═══╝   ╚═╝          ╚═╝   ╚═╝  ╚═╝ ╚═════╝ 
+ *       ╚═╝   ╚═╝  ╚═══╝   ╚═╝          ╚═╝   ╚═╝  ╚═╝ ╚═════╝
  *
  * Jeu : Reproduction d'un jeu de chat (tnt tag, attrape-loup, etc.)
  * Objectif : Fluidité du jeu, gestion des collisions, gestion des scores sans fichier externe
- * Contrainte : Utilisation d'animations                                                       
+ * Contrainte : Utilisation d'animations
  */
 
 #include <stdio.h>
@@ -21,6 +21,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include "../header/tag.h"
+#include "../header/loader.h"
 
 #define SCREEN_WIDTH 1200
 #define SCREEN_HEIGHT 800
@@ -36,11 +37,11 @@ typedef struct {
     int score;
 } Bonhomme;
 
-//définir chaque fonction : 
-void lib_memory(BITMAP * buffer, BITMAP * calque_collision, BITMAP * background, BITMAP * bonhomme1, BITMAP * bonhomme2, BITMAP * torche1 , BITMAP * torche2, BITMAP * cheminee1, BITMAP * cheminee2, SAMPLE * jump, SAMPLE * music);
-void init_chat(Bonhomme *bonhomme1, Bonhomme *bonhomme2);
+//définir chaque fonction :
 BITMAP* image_loader(const char* filepath);
 SAMPLE* sound_loader(const char* filepath);
+void lib_memory(BITMAP * buffer, BITMAP * calque_collision, BITMAP * background, BITMAP * bonhomme1, BITMAP * bonhomme2, BITMAP * torche1 , BITMAP * torche2, BITMAP * cheminee1, BITMAP * cheminee2, SAMPLE * jump, SAMPLE * music);
+void init_chat(Bonhomme *bonhomme1, Bonhomme *bonhomme2);
 void arrow_manager(BITMAP * buffer, Bonhomme bonhomme1, Bonhomme bonhomme2, int compteur, int * fleche_liste, int init);
 void mouvement(Bonhomme *bonhomme, BITMAP *calque_collision, int groundLevel, int HORIZONTAL_SPEED, int MAX_JUMP_HEIGHT, double GRAVITY, double MAX_FALL_SPEED, int UP, int RIGHT, int LEFT, SAMPLE * jump);
 void loadNumberBitmaps(BITMAP *numberBitmaps[10]);
@@ -48,22 +49,23 @@ void displayNumber(BITMAP* destination, BITMAP* numberBitmaps[], int number, int
 void draw_background_elements_animation(BITMAP *buffer, BITMAP *torche1, BITMAP *torche2, BITMAP *cheminee1, BITMAP *cheminee2, int compteur);
 
 int tag(){
+
     set_window_title("Chat");
 
     //! Initialisation des paramètres
-    double GRAVITY = 0.4;
+    double GRAVITY        = 0.4;
     double MAX_FALL_SPEED = 20;
-    int HORIZONTAL_SPEED = 6;
-    int MAX_JUMP_HEIGHT = 14;
-    int groundLevel = SCREEN_HEIGHT - 39;
-    int counter_duration = 60;
+    int HORIZONTAL_SPEED  = 6;
+    int MAX_JUMP_HEIGHT   = 14;
+    int groundLevel       = SCREEN_HEIGHT - 39;
+    int counter_duration  = 60;
     //!##########################################
 
     // Création du buffer et des images principales
-    BITMAP *buffer = create_bitmap(SCREEN_WIDTH, SCREEN_HEIGHT);
-    BITMAP * map = image_loader("attractions/assets/tag/map.bmp");
     BITMAP * calque_collisions = image_loader("attractions/assets/tag/map_collisions.bmp");
-    
+    BITMAP *buffer             = create_bitmap(SCREEN_WIDTH, SCREEN_HEIGHT);
+    BITMAP * map               = image_loader("attractions/assets/tag/map.bmp");
+
     // Création du bonhomme
     Bonhomme bonhomme1 = {image_loader("attractions/assets/tag/player_1.bmp"), SCREEN_WIDTH/2, SCREEN_HEIGHT - 150, 0, 0, FALSE};
     Bonhomme bonhomme2 = {image_loader("attractions/assets/tag/player_2.bmp"), SCREEN_WIDTH/3, SCREEN_HEIGHT - 150, 0, 0, FALSE};
@@ -86,13 +88,14 @@ int tag(){
     clock_t start_chrono = clock();
 
     //Initialisation des sons et des images externes
-    SAMPLE *music = sound_loader("attractions/assets/tag/music.wav");
-    SAMPLE *jump = sound_loader("attractions/assets/tag/jump.wav");
-    play_sample(music, 255, 127, 1000, 1);
-    BITMAP *torche1 = image_loader("attractions/assets/tag/torche1.bmp");
-    BITMAP *torche2 = image_loader("attractions/assets/tag/torche2.bmp");
     BITMAP *cheminee1 = image_loader("attractions/assets/tag/cheminee1.bmp");
     BITMAP *cheminee2 = image_loader("attractions/assets/tag/cheminee2.bmp");
+    BITMAP *torche1   = image_loader("attractions/assets/tag/torche1.bmp");
+    BITMAP *torche2   = image_loader("attractions/assets/tag/torche2.bmp");
+    SAMPLE *jump      = sound_loader("attractions/assets/tag/jump.wav");
+    SAMPLE *music     = sound_loader("attractions/assets/tag/music.wav");
+
+    play_sample(music, 255, 127, 1000, 1);
 
     // Boucle principale
     while (!key[KEY_ESC]) {
@@ -100,7 +103,7 @@ int tag(){
         mouvement(&bonhomme1, calque_collisions, groundLevel, HORIZONTAL_SPEED, MAX_JUMP_HEIGHT, GRAVITY, MAX_FALL_SPEED, KEY_UP, KEY_RIGHT, KEY_LEFT, jump);
         mouvement(&bonhomme2, calque_collisions, groundLevel, HORIZONTAL_SPEED, MAX_JUMP_HEIGHT, GRAVITY, MAX_FALL_SPEED, KEY_W, KEY_D, KEY_A, jump);
 
-        
+
         //when players touch themselves, reverse the chat role but only once every second, to avoid the chat to change every frame
         //example of collision : (head1->x <= current_block->x + BLOCK_SIZE && current_block->x <= head1->x + BLOCK_SIZE && head1->y <= current_block->y + BLOCK_SIZE && current_block->y <= head1->y + BLOCK_SIZE)
         if (bonhomme1.x <= bonhomme2.x + bonhomme2.sprite->w && bonhomme2.x <= bonhomme1.x + bonhomme1.sprite->w && bonhomme1.y <= bonhomme2.y + bonhomme2.sprite->h && bonhomme2.y <= bonhomme1.y + bonhomme1.sprite->h) {
@@ -127,8 +130,8 @@ int tag(){
         // Draw bonhomme sprite at its updated position
         stretch_blit(calque_collisions, buffer, 0, 0, calque_collisions->w, calque_collisions->h, 0, 0, buffer->w, buffer->h);
         stretch_blit(map, buffer, 0, 0, map->w, map->h, 0, 0, buffer->w, buffer->h);
-        
-        //display the number of the chrono 
+
+        //display the number of the chrono
         chrono = counter_duration - ((clock() - start_chrono) / CLOCKS_PER_SEC);
         displayNumber(buffer, numberBitmaps, chrono, 10, 10);
         draw_background_elements_animation(buffer, torche1, torche2, cheminee1, cheminee2, chrono);
@@ -159,7 +162,7 @@ int tag(){
 
     // Fermeture d'Allegro
     lib_memory(buffer, calque_collisions, map, bonhomme1.sprite, bonhomme2.sprite, torche1, torche2, cheminee1, cheminee2, jump, music);
-    
+
     //allegro_exit();
     return 0;
 }
@@ -188,42 +191,6 @@ void init_chat(Bonhomme *bonhomme1, Bonhomme *bonhomme2){
     }else{
         bonhomme2->isChat = !bonhomme2->isChat;
     }
-}
-
-BITMAP* image_loader(const char* filepath){
-    // on vérifie que les BITMAPS ont bien été initialisés
-    BITMAP * img = load_bitmap(filepath, NULL);
-    if (!img) {
-        char clion_filepath[100];
-        strcpy(clion_filepath, "../");
-        strcat(clion_filepath, filepath);
-        img = load_bitmap(clion_filepath, NULL);
-        
-        if (!img) {
-            allegro_message("Erreur d'importation d'image : %s", filepath);
-            allegro_exit();
-            exit(EXIT_FAILURE);
-        }
-    }
-    return img;
-}
-
-SAMPLE* sound_loader(const char* filepath){
-    // on vérifie que les BITMAPS ont bien été initialisés
-    SAMPLE * sound = load_bitmap(filepath, NULL);
-    if (!sound) {
-        char clion_filepath[100];
-        strcpy(clion_filepath, "../");
-        strcat(clion_filepath, filepath);
-        sound = load_bitmap(clion_filepath, NULL);
-        
-        if (!sound) {
-            allegro_message("Erreur d'importation d'image : %s", filepath);
-            allegro_exit();
-            exit(EXIT_FAILURE);
-        }
-    }
-    return sound;
 }
 
 void arrow_manager(BITMAP * buffer, Bonhomme bonhomme1, Bonhomme bonhomme2, int compteur, int * fleche_liste, int init){
@@ -299,8 +266,8 @@ void mouvement(Bonhomme *bonhomme, BITMAP *calque_collision, int groundLevel, in
     if ((wall_down_left || wall_down_right || wall_up_left || wall_up_right || wall_middle_left || wall_middle_right) && !wall_middle_down) {
         bonhomme->x = bonhomme->previous_x;
         bonhomme->y = bonhomme->previous_y;
-        
-        
+
+
     }
 
     // Jump only if the bonhomme is on the ground or on a platform
@@ -349,7 +316,7 @@ void loadNumberBitmaps(BITMAP *numberBitmaps[10]) {
 }
 
 void displayNumber(BITMAP* destination, BITMAP* numberBitmaps[], int number, int x, int y) {
-    // Display the nnumber of the digits following the first number of number 
+    // Display the nnumber of the digits following the first number of number
     // (e.g., if number is 98, first display a 9, then an 8)
     //first digit of number
     if (number < 0) {
@@ -382,5 +349,3 @@ void draw_background_elements_animation(BITMAP *buffer, BITMAP *torche1, BITMAP 
         stretch_blit(torche2, buffer, 0, 0, torche2->w, torche2->h, 520, 720, 40, 40);
     }
 }
-
-

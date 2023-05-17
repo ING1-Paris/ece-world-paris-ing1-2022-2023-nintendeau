@@ -17,6 +17,7 @@
 #include "attractions/header/guitar_hero.h"
 #include "attractions/header/guitar_hero.h"
 #include "attractions/header/palais_des_glaces.h"
+#include "attractions/header/snake.h"
 
 
 // Structure Player qui contient les informations du joueur
@@ -126,10 +127,10 @@ void check_collision_main(Player * player, BITMAP * calque_collisions, BITMAP * 
                 else if (color_array[i] == tag_color) {
                     printf("tag\n");
                     tag();
-
                 }
                 else if (color_array[i] == snake_color) {
                     printf("snake\n");
+                    snake();
                 }
                 else if (color_array[i] == flappy_bird_color) {
                     printf("flappy_bird\n");

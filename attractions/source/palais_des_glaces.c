@@ -16,6 +16,7 @@
 #include <time.h>
 #include <math.h>
 #include "../header/palais_des_glaces.h"
+#include "../header/loader.h"
 
 #define SIZE 10
 #define CELL_SIZE 800 / SIZE
@@ -39,13 +40,12 @@ typedef struct {
 } Cell;
 
 
-void show_grid(Cell *** cell_grid, BITMAP * maze, BITMAP * buffer);
-Cell * creer_cellule(int x, int y);
-Player * initialiser_joueur();
+Cell *   creer_cellule(int x, int y);
 Cell *** remplir_grille(Cell *** cell_grid);
+Cell *   check_neighbours(Cell * cell, Cell *** cell_grid);
+Player * initialiser_joueur();
+void show_grid(Cell *** cell_grid, BITMAP * maze, BITMAP * buffer);
 void free_grid(Cell *** cell_grid);
-Cell * check_neighbours(Cell * cell, Cell *** cell_grid);
-int check_visited(Cell *** cell_grid);
 void check_collision(Player * player, BITMAP * maze);
 void move_players(Player * player_1, Player * player_2);
 void remove_wall(Cell * current_cell, Cell * chosen_neighbour);
@@ -54,9 +54,12 @@ void check_victory(Player * player_1, Player * player_2, time_t start_time, time
 void generer_labyrinthe(Cell *** cell_grid, Cell * current_cell, Cell ** stack, int stack_size, BITMAP * maze, BITMAP * buffer);
 void show_start_menu_maze(BITMAP * buffer, BITMAP * titre);
 void show_distance_to_finish(Player * player_1, Player * player_2, BITMAP * buffer);
+int check_visited(Cell *** cell_grid);
 
 
 int palais_des_glaces() {
+
+    set_window_title("Palais des Glaces");
 
     srand(time(NULL));
 
@@ -74,39 +77,13 @@ int palais_des_glaces() {
     BITMAP * maze = create_bitmap(SCREEN_H, SCREEN_H);
     BITMAP * mask = create_bitmap(SCREEN_W, SCREEN_H);
 
-    BITMAP * titre           = load_bitmap("../attractions/assets/palais_des_glaces/maze_run.bmp", NULL);
-    BITMAP * player_sprite_1 = load_bitmap("../attractions/assets/palais_des_glaces/player_1.bmp", NULL);
-    BITMAP * player_sprite_2 = load_bitmap("../attractions/assets/palais_des_glaces/player_2.bmp", NULL);
-
-    //* On vérifie que les bitmaps ont bien été initialisés
-    if (!titre || !player_sprite_1 || !player_sprite_2) {
-
-        titre           = load_bitmap("attractions\\assets\\palais_des_glaces\\maze_run.bmp", NULL);
-        player_sprite_1 = load_bitmap("attractions\\assets\\palais_des_glaces\\player_1.bmp", NULL);
-        player_sprite_2 = load_bitmap("attractions\\assets\\palais_des_glaces\\player_2.bmp", NULL);
-
-        if (!titre || !player_sprite_1 || !player_sprite_2) {
-
-            allegro_message("BITMAP ERROR");
-            allegro_exit();
-            exit(EXIT_FAILURE);
-        }
-    }
+    BITMAP * titre           = image_loader("attractions/assets/palais_des_glaces/maze_run.bmp");
+    BITMAP * player_sprite_1 = image_loader("attractions/assets/palais_des_glaces/player_1.bmp");
+    BITMAP * player_sprite_2 = image_loader("attractions/assets/palais_des_glaces/player_2.bmp");
 
     //* Charger la musique de fond
-    SAMPLE * bcg_music = load_sample("../attractions/assets/palais_des_glaces/Bubble-Bobble.wav");
-    SAMPLE * win_music = load_sample("../attractions/assets/palais_des_glaces/mario_victory.wav");
-
-    // *Vérifier que la musique a bien été chargée
-    if (!bcg_music || !win_music) {
-        bcg_music = load_sample("attractions\\assets\\palais_des_glaces\\Bubble-Bobble.wav");
-        win_music = load_sample("attractions\\assets\\palais_des_glaces\\mario_victory.wav");
-        if (!bcg_music) {
-            allegro_message("SAMPLE ERROR");
-            allegro_exit();
-            exit(EXIT_FAILURE);
-        }
-    }
+    SAMPLE * bcg_music = sound_loader("attractions/assets/palais_des_glaces/Bubble-Bobble.wav");
+    SAMPLE * win_music = sound_loader("attractions/assets/palais_des_glaces/mario_victory.wav");
 
     // jouer la musique de fond
     play_sample(bcg_music, 255, 128, 1000, 1);

@@ -13,7 +13,7 @@
  *
  *
  *
- * Jeu : Reproduction d'un Snake à deux joueurs sur Allegro 4
+ * Jeu : Reproduction d'un SNAKE à deux joueurs sur Allegro 4
  * Objectif : Fluidité du jeu, gestion des collisions, gestion des scores sans fichier externe
  * Contrainte : Utilisation de listes chainées pour la gestion du serpent
  *
@@ -24,7 +24,8 @@
 #include <time.h>
 #include <allegro.h>
 #include <stdbool.h>
-#include "../header/snake.h"
+#include "../header/SNAKE.h"
+#include "../header/loader.h"
 
 //* Constantes pour la taille des blocs et de l'écran
 #define BLOCK_SIZE 20
@@ -33,60 +34,62 @@
 #define SCREEN_HEIGHT 800
 
 //* Structures pour les blocs du serpent et la nourriture
-typedef struct snake {
+typedef struct Snake {
     int x, y;
     int direction;
     int previous_pos_x, previous_pos_y;
-    struct snake *next;
+    struct Snake *next;
     bool is_head;
-} snake;
+} SNAKE;
 typedef struct food {
     int x;
     int y;
 } food;
 
 //définition des fonctions :
-void init_snake(snake *head, int x, int y);
-void init_food(food *food);
 BITMAP* image_loader(const char* filepath);
 SAMPLE* sound_loader(const char* filepath);
-void lib_memoire(snake *head, food *Food, snake *head2, food *Food2, BITMAP *game, BITMAP *buffer, SAMPLE* music);
-void draw_snake(snake *head, int color, BITMAP *game);
-void add_block(snake *head);
-void move_snake(snake *head);
-int collision_mort(snake *head1, snake *head2);
-int collision_food(snake *head, food *food);
-void gestion_mouvements(snake *head1, snake *head2);
+void init_SNAKE(SNAKE *head, int x, int y);
+void init_food(food *food);
+void lib_memoire(SNAKE *head, food *Food, SNAKE *head2, food *Food2, BITMAP *game, BITMAP *buffer, SAMPLE* music);
+void draw_SNAKE(SNAKE *head, int color, BITMAP *game);
+void add_block(SNAKE *head);
+void move_SNAKE(SNAKE *head);
+void gestion_mouvements(SNAKE *head1, SNAKE *head2);
+int collision_mort(SNAKE *head1, SNAKE *head2);
+int collision_food(SNAKE *head, food *food);
 
 int snake(){
-    set_window_title("Snake");
-    BITMAP *buffer = create_bitmap(SCREEN_WIDTH, SCREEN_HEIGHT); //buffer est la fenêtre où on affiche tous les texte et autres
-    BITMAP *game = create_bitmap(SCREEN_HEIGHT, SCREEN_HEIGHT); //game is a square
 
-    BITMAP * logo_img = image_loader("assets/snake/logo.bmp");
-    BITMAP * game_over_img = image_loader("assets/snake/game_over.bmp");
+    set_window_title("SNAKE");
+
+    BITMAP * buffer = create_bitmap(SCREEN_WIDTH, SCREEN_HEIGHT); //buffer est la fenêtre où on affiche tous les texte et autres
+    BITMAP * game   = create_bitmap(SCREEN_HEIGHT, SCREEN_HEIGHT); //game is a square
+
+    BITMAP * game_over_img = image_loader("attractions/assets/SNAKE/game_over.bmp");
+    BITMAP * logo_img      = image_loader("attractions/assets/SNAKE/logo.bmp");
 
     //?Initialisation des variables
-    int game_over = 0;
-    int score1 = 0;
-    int score2 = 0;
-    int color1 = makecol(255, 0, 0);
-    int color2 = makecol(0, 0, 255);
     int buffer_color = makecol(0x47, 0xE1, 0x0C);
-    int game_color = makecol(0, 0, 0);
-    int food_colour = makecol(71, 225, 12);
+    int food_colour  = makecol(71, 225, 12);
+    int game_color   = makecol(0, 0, 0);
+    int game_over    = 0;
+    int color1       = makecol(255, 0, 0);
+    int color2       = makecol(0, 0, 255);
+    int score1       = 0;
+    int score2       = 0;
 
-    //?Initialisation du serpent 1 (ses caractéristiques sont dans la fonction init_snake : position, direction, prochain bloc et si c'est la tête) et la nourriture et de sa position (seule caractéristique)
-    snake *head1 = malloc(sizeof(snake));
-    snake *head2 = malloc(sizeof(snake));
-    init_snake(head1, SCREEN_HEIGHT / 2, SCREEN_HEIGHT / 2);
-    init_snake(head2, SCREEN_HEIGHT / 3, SCREEN_HEIGHT /3);
+    //?Initialisation du serpent 1 (ses caractéristiques sont dans la fonction init_SNAKE : position, direction, prochain bloc et si c'est la tête) et la nourriture et de sa position (seule caractéristique)
+    SNAKE *head1 = malloc(sizeof(SNAKE));
+    SNAKE *head2 = malloc(sizeof(SNAKE));
     food *food1 = malloc(sizeof(food));
     food *food2 = malloc(sizeof(food));
+    init_SNAKE(head1, SCREEN_HEIGHT / 2, SCREEN_HEIGHT / 2);
+    init_SNAKE(head2, SCREEN_HEIGHT / 3, SCREEN_HEIGHT /3);
     init_food(food1);
     init_food(food2);
 
-    SAMPLE *music = sound_loader("attractions/assets/tag/music.wav");
+    SAMPLE *music = sound_loader("attractions/assets/snake/music.wav");
     play_sample(music, 255, 127, 1000, 1);
 
 
@@ -102,16 +105,16 @@ int snake(){
         textprintf_ex(buffer, font, SCREEN_HEIGHT + 10, 100, makecol(0,0,0), -1, "Score Joueur 1 : %d", score1);
         textprintf_ex(buffer, font, SCREEN_HEIGHT + 10, 120, makecol(0,0,0), -1, "Score Joueur 2 : %d", score2);
 
-        //print food and snake
+        //print food and SNAKE
         rectfill(game, food1->x, food1->y, food1->x + BLOCK_SIZE, food1->y + BLOCK_SIZE, food_colour);
         rectfill(game, food2->x, food2->y, food2->x + BLOCK_SIZE, food2->y + BLOCK_SIZE, food_colour);
-        draw_snake(head1, color1, game);
-        draw_snake(head2, color2, game);
+        draw_SNAKE(head1, color1, game);
+        draw_SNAKE(head2, color2, game);
 
         //Déplacement du serpent 1
         gestion_mouvements(head1, head2);
-        move_snake(head1);
-        move_snake(head2);
+        move_SNAKE(head1);
+        move_SNAKE(head2);
 
 
         //Gestion des collisions : si le serpent sort de l'écran, si le serpent se touche lui-même ou si la tête du serpent touche le corps du serpent
@@ -144,13 +147,12 @@ int snake(){
 
     //¤Fin du programme
     lib_memoire(head1, food1, head2, food2, buffer, game, music);
-    allegro_exit();
     return 0;
 }
 
 
 //*Fonctions d'initialisation
-void init_snake(snake *head, int x, int y) { //¤Initialisation de la nourriture (position aléatoire)
+void init_SNAKE(SNAKE *head, int x, int y) { //¤Initialisation de la nourriture (position aléatoire)
     head->x = x;
     head->y = y;
     head->direction = rand() % 4; //direction aléatoire
@@ -165,44 +167,9 @@ void init_food(food *food) { //¤Affichage du serpent à partir de la tête
     food->y = rand() % (SCREEN_HEIGHT - BLOCK_SIZE);
 }
 
-BITMAP* image_loader(const char* filepath){
-    // on vérifie que les BITMAPS ont bien été initialisés
-    char clion_filepath[100];
-    strcpy(clion_filepath, "../");
-    strcat(clion_filepath, filepath);
-    BITMAP *img = load_bitmap(clion_filepath, NULL);
-    if (!img) {
-        img = load_bitmap(filepath, NULL);
-        if (!img) {
-            allegro_message("Erreur d'importation d'd'image");
-            allegro_exit();
-            exit(EXIT_FAILURE);
-        }
-    }
-    return img;
-}
-
-SAMPLE* sound_loader(const char* filepath){
-    // on vérifie que les BITMAPS ont bien été initialisés
-    SAMPLE * sound = load_bitmap(filepath, NULL);
-    if (!sound) {
-        char clion_filepath[100];
-        strcpy(clion_filepath, "../");
-        strcat(clion_filepath, filepath);
-        sound = load_bitmap(clion_filepath, NULL);
-        
-        if (!sound) {
-            allegro_message("Erreur d'importation d'image : %s", filepath);
-            allegro_exit();
-            exit(EXIT_FAILURE);
-        }
-    }
-    return sound;
-}
-
-void lib_memoire(snake *head, food *Food, snake *head2, food *Food2, BITMAP *game, BITMAP *buffer, SAMPLE *music) { //¤Fonction pour libérer la mémoire
-    snake *current_block = head;
-    snake *next_block = head->next;
+void lib_memoire(SNAKE *head, food *Food, SNAKE *head2, food *Food2, BITMAP *game, BITMAP *buffer, SAMPLE *music) { //¤Fonction pour libérer la mémoire
+    SNAKE *current_block = head;
+    SNAKE *next_block = head->next;
     while (current_block != NULL) {
         next_block = current_block->next;
         free(current_block);
@@ -225,20 +192,20 @@ void lib_memoire(snake *head, food *Food, snake *head2, food *Food2, BITMAP *gam
 //*############################################################################################################################################
 
 //!Fonctions relatives au serpent et appelées souvent
-void draw_snake(snake *head, int color, BITMAP *game) { //¤Fonction pour libérer la mémoire
-    snake *current_block = head;
+void draw_SNAKE(SNAKE *head, int color, BITMAP *game) { //¤Fonction pour libérer la mémoire
+    SNAKE *current_block = head;
     while (current_block != NULL) {
         rectfill(game, current_block->x, current_block->y, current_block->x + BLOCK_SIZE, current_block->y + BLOCK_SIZE, color);
         current_block = current_block->next;
     }
 }
 
-void add_block(snake *head) { //¤ Fonction pour ajouter un bloc au serpent
-    snake *current_block = head;
+void add_block(SNAKE *head) { //¤ Fonction pour ajouter un bloc au serpent
+    SNAKE *current_block = head;
     while (current_block->next != NULL) {
         current_block = current_block->next;
     }
-    snake *new_block = malloc(sizeof(snake));
+    SNAKE *new_block = malloc(sizeof(SNAKE));
     new_block->x = current_block->previous_pos_x;
     new_block->y = current_block->previous_pos_y;
     new_block->direction = current_block->direction;
@@ -247,7 +214,7 @@ void add_block(snake *head) { //¤ Fonction pour ajouter un bloc au serpent
     current_block->next = new_block;
 }
 
-void move_snake(snake *head){ //¤ On bouge chaque bloc du serpent en fonction de la direction du bloc qui le précède
+void move_SNAKE(SNAKE *head){ //¤ On bouge chaque bloc du serpent en fonction de la direction du bloc qui le précède
     int previous_pos_x = head->x;
     int previous_pos_y = head->y;
     //Déplacement du serpent 1
@@ -265,7 +232,7 @@ void move_snake(snake *head){ //¤ On bouge chaque bloc du serpent en fonction d
     }
 
     //on transmet les coordonnées du bloc précédent au bloc suivant
-    snake *current_block = head->next;
+    SNAKE *current_block = head->next;
     while (current_block != NULL) {
         int temp_x = current_block->x;
         int temp_y = current_block->y;
@@ -277,7 +244,7 @@ void move_snake(snake *head){ //¤ On bouge chaque bloc du serpent en fonction d
     }
 }
 
-int collision_mort(snake *head1, snake *head2){ //¤ On vérifie si le serpent sort de l'écran ou se mord la queue ou mord l'autre serpent
+int collision_mort(SNAKE *head1, SNAKE *head2){ //¤ On vérifie si le serpent sort de l'écran ou se mord la queue ou mord l'autre serpent
     int looser = 0;
     //vérifier si le serpent sort de l'écran
     if (head1->x < 0 || head1->x >= SCREEN_HEIGHT || head1->y < 0 || head1->y >= SCREEN_HEIGHT) {
@@ -291,7 +258,7 @@ int collision_mort(snake *head1, snake *head2){ //¤ On vérifie si le serpent s
 
     //vérifier si le serpent se mord la queue
     //Gestion des collisions avec le serpent
-    snake *current_block = head1->next;
+    SNAKE *current_block = head1->next;
     while (current_block != NULL) {
         if (head1->x == current_block->x && head1->y == current_block->y) {
             printf("Game Over ! first player ate himself !\n");
@@ -331,7 +298,7 @@ int collision_mort(snake *head1, snake *head2){ //¤ On vérifie si le serpent s
     return looser;
 }
 
-int collision_food(snake *head, food *food) { //¤ On vérifie si le serpent mange la nourriture
+int collision_food(SNAKE *head, food *food) { //¤ On vérifie si le serpent mange la nourriture
     if (head->x <= food->x + BLOCK_SIZE && food->x <= head->x + BLOCK_SIZE && head->y <= food->y + BLOCK_SIZE && food->y <= head->y + BLOCK_SIZE) {
         init_food(food);
         return 1;
@@ -340,9 +307,9 @@ int collision_food(snake *head, food *food) { //¤ On vérifie si le serpent man
     }
 }
 
-void gestion_mouvements(snake *head1, snake *head2){
+void gestion_mouvements(SNAKE *head1, SNAKE *head2){
     //Déplacement du serpent 1 en fonction de la direction (0 = haut, 1 = droite, 2 = bas, d3 = gauche, pas de demi-tour possible)
-    //move snake 1 with arrows
+    //move SNAKE 1 with arrows
     if (key[KEY_UP] && head1->direction != 2) {
         head1->direction = 0;
     }else if (key[KEY_LEFT] && head1->direction != 1) {
@@ -353,7 +320,7 @@ void gestion_mouvements(snake *head1, snake *head2){
         head1->direction = 1;
     }
 
-    //move snake 2 with ZQSD (azerty keyboard)
+    //move SNAKE 2 with ZQSD (azerty keyboard)
     if (key[KEY_W] && head2->direction != 2) {
         head2->direction = 0;
     }else if (key[KEY_A] && head2->direction != 1) {
