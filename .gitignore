@@ -7,6 +7,7 @@
 .DS_Store
 *.html
 *.pdf
+MODIFIEZ_ICI/*.exe
 
 # CMake files and json files for vscode
 .vscode/
