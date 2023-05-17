@@ -26,19 +26,19 @@ typedef struct note {
 } Note;
 
 
+Player * creer_joueur(int id);
+Note * allouer_note(Note * note, int x, int color);
+int victory (int temps_1, int temps_2);
 void afficher_stats(Player * player, BITMAP * buffer, int duration);
 void afficher_boutons(BITMAP * stage, int positions[5], int couleurs[5]);
 void afficher_final_screen(int duration, BITMAP * buffer, BITMAP * game_over);
-Player * creer_joueur(int id);
-int victory (int temps_1, int temps_2);
 void fin_partie(BITMAP * buffer, int gagnant);
 void afficher(BITMAP * buffer, BITMAP * stage, int positions[4], int couleurs[4]);
 void afficher_cordes(BITMAP * stage, int positions[4], int couleurs[4]);
 void afficher_note(BITMAP * stage, Note * note);
 void free_memory(BITMAP * buffer, BITMAP * stage, BITMAP * logo, BITMAP * background, BITMAP * game_over, Player * player_1, Player * player_2, Player * player, Note * ancre);
-Note * allouer_note(Note * note, int x, int color);
 void play_guitar(Note * note, int positions[4], SAMPLE * music);
-void afficher_start_menu(BITMAP * buffer, BITMAP * title);
+void show_start_menu_guitar_hero(BITMAP * buffer, BITMAP * title);
 
 int guitar_hero() {
 
@@ -94,7 +94,7 @@ int guitar_hero() {
 
     //* Afficher l'écran de démarrage
     while (!key[KEY_ENTER]) {
-        afficher_start_menu(buffer, title);
+        show_start_menu_guitar_hero(buffer, title);
     }
 
     // on démarre le timer
@@ -206,6 +206,7 @@ int guitar_hero() {
                 player_2->id = 2;
                 gagnant = victory(player_1->temps, player_2->temps);
                 fin_partie(buffer, gagnant);
+                destroy_sample(music);
                 return 0;
             }
         }
@@ -221,8 +222,8 @@ int guitar_hero() {
     }
 
     // on libère la memoire allouée
-    free_memory(buffer, stage, logo, background, game_over, player_1, player_2, player, ancre);
-    destroy_sample(music);
+    //free_memory(buffer, stage, logo, background, game_over, player_1, player_2, player, ancre);
+    //destroy_sample(music);
     return 0;
 }
 
@@ -353,7 +354,7 @@ void play_guitar(Note * note, int positions[4], SAMPLE * music) {
 }
 
 
-void afficher_start_menu(BITMAP * buffer, BITMAP * title) {
+void show_start_menu_guitar_hero(BITMAP * buffer, BITMAP * title) {
     clear_bitmap(buffer);
     masked_stretch_blit(title, buffer, 0, 0, title->w, title->h, SCREEN_W/2 - title->w, SCREEN_H/2 - title->h, title->w*2, title->h*2);
     textprintf_ex(buffer, font, SCREEN_W/2 - 100, SCREEN_H/2 + 50, makecol(255, 255, 255), -1, "PRESS ENTER TO START");

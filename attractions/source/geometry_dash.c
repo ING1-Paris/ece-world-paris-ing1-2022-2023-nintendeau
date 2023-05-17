@@ -41,7 +41,7 @@ void move_player_to_default(Player * player, int frame_counter);
 void show_background(BITMAP * buffer, BITMAP * level, Background bg[NB_BACKGROUNDS], int largeur);
 void move_bcg(int compteur_frames, Background bg[NB_BACKGROUNDS], int largeur);
 void show_game_over(BITMAP * buffer, BITMAP * game_over_text, int winner, double time_spent);
-void show_start_menu(BITMAP * level, BITMAP * buffer, BITMAP * title, int largeur);
+void show_start_menu_geometry_dash(BITMAP * level, BITMAP * buffer, BITMAP * title, int largeur);
 
 
 int geometry_dash() {
@@ -103,7 +103,7 @@ int geometry_dash() {
 
     //* Afficher l'écran de démarrage
     while (!key[KEY_ENTER]) {
-        show_start_menu(level, buffer, title, largeur);
+        show_start_menu_geometry_dash(level, buffer, title, largeur);
     }
 
     start = clock();
@@ -278,7 +278,7 @@ void show_game_over(BITMAP * buffer, BITMAP * game_over_text, int winner, double
 }
 
 
-void show_start_menu(BITMAP * level, BITMAP * buffer, BITMAP * title, int largeur) {
+void show_start_menu_geometry_dash(BITMAP * level, BITMAP * buffer, BITMAP * title, int largeur) {
     clear_bitmap(buffer);
     stretch_blit(level, buffer, 0, 0, level->w, level->h, 0, 0, largeur, SCREEN_H);
     masked_blit(title, buffer, 0, 0, SCREEN_W/2 - title->w/2, SCREEN_H/2 - title->h/2, title->w, title->h);

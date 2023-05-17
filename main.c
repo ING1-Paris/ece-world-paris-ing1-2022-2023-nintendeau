@@ -11,10 +11,12 @@
 
 #include <stdio.h>
 #include <Allegro.h>
+
 #include "attractions/header/tag.h"
 #include "attractions/header/geometry_dash.h"
 #include "attractions/header/guitar_hero.h"
 #include "attractions/header/guitar_hero.h"
+#include "attractions/header/palais_des_glaces.h"
 
 
 // Structure Player qui contient les informations du joueur
@@ -64,7 +66,7 @@ void launch_game(int active) {
 
 
 // fonction qui gere les collisions de la map
-void check_collision(Player * player, BITMAP * calque_collisions, BITMAP * player_sprite, SAMPLE * music_main) {
+void check_collision_main(Player * player, BITMAP * calque_collisions, BITMAP * player_sprite, SAMPLE * music_main) {
 
     int active = 0;
 
@@ -98,8 +100,11 @@ void check_collision(Player * player, BITMAP * calque_collisions, BITMAP * playe
 
             // si le joueur est sur un jeu, on lance l'attraction correspondante
             else if (color_array[i] != ground) {
+
+                stop_sample(music_main);
                 if (color_array[i] == palais_des_glaces_color) {
                     printf("palais_des_glaces\n");
+                    palais_des_glaces();
                 }
                 else if (color_array[i] == paris_hippiques_color) {
                     printf("paris_hippiques\n");
@@ -113,7 +118,6 @@ void check_collision(Player * player, BITMAP * calque_collisions, BITMAP * playe
                 }
                 else if (color_array[i] == guitar_hero_color) {
                     printf("guitar_hero\n");
-                    stop_sample(music_main);
                     guitar_hero();
                 }
                 else if (color_array[i] == jackpot_color) {
@@ -132,6 +136,7 @@ void check_collision(Player * player, BITMAP * calque_collisions, BITMAP * playe
                 }
                 player->y = 300;
                 player->x = 300;
+                play_sample(music_main, 255, 128, 1000, 1);
             }
             player->previous_x = player->x;
             player->previous_y = player->y;
@@ -264,7 +269,7 @@ int main() {
     //& boucle principale du menu (carte du parc)
     while (!key[KEY_M]) {
 
-        check_collision(&player, calque_collisions, player_sprite, music_main);
+        check_collision_main(&player, calque_collisions, player_sprite, music_main);
 
         if (can_move) {
             move_player(&player);

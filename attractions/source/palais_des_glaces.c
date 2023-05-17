@@ -15,6 +15,7 @@
 #include <allegro.h>
 #include <time.h>
 #include <math.h>
+#include "../header/palais_des_glaces.h"
 
 #define SIZE 10
 #define CELL_SIZE 800 / SIZE
@@ -37,6 +38,147 @@ typedef struct {
     int visite;
 } Cell;
 
+
+void show_grid(Cell *** cell_grid, BITMAP * maze, BITMAP * buffer);
+Cell * creer_cellule(int x, int y);
+Player * initialiser_joueur();
+Cell *** remplir_grille(Cell *** cell_grid);
+void free_grid(Cell *** cell_grid);
+Cell * check_neighbours(Cell * cell, Cell *** cell_grid);
+int check_visited(Cell *** cell_grid);
+void check_collision(Player * player, BITMAP * maze);
+void move_players(Player * player_1, Player * player_2);
+void remove_wall(Cell * current_cell, Cell * chosen_neighbour);
+void wait_to_quit();
+void check_victory(Player * player_1, Player * player_2, time_t start_time, time_t end_time, BITMAP * buffer, SAMPLE * win_music, SAMPLE * music, int * temps);
+void generer_labyrinthe(Cell *** cell_grid, Cell * current_cell, Cell ** stack, int stack_size, BITMAP * maze, BITMAP * buffer);
+void show_start_menu_maze(BITMAP * buffer, BITMAP * titre);
+void show_distance_to_finish(Player * player_1, Player * player_2, BITMAP * buffer);
+
+
+int palais_des_glaces() {
+
+    srand(time(NULL));
+
+    //* On initialise les joueurs
+    Player * player_1 = initialiser_joueur();
+    player_1->x = SCREEN_H - CELL_SIZE/2;
+    player_1->y = SCREEN_H - CELL_SIZE/2 - player_1->size;
+
+    Player * player_2 = initialiser_joueur();
+    player_2->x = SCREEN_H - CELL_SIZE/2 - player_1->size;
+    player_2->y = SCREEN_H - CELL_SIZE/2;
+
+    //* On initialise les BITMAPS
+    BITMAP * buffer = create_bitmap(SCREEN_W, SCREEN_H);
+    BITMAP * maze = create_bitmap(SCREEN_H, SCREEN_H);
+    BITMAP * mask = create_bitmap(SCREEN_W, SCREEN_H);
+
+    BITMAP * titre           = load_bitmap("../attractions/assets/palais_des_glaces/maze_run.bmp", NULL);
+    BITMAP * player_sprite_1 = load_bitmap("../attractions/assets/palais_des_glaces/player_1.bmp", NULL);
+    BITMAP * player_sprite_2 = load_bitmap("../attractions/assets/palais_des_glaces/player_2.bmp", NULL);
+
+    //* On vérifie que les bitmaps ont bien été initialisés
+    if (!titre || !player_sprite_1 || !player_sprite_2) {
+
+        titre           = load_bitmap("attractions\\assets\\palais_des_glaces\\maze_run.bmp", NULL);
+        player_sprite_1 = load_bitmap("attractions\\assets\\palais_des_glaces\\player_1.bmp", NULL);
+        player_sprite_2 = load_bitmap("attractions\\assets\\palais_des_glaces\\player_2.bmp", NULL);
+
+        if (!titre || !player_sprite_1 || !player_sprite_2) {
+
+            allegro_message("BITMAP ERROR");
+            allegro_exit();
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    //* Charger la musique de fond
+    SAMPLE * bcg_music = load_sample("../attractions/assets/palais_des_glaces/Bubble-Bobble.wav");
+    SAMPLE * win_music = load_sample("../attractions/assets/palais_des_glaces/mario_victory.wav");
+
+    // *Vérifier que la musique a bien été chargée
+    if (!bcg_music || !win_music) {
+        bcg_music = load_sample("attractions\\assets\\palais_des_glaces\\Bubble-Bobble.wav");
+        win_music = load_sample("attractions\\assets\\palais_des_glaces\\mario_victory.wav");
+        if (!bcg_music) {
+            allegro_message("SAMPLE ERROR");
+            allegro_exit();
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    // jouer la musique de fond
+    play_sample(bcg_music, 255, 128, 1000, 1);
+
+    // création du tableau de cellules (SIZE*SIZE)
+    Cell *** cell_grid = malloc(sizeof(Cell**) * SIZE);
+    for (int i = 0; i < SIZE; i++) {
+        cell_grid[i] = malloc(sizeof(Cell*) * SIZE);
+    }
+    cell_grid = remplir_grille(cell_grid);
+
+    // initialisation de la premiere cellule
+    Cell * current_cell = cell_grid[0][0];
+
+    // création de la pile de cellules
+    Cell ** stack = malloc(sizeof(Cell*) * SIZE * SIZE);
+    int stack_size = 0;
+
+
+    time_t start_time, end_time;
+    int temps;
+
+    // génération du labyrinthe
+    clear_to_color(screen, makecol(0, 0, 0));
+    generer_labyrinthe(cell_grid, current_cell, stack, stack_size, maze, buffer);
+
+    // on demarre le chrono
+    time(&start_time);
+
+    while (!key[KEY_ENTER]) {
+        show_start_menu_maze(buffer, titre);
+    }
+
+    // main loop
+    while (!key[KEY_ESC]) {
+        clear(buffer);
+
+        clear_to_color(mask, makecol(0, 0, 0));
+        circlefill(mask, player_1->x + player_1->size/2, player_1->y + player_1->size/2, 65, makecol(255, 0, 255));
+        circlefill(mask, player_2->x + player_2->size/2, player_2->y + player_2->size/2, 65, makecol(255, 0, 255));
+
+        //* Départ en haut a gauche et arrivée en bas a droite
+        rectfill(maze, 2, 2, CELL_SIZE - 2, CELL_SIZE - 2, makecol(100, 200, 100));
+        rectfill(maze, SCREEN_H - CELL_SIZE + 2, SCREEN_H - CELL_SIZE + 2, SCREEN_H - 2, SCREEN_H - 2, makecol(100, 100, 200));
+
+        //* Affichage du labyrinthe et des joueurs
+        blit(maze, buffer, 0, 0, 0, 0, SCREEN_H, SCREEN_H);
+        masked_stretch_blit(player_sprite_1, buffer, 0, 0, player_sprite_1->w, player_sprite_1->h, player_1->x, player_1->y - 10, player_1->size, player_1->size + 10);
+        masked_stretch_blit(player_sprite_2, buffer, 0, 0, player_sprite_2->w, player_sprite_2->h, player_2->x, player_2->y - 10, player_2->size, player_2->size + 10);
+
+        //* Collisions et mouvements
+        check_collision(player_1, maze);
+        check_collision(player_2, maze);
+        move_players(player_1, player_2);
+
+
+        //* Encore affichage
+        masked_blit(mask, buffer, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+        rectfill(buffer, SCREEN_W * 2/3, 70, SCREEN_W, 70, makecol(255, 255, 255));
+        rectfill(buffer, SCREEN_H, 0, SCREEN_H, SCREEN_H, makecol(255, 255, 255));
+        check_victory(player_1, player_2, start_time, end_time, buffer, win_music, bcg_music, &temps);
+        masked_stretch_blit(titre, buffer, 0, 0, titre->w, titre->h, 810, 10, 380, 50);
+        show_distance_to_finish(player_1, player_2, buffer);
+        blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+    }
+    stop_sample(bcg_music);
+    stop_sample(win_music);
+    free_grid(cell_grid);
+    destroy_sample(bcg_music);
+    destroy_sample(win_music);
+    return 0;
+}
 
 void show_grid(Cell *** cell_grid, BITMAP * maze, BITMAP * buffer) {
 
@@ -124,8 +266,6 @@ Cell *** remplir_grille(Cell *** cell_grid) {
     }
     return cell_grid;
 }
-
-
 
 
 void free_grid(Cell *** cell_grid) {
@@ -303,24 +443,6 @@ void remove_wall(Cell * current_cell, Cell * chosen_neighbour) {
 }
 
 
-void init() {
-
-    allegro_init();
-    install_mouse();
-    install_keyboard();
-    install_sound(DIGI_AUTODETECT, MIDI_AUTODETECT, NULL);
-    install_timer();
-    set_window_title("MAZE RUN");
-
-    set_color_depth(desktop_color_depth());
-    if (set_gfx_mode(GFX_AUTODETECT_WINDOWED, 1200, 800, 0, 0) != 0) {
-        allegro_message("GFX ERROR");
-        allegro_exit();
-        exit(EXIT_FAILURE);
-    }
-}
-
-
 void wait_to_quit() {
 
     //* On affiche un message pour quitter le jeu
@@ -328,8 +450,6 @@ void wait_to_quit() {
     while (!key[KEY_ESC]) {
         rest(1);
     }
-    allegro_exit();
-    exit(EXIT_SUCCESS);
 }
 
 
@@ -350,8 +470,6 @@ void check_victory(Player * player_1, Player * player_2, time_t start_time, time
         }
 
         wait_to_quit();
-        allegro_exit();
-        exit(EXIT_SUCCESS);
     }
 
     //* Sinon on affiche le temps des deux joueurs
@@ -363,7 +481,7 @@ void check_victory(Player * player_1, Player * player_2, time_t start_time, time
 }
 
 
-void generer_labirynthe(Cell *** cell_grid, Cell * current_cell, Cell ** stack, int stack_size, BITMAP * maze, BITMAP * buffer) {
+void generer_labyrinthe(Cell *** cell_grid, Cell * current_cell, Cell ** stack, int stack_size, BITMAP * maze, BITMAP * buffer) {
 
     //* Génération du labyrinthe
     while (!check_visited(cell_grid)) {
@@ -400,7 +518,7 @@ void generer_labirynthe(Cell *** cell_grid, Cell * current_cell, Cell ** stack, 
 }
 
 
-void show_start_menu(BITMAP * buffer, BITMAP * titre) {
+void show_start_menu_maze(BITMAP * buffer, BITMAP * titre) {
 
     clear_bitmap(buffer);
     masked_stretch_blit(titre, buffer, 0, 0, titre->w, titre->h, 300, SCREEN_H/2 - titre->h/2, 600, 100);
@@ -417,125 +535,3 @@ void show_distance_to_finish(Player * player_1, Player * player_2, BITMAP * buff
     textprintf_ex(buffer, font, 900, 100, makecol(255, 255, 255), -1, "Joueur 1 a %dm de la fin", distance_1);
     textprintf_ex(buffer, font, 900, 150, makecol(255, 255, 255), -1, "Joueur 2 a %dm de la fin", distance_2);
 }
-
-
-int main() {
-
-    init();
-
-    srand(time(NULL));
-
-    //* On initialise les joueurs
-    Player * player_1 = initialiser_joueur();
-    player_1->x = SCREEN_H - CELL_SIZE/2;
-    player_1->y = SCREEN_H - CELL_SIZE/2 - player_1->size;
-
-    Player * player_2 = initialiser_joueur();
-    player_2->x = SCREEN_H - CELL_SIZE/2 - player_1->size;
-    player_2->y = SCREEN_H - CELL_SIZE/2;
-
-    //* On initialise les BITMAPS
-    BITMAP * buffer = create_bitmap(SCREEN_W, SCREEN_H);
-    BITMAP * maze = create_bitmap(SCREEN_H, SCREEN_H);
-    BITMAP * mask = create_bitmap(SCREEN_W, SCREEN_H);
-    BITMAP * titre = load_bitmap("../assets/palais_des_glaces/maze_run.bmp", NULL);
-
-    BITMAP * player_sprite_1 = load_bitmap("../assets/palais_des_glaces/player_1.bmp", NULL);
-    BITMAP * player_sprite_2 = load_bitmap("../assets/palais_des_glaces/player_2.bmp", NULL);
-
-    //* On vérifie que les bitmaps ont bien été initialisés
-    if (!titre || !player_sprite_1 || !player_sprite_2) {
-
-        titre = load_bitmap("assets\\palais_des_glaces\\maze_run.bmp", NULL);
-        player_sprite_1 = load_bitmap("assets\\palais_des_glaces\\player_1.bmp", NULL);
-        player_sprite_2 = load_bitmap("assets\\palais_des_glaces\\player_2.bmp", NULL);
-
-        if (!titre || !player_sprite_1 || !player_sprite_2) {
-
-            allegro_message("BITMAP ERROR");
-            allegro_exit();
-            exit(EXIT_FAILURE);
-        }
-    }
-
-    //* Charger la musique de fond
-    SAMPLE * bcg_music = load_sample("../sounds/Bubble-Bobble.wav");
-    SAMPLE * win_music = load_sample("../sounds/mario_victory.wav");
-
-    // *Vérifier que la musique a bien été chargée
-    if (!bcg_music || !win_music) {
-        bcg_music = load_sample("sounds\\Bubble-Bobble.wav");
-        win_music = load_sample("sounds\\mario_victory.wav");
-        if (!bcg_music) {
-            allegro_message("SAMPLE ERROR");
-            allegro_exit();
-            exit(EXIT_FAILURE);
-        }
-    }
-
-    // jouer la musique de fond
-    play_sample(bcg_music, 255, 128, 1000, 1);
-
-    // création du tableau de cellules (SIZE*SIZE)
-    Cell *** cell_grid = malloc(sizeof(Cell**) * SIZE);
-    for (int i = 0; i < SIZE; i++) {
-        cell_grid[i] = malloc(sizeof(Cell*) * SIZE);
-    }
-    cell_grid = remplir_grille(cell_grid);
-
-    // initialisation de la premiere cellule
-    Cell * current_cell = cell_grid[0][0];
-
-    // création de la pile de cellules
-    Cell ** stack = malloc(sizeof(Cell*) * SIZE * SIZE);
-    int stack_size = 0;
-
-
-    time_t start_time, end_time;
-    int temps;
-
-    // génération du labyrinthe
-    generer_labirynthe(cell_grid, current_cell, stack, stack_size, maze, buffer);
-
-    // on demarre le chrono
-    time(&start_time);
-
-    while (!key[KEY_ENTER]) {
-        show_start_menu(buffer, titre);
-    }
-
-    // main loop
-    while (!key[KEY_ESC]) {
-        clear(buffer);
-
-        clear_to_color(mask, makecol(0, 0, 0));
-        circlefill(mask, player_1->x + player_1->size/2, player_1->y + player_1->size/2, 65, makecol(255, 0, 255));
-        circlefill(mask, player_2->x + player_2->size/2, player_2->y + player_2->size/2, 65, makecol(255, 0, 255));
-
-        //* Départ en haut a gauche et arrivée en bas a droite
-        rectfill(maze, 2, 2, CELL_SIZE - 2, CELL_SIZE - 2, makecol(100, 200, 100));
-        rectfill(maze, SCREEN_H - CELL_SIZE + 2, SCREEN_H - CELL_SIZE + 2, SCREEN_H - 2, SCREEN_H - 2, makecol(100, 100, 200));
-
-        //* Affichage du labyrinthe et des joueurs
-        blit(maze, buffer, 0, 0, 0, 0, SCREEN_H, SCREEN_H);
-        masked_stretch_blit(player_sprite_1, buffer, 0, 0, player_sprite_1->w, player_sprite_1->h, player_1->x, player_1->y - 10, player_1->size, player_1->size + 10);
-        masked_stretch_blit(player_sprite_2, buffer, 0, 0, player_sprite_2->w, player_sprite_2->h, player_2->x, player_2->y - 10, player_2->size, player_2->size + 10);
-
-        //* Collisions et mouvements
-        check_collision(player_1, maze);
-        check_collision(player_2, maze);
-        move_players(player_1, player_2);
-
-
-        //* Encore affichage
-        masked_blit(mask, buffer, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-        rectfill(buffer, SCREEN_W * 2/3, 70, SCREEN_W, 70, makecol(255, 255, 255));
-        rectfill(buffer, SCREEN_H, 0, SCREEN_H, SCREEN_H, makecol(255, 255, 255));
-        check_victory(player_1, player_2, start_time, end_time, buffer, win_music, bcg_music, &temps);
-        masked_stretch_blit(titre, buffer, 0, 0, titre->w, titre->h, 810, 10, 380, 50);
-        show_distance_to_finish(player_1, player_2, buffer);
-        blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-    }
-    free_grid(cell_grid);
-    return 0;
-}END_OF_MAIN();
