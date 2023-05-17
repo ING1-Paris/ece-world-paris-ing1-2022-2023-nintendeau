@@ -289,7 +289,6 @@ int main() {
             }
             draw_sprite(page, sprite4[anim], x4, y4);
             blit(page, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-
         }
 
     }
