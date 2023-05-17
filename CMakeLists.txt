@@ -3,6 +3,8 @@ project(PROJET C)
 
 set(CMAKE_C_STANDARD 23)
 
+set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/.cmake-build-debug)
+
 add_executable(ece-world-paris-ing1-2022-2023-nintendeau
 main.c
 attractions/source/loader.c            attractions/header/loader.h
