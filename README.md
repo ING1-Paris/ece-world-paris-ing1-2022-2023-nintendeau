@@ -2,7 +2,7 @@
 
 **Projet d'informatique avec Allegro 4 du second semestre (ECE ING1)** 
 
-*Liens : [Sujet](presentation\sujet\ece-world-final.pdf) / [Barème](presentation\sujet\ING1-2022-2023-bareme-projet-S2 final.xlsx) *
+*Liens : [Sujet](sujet.pdf) / [Barème](bareme.xlsx) *
 
 ## Énoncé
 
