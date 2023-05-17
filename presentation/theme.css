@@ -1,4 +1,4 @@
-/* @theme labyrinthe */
+/* @theme projet */
 
 @import 'default';
 
@@ -10,36 +10,16 @@
 
 section {
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-  padding: 40px;
+  padding: 25px 35px;
   background-color: #fff;
-  color: #333;
-}
-
-section.lead {
-  background-color: #216067;
-  color: #ffffff;
-  padding-left: 60px;
-}
-
-section.lead a {
-  color: #ccc;
-  font-size: 0.8em;
-}
-
-section.lead h1 {
-  font-size: 2em;
-  color: #fff;
-}
-
-section.lead header {
-  color: #fff;
+  color: #333333;
 }
 
 section:not(.lead) {
   justify-content: start;
 }
 
-section::after {
+section::after { /* pagination */
   content: attr(data-marpit-pagination);
   right: 40px;
 }
@@ -65,8 +45,8 @@ h1, h2, h3, h4, h6 {
   margin: 0;
 }
 
-h1 {
-  color: #466969;
+h1 { /* Titre principal */
+  color: #2e4f52;
   font-size: 2em;
 }
 
@@ -108,19 +88,20 @@ code {
   font-family: Consolas, 'Courier New', monospace;
 }
 
-pre {
+pre { /* Bloc de `code` */
   background-color: #f1f1f1;
-  border-radius: 0;
+  border-radius: 10px;
   border: none;
   padding: 12px;
   font-size: 1em;
 }
 
-strong {
-  color: #74a195;
-  font-weight: bolder;
+strong { /* texte en **gras** */
+  color: #01666d;
+  font-weight: bold;
 }
 
+/* Terminal affiché par '>' */
 blockquote {
   border: solid 1px #313335;
   padding: 20px;
@@ -133,6 +114,7 @@ blockquote {
   font-size: 0.8em;
 }
 
+/* Ronds (rouge - jaune - vert) du terminal (style : MacOS) */
 blockquote:after {
   content: '';
   display: block;
@@ -187,4 +169,56 @@ ul li::before {
   /* Also needed for space (tweak if needed) */
   margin-left: -1em;
   /* Also needed for space (tweak if needed) */
+}
+
+
+/********************* PREMIERE SLIDE *********************/
+
+section.lead {
+  background-color: #006c74;
+  color: #ffffff; 
+  padding: 90px 35px 40px;
+  justify-content: space-between;
+}
+
+section.lead footer {
+  color: #dddddd; 
+  top: 40px;
+  font-size: 0.6em;
+}
+
+section.lead strong {
+  background-color: #00a2ad;
+  padding: 6px 10px;
+  border-radius: 10px;
+  color: #ffffff;
+}
+
+section.lead h1 {
+  font-size: 2.5em;
+  color: #fff;
+}
+
+
+/********************* GANTT *********************/
+
+.grid .tick {
+  opacity: 1;
+  shape-rendering: crispEdges;
+}
+
+.taskText {
+  fill: white;
+  text-anchor: middle;
+}
+.taskTextOutsideRight {
+  fill: black !important;
+  text-anchor: start;
+}
+.taskTextOutsideLeft {
+  fill: black;
+  text-anchor: end;
+}
+.sectionTitle {
+  fill: black;
 }

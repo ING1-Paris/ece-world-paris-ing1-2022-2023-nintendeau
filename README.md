@@ -1,34 +1,66 @@
-# PROJET
+# ECE WORLD - PROJET ALLEGRO -  By Nintendeau ಠ▃ಠ™
 
-Projet d'informatique du second semestre ING1, ECE Paris - 2023.
+**Projet d'informatique avec Allegro 4 du second semestre (ECE ING1)** 
 
-# Enoncé du projet
+*Liens : [Sujet](presentation\sujet\ece-world-final.pdf) / [Barème](presentation\sujet\ING1-2022-2023-bareme-projet-S2 final.xlsx) *
 
-Programmer un jeu parc d'attraction a deux joueurs en C, en utilisant la bibliothèque graphique [Allegro 4.4](https://github.com/carstene1ns/allegro-4.4/blob/master/addons/allegrogl/howto.txt).
+## Énoncé
 
-* La carte du parc fait office de menu, les deux joueurs peuvent s'y déplacer et choisir une attraction.
-* Chaque membre de l'équipe doit programmer intégralement au moins une attraction.
-* Un système de tickets doit être mis en place pour participer à une attraction.
-* Les scores des deux joueurs réalisés lors des attractions devront être sauvegardés dans un fichier.
+Programmer un jeu dans le thème "parc d'attractions" à deux joueurs en C, en utilisant la bibliothèque graphique [Allegro 4.4](https://github.com/carstene1ns/allegro-4.4/blob/master/addons/allegrogl/howto.txt). Chaque étudiant réalise de A à Z une attraction du CDC, et deux jeux bonus (issus du CDC ou non).
 
-# Jeux
+* La carte du parc fait office de menu, avec chaque attraction représentée par un lieu-dit, et les joueurs (représentés chacun par un personnage) s'y déplacent et choisissent à tour de rôle les attractions.
 
-Chaque membre de l'équipe doit réaliser un jeu (attraction)
+  * (Idéalement, les joueurs seront nommés)
+  * On peut entrer/sortir de la carte, consulter les stats et lancer un jeu
+* Les stats de chaque joueur sont sauvegardées pendant la partie pour comparer + Une sauvegarde globale permet de consulter les meilleurs scores all-time
+* Chaque joueur dispose de 5 tickets, jouer à un jeu coûte un ticket, en gagner un peut rapporter 1/2 tickets
+* Plus de ticket = défaite, on affiche les stats 
 
-Liste des attractions :
+Liste des jeux réalisés :
 
-* Pêche aux canards - ✅
-* Taupe-la (jeu des taupes) - ✅
-* Tir aux ballons - ✅
-* Paris hippiques - ✅ - ⚠️ (si chevaux animés)
-* Jackpot (casino) - ⚠️
-* Traversée de la rivière (Crossy Road) - ⚠️
-* Palais des glaces (labyrinthe) - ⚠️
-* Héro de la guitare (Guitar Hero) - ❗
-* Serpent (Snake à deux joueurs) - ❗
+|        Attraction        | Difficulté | Nom                |
+| :----------------------: | :---------: | ------------------ |
+|          Snake          |     ❗     | Léon (@PingoLeon) |
+|           Chat           |     ❗     | Léon (@PingoLeon) |
+|       Guitar Hero       |     ❗     | Alfred             |
+|    Palais des glaces    |    ⚠️    | Alfred             |
+|      Geometry Dash      |     ❗     | Alfred             |
+|        Tape-Taupe        |     ✅     | Mathéo            |
+|         Jackpot!         |    ⚠️    | Mathéo            |
+| Paris hippiques (animé) |    ⚠️    | Shaïma            |
+|       Flappy Bird       |     ❔     | Shaïma            |
 
-(Facile = ✅| Moyen = ⚠️| Difficile = ❗)
+(Facile = ✅| Moyen = ⚠️| Difficile = ❗| Inconnu = ❔)
 
-La notation dépendra de la difficulté de l'attraction, mais aussi de la qualité de la réalisation.
+La notation dépendra de la difficulté de l'attraction, la qualité du code, la fluidité du jeu et l'apparence.
+
+## Livrables
+
+Lors de la soutenance, le travail global sera évalué sur la qualité de la conception, l'organisation, la qualité de l'implémentation, la jouabilité, la fluidité ainsi que sur la présentation orale.
+
+A rendre (.zip) :
+
+* Preuves de conception (.pdf)
+* Code source
+* Slides de soutenance **(Marp imposé)**
+* Bonus : vidéo et infographie (+1pts)
+
+## Soutenance
+
+Trois phases : 
+
+* Présentation (slides -> template MARP)
+* Démonstration
+* Q/R
+
+---
+
+**Fiche technique :**
+
+-> Jeu 2D / Dims : 1200x800 / Requis : CMake+ Compilateur avec Allegro4 installé
+
+---
+
+> Nintendeau ಠ▃ಠ™ 2023, tous droits réservés
 
 ---
