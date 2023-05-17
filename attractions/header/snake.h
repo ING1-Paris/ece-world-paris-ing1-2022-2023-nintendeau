@@ -1,5 +1,6 @@
-#ifndef snake
-#define snake
+#ifndef SNAKE_H
+#define SNAKE_H
 
+int snake();
 
-#endif // snake
+#endif // snake.h

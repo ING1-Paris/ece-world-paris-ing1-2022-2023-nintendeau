@@ -1,4 +1,3 @@
-
 /*
  ! By Léon DALLE - ECE ING1 - TD13
  *
@@ -25,6 +24,7 @@
 #include <time.h>
 #include <allegro.h>
 #include <stdbool.h>
+#include "../header/snake.h"
 
 //* Constantes pour la taille des blocs et de l'écran
 #define BLOCK_SIZE 20
@@ -45,23 +45,111 @@ typedef struct food {
     int y;
 } food;
 
-//*Fonctions d'initialisation
-void init_allegro(){ //¤Initialisation des serpents (direction aléatoire)
-    //Initialisation de la seed pour les nombres aléatoires
-    srand(time(NULL));
-    //Initialisation d'Allegro
-    allegro_init();
-    install_keyboard();
-    set_color_depth(32);
+//définition des fonctions :
+void init_snake(snake *head, int x, int y);
+void init_food(food *food);
+BITMAP* image_loader(const char* filepath);
+SAMPLE* sound_loader(const char* filepath);
+void lib_memoire(snake *head, food *Food, snake *head2, food *Food2, BITMAP *game, BITMAP *buffer, SAMPLE* music);
+void draw_snake(snake *head, int color, BITMAP *game);
+void add_block(snake *head);
+void move_snake(snake *head);
+int collision_mort(snake *head1, snake *head2);
+int collision_food(snake *head, food *food);
+void gestion_mouvements(snake *head1, snake *head2);
+
+int snake(){
     set_window_title("Snake");
-    set_color_depth(desktop_color_depth());
-    if (set_gfx_mode(GFX_AUTODETECT_WINDOWED, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0) != 0) {
-        allegro_message("GFX ERROR");
-        allegro_exit();
-        exit(EXIT_FAILURE);
+    BITMAP *buffer = create_bitmap(SCREEN_WIDTH, SCREEN_HEIGHT); //buffer est la fenêtre où on affiche tous les texte et autres
+    BITMAP *game = create_bitmap(SCREEN_HEIGHT, SCREEN_HEIGHT); //game is a square
+
+    BITMAP * logo_img = image_loader("assets/snake/logo.bmp");
+    BITMAP * game_over_img = image_loader("assets/snake/game_over.bmp");
+
+    //?Initialisation des variables
+    int game_over = 0;
+    int score1 = 0;
+    int score2 = 0;
+    int color1 = makecol(255, 0, 0);
+    int color2 = makecol(0, 0, 255);
+    int buffer_color = makecol(0x47, 0xE1, 0x0C);
+    int game_color = makecol(0, 0, 0);
+    int food_colour = makecol(71, 225, 12);
+
+    //?Initialisation du serpent 1 (ses caractéristiques sont dans la fonction init_snake : position, direction, prochain bloc et si c'est la tête) et la nourriture et de sa position (seule caractéristique)
+    snake *head1 = malloc(sizeof(snake));
+    snake *head2 = malloc(sizeof(snake));
+    init_snake(head1, SCREEN_HEIGHT / 2, SCREEN_HEIGHT / 2);
+    init_snake(head2, SCREEN_HEIGHT / 3, SCREEN_HEIGHT /3);
+    food *food1 = malloc(sizeof(food));
+    food *food2 = malloc(sizeof(food));
+    init_food(food1);
+    init_food(food2);
+
+    SAMPLE *music = sound_loader("attractions/assets/tag/music.wav");
+    play_sample(music, 255, 127, 1000, 1);
+
+
+    //Boucle principale
+    while(!key[KEY_ESC] && !game_over){
+        //Effacement de l'écran (actualisation) et de affichage de la nourriture et du score
+        clear_to_color(game, game_color);
+        clear_to_color(buffer, buffer_color);
+        //print logo on buffer on the far-right, a bit reduced with masked_stretch_blit
+        masked_stretch_blit(logo_img, buffer, 0, 0, logo_img->w, logo_img->h, SCREEN_HEIGHT + 20, 20, logo_img->w / 2, logo_img->h / 2);
+
+        //print scores
+        textprintf_ex(buffer, font, SCREEN_HEIGHT + 10, 100, makecol(0,0,0), -1, "Score Joueur 1 : %d", score1);
+        textprintf_ex(buffer, font, SCREEN_HEIGHT + 10, 120, makecol(0,0,0), -1, "Score Joueur 2 : %d", score2);
+
+        //print food and snake
+        rectfill(game, food1->x, food1->y, food1->x + BLOCK_SIZE, food1->y + BLOCK_SIZE, food_colour);
+        rectfill(game, food2->x, food2->y, food2->x + BLOCK_SIZE, food2->y + BLOCK_SIZE, food_colour);
+        draw_snake(head1, color1, game);
+        draw_snake(head2, color2, game);
+
+        //Déplacement du serpent 1
+        gestion_mouvements(head1, head2);
+        move_snake(head1);
+        move_snake(head2);
+
+
+        //Gestion des collisions : si le serpent sort de l'écran, si le serpent se touche lui-même ou si la tête du serpent touche le corps du serpent
+        int looser = collision_mort(head1, head2);
+        if (looser != 0) {
+            if (looser == 1) {
+                printf("Game Over ! first player loosed !\n");
+            }else{
+                printf("Game Over ! second player loosed !\n");
+            }
+            game_over = 1;
+        }
+
+        //Gestion des collisions avec la nourriture
+        if (collision_food(head1, food1) || collision_food(head1, food2)){
+            score1++;
+            add_block(head1);
+        }
+        if (collision_food(head2, food1) || collision_food(head2, food2)){
+            score2++;
+            add_block(head2);
+        }
+
+        //Actualisation de l'écran
+        rest(120);
+        blit(game, buffer, 0, 0, 0, 0, SCREEN_HEIGHT, SCREEN_HEIGHT);
+        blit(buffer, screen, 0, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     }
+
+
+    //¤Fin du programme
+    lib_memoire(head1, food1, head2, food2, buffer, game, music);
+    allegro_exit();
+    return 0;
 }
 
+
+//*Fonctions d'initialisation
 void init_snake(snake *head, int x, int y) { //¤Initialisation de la nourriture (position aléatoire)
     head->x = x;
     head->y = y;
@@ -94,7 +182,25 @@ BITMAP* image_loader(const char* filepath){
     return img;
 }
 
-void lib_memoire(snake *head, food *Food, snake *head2, food *Food2, BITMAP *game, BITMAP *buffer) { //¤Fonction pour libérer la mémoire
+SAMPLE* sound_loader(const char* filepath){
+    // on vérifie que les BITMAPS ont bien été initialisés
+    SAMPLE * sound = load_bitmap(filepath, NULL);
+    if (!sound) {
+        char clion_filepath[100];
+        strcpy(clion_filepath, "../");
+        strcat(clion_filepath, filepath);
+        sound = load_bitmap(clion_filepath, NULL);
+        
+        if (!sound) {
+            allegro_message("Erreur d'importation d'image : %s", filepath);
+            allegro_exit();
+            exit(EXIT_FAILURE);
+        }
+    }
+    return sound;
+}
+
+void lib_memoire(snake *head, food *Food, snake *head2, food *Food2, BITMAP *game, BITMAP *buffer, SAMPLE *music) { //¤Fonction pour libérer la mémoire
     snake *current_block = head;
     snake *next_block = head->next;
     while (current_block != NULL) {
@@ -111,8 +217,10 @@ void lib_memoire(snake *head, food *Food, snake *head2, food *Food2, BITMAP *gam
     }
     free(Food);
     free(Food2);
-    clear_bitmap(game);
-    clear_bitmap(buffer);
+    stop_sample(music);
+    destroy_sample(music);
+    destroy_bitmap(game);
+    destroy_bitmap(buffer);
 }
 //*############################################################################################################################################
 
@@ -257,91 +365,3 @@ void gestion_mouvements(snake *head1, snake *head2){
     }
 }
 //!############################################################################################################################################
-
-
-int main(int argc, char *argv[]){
-    init_allegro();
-    BITMAP *buffer = create_bitmap(SCREEN_WIDTH, SCREEN_HEIGHT); //buffer est la fenêtre où on affiche tous les texte et autres
-    BITMAP *game = create_bitmap(SCREEN_HEIGHT, SCREEN_HEIGHT); //game is a square
-
-    BITMAP * logo_img = image_loader("assets/snake/logo.bmp");
-    BITMAP * game_over_img = image_loader("assets/snake/game_over.bmp");
-
-    //?Initialisation des variables
-    int game_over = 0;
-    int score1 = 0;
-    int score2 = 0;
-    int color1 = makecol(255, 0, 0);
-    int color2 = makecol(0, 0, 255);
-    int buffer_color = makecol(0x47, 0xE1, 0x0C);
-    int game_color = makecol(0, 0, 0);
-    int food_colour = makecol(71, 225, 12);
-
-    //?Initialisation du serpent 1 (ses caractéristiques sont dans la fonction init_snake : position, direction, prochain bloc et si c'est la tête) et la nourriture et de sa position (seule caractéristique)
-    snake *head1 = malloc(sizeof(snake));
-    snake *head2 = malloc(sizeof(snake));
-    init_snake(head1, SCREEN_HEIGHT / 2, SCREEN_HEIGHT / 2);
-    init_snake(head2, SCREEN_HEIGHT / 3, SCREEN_HEIGHT /3);
-    food *food1 = malloc(sizeof(food));
-    food *food2 = malloc(sizeof(food));
-    init_food(food1);
-    init_food(food2);
-
-
-    //Boucle principale
-    while(!key[KEY_ESC] && !game_over){
-        //Effacement de l'écran (actualisation) et de affichage de la nourriture et du score
-        clear_to_color(game, game_color);
-        clear_to_color(buffer, buffer_color);
-        //print logo on buffer on the far-right, a bit reduced with masked_stretch_blit
-        masked_stretch_blit(logo_img, buffer, 0, 0, logo_img->w, logo_img->h, SCREEN_HEIGHT + 20, 20, logo_img->w / 2, logo_img->h / 2);
-
-        //print scores
-        textprintf_ex(buffer, font, SCREEN_HEIGHT + 10, 100, makecol(0,0,0), -1, "Score Joueur 1 : %d", score1);
-        textprintf_ex(buffer, font, SCREEN_HEIGHT + 10, 120, makecol(0,0,0), -1, "Score Joueur 2 : %d", score2);
-
-        //print food and snake
-        rectfill(game, food1->x, food1->y, food1->x + BLOCK_SIZE, food1->y + BLOCK_SIZE, food_colour);
-        rectfill(game, food2->x, food2->y, food2->x + BLOCK_SIZE, food2->y + BLOCK_SIZE, food_colour);
-        draw_snake(head1, color1, game);
-        draw_snake(head2, color2, game);
-
-        //Déplacement du serpent 1
-        gestion_mouvements(head1, head2);
-        move_snake(head1);
-        move_snake(head2);
-
-
-        //Gestion des collisions : si le serpent sort de l'écran, si le serpent se touche lui-même ou si la tête du serpent touche le corps du serpent
-        int looser = collision_mort(head1, head2);
-        if (looser != 0) {
-            if (looser == 1) {
-                printf("Game Over ! first player loosed !\n");
-            }else{
-                printf("Game Over ! second player loosed !\n");
-            }
-            game_over = 1;
-        }
-
-        //Gestion des collisions avec la nourriture
-        if (collision_food(head1, food1) || collision_food(head1, food2)){
-            score1++;
-            add_block(head1);
-        }
-        if (collision_food(head2, food1) || collision_food(head2, food2)){
-            score2++;
-            add_block(head2);
-        }
-
-        //Actualisation de l'écran
-        rest(120);
-        blit(game, buffer, 0, 0, 0, 0, SCREEN_HEIGHT, SCREEN_HEIGHT);
-        blit(buffer, screen, 0, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    }
-
-
-    //¤Fin du programme
-    lib_memoire(head1, food1, head2, food2, buffer, game);
-    allegro_exit();
-    return 0;
-}END_OF_MAIN()

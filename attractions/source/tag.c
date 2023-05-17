@@ -11,7 +11,7 @@
  *
  * Jeu : Reproduction d'un jeu de chat (tnt tag, attrape-loup, etc.)
  * Objectif : Fluidité du jeu, gestion des collisions, gestion des scores sans fichier externe
- * Contrainte : Utilisation d'animations ?                                                       
+ * Contrainte : Utilisation d'animations                                                       
  */
 
 #include <stdio.h>
@@ -20,7 +20,6 @@
 #include <time.h>
 #include <stdbool.h>
 #include <unistd.h>
-//include the header located at attractions/header/tag.h
 #include "../header/tag.h"
 
 #define SCREEN_WIDTH 1200
@@ -38,10 +37,10 @@ typedef struct {
 } Bonhomme;
 
 //définir chaque fonction : 
-void init_allegro();
 void lib_memory(BITMAP * buffer, BITMAP * calque_collision, BITMAP * background, BITMAP * bonhomme1, BITMAP * bonhomme2, BITMAP * torche1 , BITMAP * torche2, BITMAP * cheminee1, BITMAP * cheminee2, SAMPLE * jump, SAMPLE * music);
 void init_chat(Bonhomme *bonhomme1, Bonhomme *bonhomme2);
 BITMAP* image_loader(const char* filepath);
+SAMPLE* sound_loader(const char* filepath);
 void arrow_manager(BITMAP * buffer, Bonhomme bonhomme1, Bonhomme bonhomme2, int compteur, int * fleche_liste, int init);
 void mouvement(Bonhomme *bonhomme, BITMAP *calque_collision, int groundLevel, int HORIZONTAL_SPEED, int MAX_JUMP_HEIGHT, double GRAVITY, double MAX_FALL_SPEED, int UP, int RIGHT, int LEFT, SAMPLE * jump);
 void loadNumberBitmaps(BITMAP *numberBitmaps[10]);
@@ -49,6 +48,7 @@ void displayNumber(BITMAP* destination, BITMAP* numberBitmaps[], int number, int
 void draw_background_elements_animation(BITMAP *buffer, BITMAP *torche1, BITMAP *torche2, BITMAP *cheminee1, BITMAP *cheminee2, int compteur);
 
 int tag(){
+    set_window_title("Chat");
 
     //! Initialisation des paramètres
     double GRAVITY = 0.4;
@@ -59,7 +59,7 @@ int tag(){
     int counter_duration = 60;
     //!##########################################
 
-    // Création du buffer
+    // Création du buffer et des images principales
     BITMAP *buffer = create_bitmap(SCREEN_WIDTH, SCREEN_HEIGHT);
     BITMAP * map = image_loader("attractions/assets/tag/map.bmp");
     BITMAP * calque_collisions = image_loader("attractions/assets/tag/map_collisions.bmp");
@@ -70,7 +70,7 @@ int tag(){
     init_chat(&bonhomme1, &bonhomme2);
 
 
-    //Variables pour la flèche
+    //Variables pour la flèche, le score et le chrono
     clock_t start;
     int fleche_liste[20];
     for (int i = 0; i < 20; ++i) {
@@ -85,24 +85,10 @@ int tag(){
     int chrono = 1;
     clock_t start_chrono = clock();
 
-    SAMPLE *music = load_sample("../attractions/assets/tag/music.wav");
-    if (!music) {
-        if (!music){
-            allegro_message("Failed to load music");
-            exit(1);
-        }
-    }
+    //Initialisation des sons et des images externes
+    SAMPLE *music = sound_loader("attractions/assets/tag/music.wav");
+    SAMPLE *jump = sound_loader("attractions/assets/tag/jump.wav");
     play_sample(music, 255, 127, 1000, 1);
-
-    SAMPLE *jump = load_sample("../attractions/assets/tag/jump.wav");
-    if (!jump) {
-        jump = load_sample("../assets/tag/jump.wav");
-        if (!jump){
-            allegro_message("Failed to load jump sound");
-            exit(1);
-        }
-    }
-
     BITMAP *torche1 = image_loader("attractions/assets/tag/torche1.bmp");
     BITMAP *torche2 = image_loader("attractions/assets/tag/torche2.bmp");
     BITMAP *cheminee1 = image_loader("attractions/assets/tag/cheminee1.bmp");
@@ -145,8 +131,8 @@ int tag(){
         //display the number of the chrono 
         chrono = counter_duration - ((clock() - start_chrono) / CLOCKS_PER_SEC);
         displayNumber(buffer, numberBitmaps, chrono, 10, 10);
-        arrow_manager(buffer, bonhomme1, bonhomme2, compteur, fleche_liste, reverse);
         draw_background_elements_animation(buffer, torche1, torche2, cheminee1, cheminee2, chrono);
+        arrow_manager(buffer, bonhomme1, bonhomme2, compteur, fleche_liste, reverse);
         draw_sprite(buffer, bonhomme1.sprite, bonhomme1.x, bonhomme1.y);
         draw_sprite(buffer, bonhomme2.sprite, bonhomme2.x, bonhomme2.y);
 
@@ -168,34 +154,19 @@ int tag(){
         }
     }
 
-    //Let's see who lost (who has the highest score)install_sound(DIGI_AUTODETECT, MIDI_AUTODETECT, NULL);
+    //Let's see who lost (who has the highest score)
     (bonhomme1.score > bonhomme2.score)? printf("Player 1 lost !\n"): printf("Player 2 lost !\n");
 
     // Fermeture d'Allegro
     lib_memory(buffer, calque_collisions, map, bonhomme1.sprite, bonhomme2.sprite, torche1, torche2, cheminee1, cheminee2, jump, music);
+    
     //allegro_exit();
     return 0;
 }
 
-void init_allegro(){ //¤Initialisation des serpents (direction aléatoire)
-    //Initialisation de la seed pour les nombres aléatoires
-    srand(time(NULL));
-    //Initialisation d'Allegro
-    allegro_init();
-    install_keyboard();
-    install_sound(DIGI_AUTODETECT, MIDI_AUTODETECT, NULL);
-    set_color_depth(32);
-    set_window_title("Chat");
-    set_color_depth(desktop_color_depth());
-    if (set_gfx_mode(GFX_AUTODETECT_WINDOWED, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0) != 0) {
-        allegro_message("Erreur relative à Allegro");
-        allegro_exit();
-        exit(EXIT_FAILURE);
-    }
-}
-
 void lib_memory(BITMAP * buffer, BITMAP * calque_collision, BITMAP * background, BITMAP * bonhomme1, BITMAP * bonhomme2, BITMAP * torche1 , BITMAP * torche2, BITMAP * cheminee1, BITMAP * cheminee2, SAMPLE * jump, SAMPLE * music){
     //Free memory
+    stop_sample(music);
     destroy_bitmap(buffer);
     destroy_bitmap(calque_collision);
     destroy_bitmap(background);
@@ -235,6 +206,24 @@ BITMAP* image_loader(const char* filepath){
         }
     }
     return img;
+}
+
+SAMPLE* sound_loader(const char* filepath){
+    // on vérifie que les BITMAPS ont bien été initialisés
+    SAMPLE * sound = load_bitmap(filepath, NULL);
+    if (!sound) {
+        char clion_filepath[100];
+        strcpy(clion_filepath, "../");
+        strcat(clion_filepath, filepath);
+        sound = load_bitmap(clion_filepath, NULL);
+        
+        if (!sound) {
+            allegro_message("Erreur d'importation d'image : %s", filepath);
+            allegro_exit();
+            exit(EXIT_FAILURE);
+        }
+    }
+    return sound;
 }
 
 void arrow_manager(BITMAP * buffer, Bonhomme bonhomme1, Bonhomme bonhomme2, int compteur, int * fleche_liste, int init){
@@ -393,8 +382,5 @@ void draw_background_elements_animation(BITMAP *buffer, BITMAP *torche1, BITMAP 
         stretch_blit(torche2, buffer, 0, 0, torche2->w, torche2->h, 520, 720, 40, 40);
     }
 }
-
-
-
 
 

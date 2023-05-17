@@ -3,4 +3,4 @@
 
 int tag();
 
-#endif // tag
+#endif // tag.h
