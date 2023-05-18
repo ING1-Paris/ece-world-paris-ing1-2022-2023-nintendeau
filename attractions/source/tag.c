@@ -34,11 +34,14 @@ typedef struct {
     int previous_y;   // Position Y précédente du bonhomme
     bool isChat;
     int score;
+    int direction;
+    int number;
 } Bonhomme;
 
 //définir chaque fonction :
 BITMAP* image_loader(const char* filepath);
 SAMPLE* sound_loader(const char* filepath);
+void draw_player(BITMAP * buffer, Bonhomme * bonhomme, BITMAP* anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4],int frame_counter, int player_color);
 void lib_memory(BITMAP * buffer, BITMAP * calque_collision, BITMAP * background, BITMAP * bonhomme1, BITMAP * bonhomme2, BITMAP * torche1 , BITMAP * torche2, BITMAP * cheminee1, BITMAP * cheminee2, SAMPLE * jump, SAMPLE * music);
 void init_chat(Bonhomme *bonhomme1, Bonhomme *bonhomme2);
 void arrow_manager(BITMAP * buffer, Bonhomme bonhomme1, Bonhomme bonhomme2, int compteur, int * fleche_liste, int init);
@@ -47,7 +50,7 @@ void loadNumberBitmaps(BITMAP *numberBitmaps[10]);
 void displayNumber(BITMAP* destination, BITMAP* numberBitmaps[], int number, int x, int y);
 void draw_background_elements_animation(BITMAP *buffer, BITMAP *torche1, BITMAP *torche2, BITMAP *cheminee1, BITMAP *cheminee2, int compteur);
 
-int tag(){
+int tag(int player_color, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4]){
 
     set_window_title("Chat");
 
@@ -66,10 +69,9 @@ int tag(){
     BITMAP * map               = image_loader("attractions/assets/tag/map.bmp");
 
     // Création du bonhomme
-    Bonhomme bonhomme1 = {image_loader("attractions/assets/tag/player_1.bmp"), SCREEN_WIDTH/2, SCREEN_HEIGHT - 150, 0, 0, FALSE};
-    Bonhomme bonhomme2 = {image_loader("attractions/assets/tag/player_2.bmp"), SCREEN_WIDTH/3, SCREEN_HEIGHT - 150, 0, 0, FALSE};
+    Bonhomme bonhomme1 = {image_loader("attractions/assets/tag/player_1.bmp"), SCREEN_WIDTH/2, SCREEN_HEIGHT - 150, 0, 0, 0, 0, FALSE, 0, 2, 1};
+    Bonhomme bonhomme2 = {image_loader("attractions/assets/tag/player_2.bmp"), SCREEN_WIDTH/3, SCREEN_HEIGHT - 150, 0, 0, 0, 0, FALSE, 0, 1, 2};
     init_chat(&bonhomme1, &bonhomme2);
-
 
     //Variables pour la flèche, le score et le chrono
     clock_t start;
@@ -85,6 +87,8 @@ int tag(){
     loadNumberBitmaps(numberBitmaps);
     int chrono = 1;
     clock_t start_chrono = clock();
+
+    int frame_counter = 0;
 
     //Initialisation des sons et des images externes
     BITMAP *cheminee1 = image_loader("attractions/assets/tag/cheminee1.bmp");
@@ -126,6 +130,9 @@ int tag(){
         // Effacer l'écran précédent
         clear(buffer);
 
+        frame_counter = (frame_counter + 1) % 4;
+        (frame_counter == 0) ? frame_counter = 4 : frame_counter;
+
         // Draw bonhomme sprite at its updated position
         stretch_blit(calque_collisions, buffer, 0, 0, calque_collisions->w, calque_collisions->h, 0, 0, buffer->w, buffer->h);
         stretch_blit(map, buffer, 0, 0, map->w, map->h, 0, 0, buffer->w, buffer->h);
@@ -135,13 +142,14 @@ int tag(){
         displayNumber(buffer, numberBitmaps, chrono, 10, 10);
         draw_background_elements_animation(buffer, torche1, torche2, cheminee1, cheminee2, chrono);
         arrow_manager(buffer, bonhomme1, bonhomme2, compteur, fleche_liste, reverse);
-        draw_sprite(buffer, bonhomme1.sprite, bonhomme1.x, bonhomme1.y);
-        draw_sprite(buffer, bonhomme2.sprite, bonhomme2.x, bonhomme2.y);
+        draw_player(buffer, &bonhomme1, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, frame_counter, player_color);
+        draw_player(buffer, &bonhomme2, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, frame_counter, player_color);
 
         // Refresh screen
         vsync();
         blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 
+        
         // Update arrow counter
         if (compteur == 19) {
             reverse = TRUE;
@@ -165,6 +173,51 @@ int tag(){
     //allegro_exit();
     return 0;
 }
+
+void draw_player(BITMAP * buffer, Bonhomme * bonhomme, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4],int frame_counter, int player_color){
+    // Select the appropriate animation array based on the direction
+    BITMAP** animation_array;
+    if (bonhomme->direction == 1) {
+        animation_array = anim_player_droite;
+    }
+    else if (bonhomme->direction == 2) {
+        animation_array = anim_player_gauche;
+    }
+
+    // Retrieve the current frame bitmap from the animation array
+    BITMAP* current_frame;
+    if (bonhomme->x != bonhomme->previous_x || bonhomme->y != bonhomme->previous_y) {
+        current_frame = animation_array[frame_counter];
+    }
+    else {
+        if (bonhomme->direction == 1 || bonhomme->direction == 2){
+            current_frame = animation_array[1];
+        }else{
+            current_frame = animation_array[2];
+        }
+    }
+
+    // Create a temporary bitmap for the masked sprite
+    BITMAP* masked_sprite = create_bitmap(current_frame->w, current_frame->h);
+
+    // Apply the mask to the sprite
+    clear(masked_sprite);
+    blit(current_frame, masked_sprite, 0, 0, 0, 0, current_frame->w, current_frame->h);
+
+    if (bonhomme->number == 2) {
+        // Apply the color filter only for bonhomme 2
+        int filter = player_color;
+        set_trans_blender(0, 0, 0, 255);
+        draw_lit_sprite(masked_sprite, masked_sprite, 0, 0, filter);
+    }
+
+    // Draw the masked sprite
+    masked_blit(masked_sprite, buffer, 0, 0, bonhomme->x, bonhomme->y, masked_sprite->w, masked_sprite->h);
+
+    // Destroy the temporary bitmap
+    destroy_bitmap(masked_sprite);
+}
+
 
 void lib_memory(BITMAP * buffer, BITMAP * calque_collision, BITMAP * background, BITMAP * bonhomme1, BITMAP * bonhomme2, BITMAP * torche1 , BITMAP * torche2, BITMAP * cheminee1, BITMAP * cheminee2, SAMPLE * jump, SAMPLE * music){
     //Free memory
@@ -234,8 +287,10 @@ void mouvement(Bonhomme *bonhomme, BITMAP *calque_collision, int groundLevel, in
     // Handle keyboard input
     if (key[RIGHT]) {
         bonhomme->xspeed = HORIZONTAL_SPEED;
+        bonhomme->direction = 1;
     } else if (key[LEFT]) {
         bonhomme->xspeed = -HORIZONTAL_SPEED;
+        bonhomme->direction = 2;
     } else {
         // Stop horizontal movement
         bonhomme->xspeed = 0;

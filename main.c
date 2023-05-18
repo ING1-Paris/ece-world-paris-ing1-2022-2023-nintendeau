@@ -96,7 +96,7 @@ void show_ending_screen(BITMAP * buffer, BITMAP * ending_screen) {
 }
 
 // fonction qui gere les collisions de la map
-void check_collision_main(Player * player, Player * player_2, BITMAP * calque_collisions, BITMAP * player_sprite_1, SAMPLE * music_main, BITMAP * regles, BITMAP * buffer, BITMAP * ending_screen) {
+void check_collision_main(Player * player, Player * player_2, BITMAP * calque_collisions, BITMAP * player_sprite_1, SAMPLE * music_main, BITMAP * regles, BITMAP * buffer, BITMAP * ending_screen, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4]) {
 
     int active = 0;
 
@@ -192,7 +192,7 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
                     }
                     else if (strcmp(game, "tag") == 0) {
                         printf("tag\n");
-                        tag();
+                        tag(PLAYER2_FILTER, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
                     }
                     else if (strcmp(game, "snake") == 0) {
                         printf("snake\n");
@@ -245,40 +245,6 @@ void afficher_score(BITMAP * score_image, BITMAP * buffer, Player player) {
     masked_stretch_blit(score_image, buffer, 0, 0, score_image->w, score_image->h, 0, 0, SCREEN_W, SCREEN_H);
     textprintf_ex(buffer, font, SCREEN_W/2, SCREEN_H/2, makecol(0, 0, 0), -1, "Score: %d", player.score);
 }
-
-/*
-void display_player(Player player, BITMAP * buffer, int frame_counter,  BITMAP * anim_player_haut[4], BITMAP * anim_player_bas[4], BITMAP * anim_player_gauche[4], BITMAP * anim_player_droite[4]) {
-    // Depending on the direction, display the right array of frames if the player is moving or the initial frame if he's not (player.sprite)
-    //if player is moving (x != previous_x or y != previous_y), display, the frames, else display the first frame of the array
-    if (player.x != player.previous_x || player.y != player.previous_y) {
-        if (player.direction == 1) {
-            masked_blit(anim_player_haut[frame_counter], buffer, 0, 0, player.x, player.y, anim_player_haut[frame_counter]->w, anim_player_haut[frame_counter]->h);
-        }
-        else if (player.direction == 2) {
-            masked_blit(anim_player_bas[frame_counter], buffer, 0, 0, player.x, player.y, anim_player_bas[frame_counter]->w, anim_player_bas[frame_counter]->h);
-        }
-        else if (player.direction == 3) {
-            masked_blit(anim_player_gauche[frame_counter], buffer, 0, 0, player.x, player.y, anim_player_gauche[frame_counter]->w, anim_player_gauche[frame_counter]->h);
-        }
-        else if (player.direction == 4) {
-            masked_blit(anim_player_droite[frame_counter], buffer, 0, 0, player.x, player.y, anim_player_droite[frame_counter]->w, anim_player_droite[frame_counter]->h);
-        }
-    }
-    else {
-        if (player.direction == 1) {
-            masked_blit(anim_player_haut[1], buffer, 0, 0, player.x, player.y, anim_player_haut[1]->w, anim_player_haut[1]->h);
-        }
-        else if (player.direction == 2) {
-            masked_blit(anim_player_bas[1], buffer, 0, 0, player.x, player.y, anim_player_bas[1]->w, anim_player_bas[1]->h);
-        }
-        else if (player.direction == 3) {
-            masked_blit(anim_player_gauche[1], buffer, 0, 0, player.x, player.y, anim_player_gauche[1]->w, anim_player_gauche[1]->h);
-        }
-        else if (player.direction == 4) {
-            masked_blit(anim_player_droite[1], buffer, 0, 0, player.x, player.y, anim_player_droite[1]->w, anim_player_droite[1]->h);
-        }
-    }
-}*/
 
 void display_player(Player player, BITMAP* buffer, int frame_counter, BITMAP* anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4]) {
     // Select the appropriate animation array based on the direction
@@ -481,8 +447,8 @@ int main() {
     while (!key[KEY_M]) {
 
         afficher_map(titre, buffer, map, player_sprite_1, player_sprite_2, player_1, player_2, &can_move, score_image, calque_collisions, buffer, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
-        check_collision_main(&player_2, &player_1, calque_collisions, player_sprite_2, music_main, regles, buffer, ending_screen);
-        check_collision_main(&player_1, &player_2, calque_collisions, player_sprite_1, music_main, regles, buffer, ending_screen);
+        check_collision_main(&player_2, &player_1, calque_collisions, player_sprite_2, music_main, regles, buffer, ending_screen, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
+        check_collision_main(&player_1, &player_2, calque_collisions, player_sprite_1, music_main, regles, buffer, ending_screen, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
 
         // alternance des leaders
         if (player_1.leader)
