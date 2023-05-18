@@ -59,19 +59,21 @@ void write_best_score(int score) {
 }
 
 
-void afficher_regles(BITMAP * regles, BITMAP * buffer, const char * file_name) {
+void afficher_regles(BITMAP* regles, BITMAP* buffer, const char* file_name) {
     masked_stretch_blit(regles, buffer, 0, 0, regles->w, regles->h, 0, 0, SCREEN_W, SCREEN_H);
-    //fetch rules from file and display them (location : attractions/assets/(game_name)/rules.txt)
-    char filepath[50] = "../attractions/assets/";
-    strcat(filepath, file_name);
-    strcat(filepath, "/rules.txt");
-    FILE * file = file_loader(filepath, "r");
+    // Fetch rules from file and display them (location: attractions/assets/(game_name)/rules.txt)
+    char filepath[200];
+    snprintf(filepath, sizeof(filepath), "attractions/assets/%s/rules.txt", file_name);
+
+    FILE* file = file_loader(filepath, "r");
+
     char line[100];
     int y = 250; // y position of the first line
-    while (fgets(line, 100, file) != NULL) {
+    while (fgets(line, sizeof(line), file) != NULL) {
         textout_ex(buffer, font, line, 200, y, makecol(0, 0, 0), -1);
         y += 20;
     }
+
     fclose(file);
 }
 

@@ -21,7 +21,7 @@ BITMAP* image_loader(const char* filepath){
 }
 
 SAMPLE* sound_loader(const char* filepath){
-    // on vérifie que les BITMAPS ont bien été initialisés
+    // on vérifie que les SAMPLE ont bien été initialisés
     SAMPLE * sound = load_sample(filepath);
     if (!sound) {
         char clion_filepath[100];
@@ -38,7 +38,9 @@ SAMPLE* sound_loader(const char* filepath){
     return sound;
 }
 
+
 FILE *file_loader(const char* filepath, const char* mode){
+    // on vérifie que les fichiers ont bien été initialisés
     FILE *file = fopen(filepath, mode);
     if (!file) {
         char clion_filepath[100];
@@ -51,5 +53,7 @@ FILE *file_loader(const char* filepath, const char* mode){
             exit(EXIT_FAILURE);
         }
     }
+
     return file;
 }
+
