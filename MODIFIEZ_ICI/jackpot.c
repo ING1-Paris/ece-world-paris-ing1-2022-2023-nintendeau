@@ -8,7 +8,7 @@
 int main(int argc, char *argv[])
 {
     srand(time(NULL));
-    int cblanc, crouge, cbleu, cvert, cviolet;
+    int cblanc, crouge, cbleu, cvert, cviolet, cnoir;
     int v7 = 1, vviande = 2,vcoeur = 3;
     int fin;
     int nbrTicket = 5 ;
@@ -40,12 +40,12 @@ int main(int argc, char *argv[])
     BITMAP *dessprite3 = create_bitmap(86, 100);
     BITMAP *dessprite5 = create_bitmap(800, 650);
 
-    SAMPLE *son1 = load_sample("../Projet_2/son/son1.wav");// ajouter fond sonore
-    SAMPLE *son2 = load_sample("../Projet_2/son/son2.wav");// son animation et appuie du bouton
-    SAMPLE *son3 = load_sample("../Projet_2/son/son3.wav");// quand une image sort
-    SAMPLE *son4 = load_sample("../Projet_2/son/son4.wav");// quand on gagne
+    SAMPLE *FondSonore = load_sample("../Projet_2/jackpot_fond.wav");// ajouter fond sonore
+    SAMPLE *Roulette = load_sample("../Projet_2/jackpot_precase.wav");// son animation et appuie du bouton
+    SAMPLE *SortieCase = load_sample("../Projet_2/jackpot_case.wav");// quand une image sort
+    SAMPLE *SonWin = load_sample("../Projet_2/jackpot_win.wav");// quand on gagne
 
-    play_sample(son1, 255, 128, 1000, 5);
+    play_sample(FondSonore, 255, 128, 1000, 5);
 
 
     if (!sprite1 || !sprite2 || !sprite3) {
@@ -69,11 +69,10 @@ int main(int argc, char *argv[])
     cbleu=makecol(0,0,255);
     cvert= makecol(0,255,0);
     cviolet = makecol(163,73,164);
+    cnoir = makecol(0,0,0);
 
     fin=0;
     int dernierAppui = 0;
-
-
 
     draw_sprite(screen, dessprite5, 0, 0);
     draw_sprite(screen, dessprite1, 233, 273);
@@ -81,35 +80,23 @@ int main(int argc, char *argv[])
     draw_sprite(screen, dessprite3, 485, 273);
 
 
-    textprintf_ex(screen,font,589,469,makecol(255,0,0),makecol(200,255,0),"START");
-    textprintf_ex(screen, font, 300, 550, cblanc, -1, "il vous reste %d tickets", nbrTicket);
-    textprintf_ex(screen, font, 5, 20, cblanc, -1, "Bienvenue au jeu du JACKPOT");
-    textprintf_ex(screen, font, 5, 35, cblanc, -1, "REGLES DU JEU :");
-    textprintf_ex(screen, font, 5, 60, cblanc, -1, "- Cliquez sur START pour jouer !");
-    textprintf_ex(screen, font, 5, 75, cblanc, -1, "- si les 3 images sont");
-    textprintf_ex(screen, font, 5, 85, cblanc, -1, "  identiques vous gagnez");
-    textprintf_ex(screen, font, 5, 95, cblanc, -1, "  1 tickets");
-    textprintf_ex(screen, font, 5, 110, cblanc, -1, "- si les 3 images ne sont");
-    textprintf_ex(screen, font, 5, 120, cblanc, -1, "  pas identiques vous ");
-    textprintf_ex(screen, font, 5, 130, cblanc, -1, "  perdez 1 ticket");
-
     while (!fin) {
-
         if (nbrTicket <= 0) {
-            rectfill(screen, 300, 545, 500, 560, cviolet);
+            rectfill(screen, 300, 545, 500, 560, cnoir);
             textprintf_ex(screen, font, 300, 550, cblanc, -1, "Vous n'avez plus de tickets !");
             rest(1000);
             fin = 1;
         }
-        if (mouse_b & 1 && mouse_x <= 660 && mouse_x >= 560 && mouse_y <= 490 && mouse_y >= 462) {
+        while (mouse_b & 1 && mouse_x <= 660 && mouse_x >= 560 && mouse_y <= 490 && mouse_y >= 462) {
             if (time(NULL) - dernierAppui >= 1) {
                 dernierAppui = time(NULL);
 
                 nbrTicket = nbrTicket - 1;
-                rectfill(screen, 300, 545, 500, 560, cviolet);
+                rectfill(screen, 300, 545, 500, 560, cnoir);
                 textprintf_ex(screen, font, 300, 550, cblanc, -1, "il vous reste %d tickets", nbrTicket);
 
                 for(int i = 0 ; i < 3 ; i++) {
+                    play_sample(Roulette, 255, 128, 1000, 0);
                     int choix = rand() % 3 + 1;
                     for (int j = 0; j < 14 ; j++){
                         if (j == 0) {
@@ -148,44 +135,47 @@ int main(int argc, char *argv[])
 
                     if (choix == v7) {
                         draw_sprite(screen, dessprite1, 233 + i * 126, 274);
+                        play_sample(SortieCase, 255, 128, 1000, 0);
                     } else if (choix == vviande) {
                         draw_sprite(screen, dessprite2, 233 + i * 126, 274);
+                        play_sample(SortieCase, 255, 128, 1000, 0);
                     } else if (choix == vcoeur) {
                         draw_sprite(screen, dessprite3, 233 + i * 126, 274);
+                        play_sample(SortieCase, 255, 128, 1000, 0);
                     }
                 }
 
                 if (getpixel(screen, 234, 275) == cvert && getpixel(screen, 234 + 126, 274) == cvert && getpixel(screen, 234 + 2*126, 274) == cvert) {
-                    rectfill(screen, 350, 45, 475, 60, cviolet);
-                    textprintf_ex(screen,font,350,50,cblanc,-1,"Vous avez gagné");
+                    play_sample(SonWin, 255, 128, 1000, 0);
+                    rectfill(screen, 350, 580, 475, 600,  cnoir);
+                    textprintf_ex(screen,font,340,570,cblanc,-1,"Vous avez gagné");
                     nbrTicket = nbrTicket + nbrTicketGagne;
-                    rectfill(screen, 300, 545, 500, 560, cviolet);
+                    rectfill(screen, 300, 545, 500, 560, cnoir);
                     textprintf_ex(screen, font, 300, 550, cblanc, -1, "il vous reste %d tickets", nbrTicket); // Affiche le nouveau texte
 
                 } else if (getpixel(screen, 234, 275) == cbleu && getpixel(screen, 234 + 126, 275) == cbleu && getpixel(screen, 234 + 2*126, 275) == cbleu) {
-                    rectfill(screen, 350, 45, 475, 60, cviolet);
-                    textprintf_ex(screen,font,350,50,cblanc,-1,"Vous avez gagné");
+                    play_sample(SonWin, 255, 128, 1000, 0);
+                    rectfill(screen, 350, 580, 475, 600,  cnoir);
+                    textprintf_ex(screen,font,340,570,cblanc,-1,"Vous avez gagné");
                     nbrTicket = nbrTicket + nbrTicketGagne;
-                    rectfill(screen, 300, 545, 500, 560, cviolet);
+                    rectfill(screen, 300, 545, 500, 560,  cnoir);
                     textprintf_ex(screen, font, 300, 550, cblanc, -1, "il vous reste %d tickets", nbrTicket); // Affiche le nouveau texte
 
                 } else if (getpixel(screen, 234, 275) == crouge && getpixel(screen, 234 + 126, 275) == crouge && getpixel(screen, 234 + 2*126, 275) == crouge) {
-                    rectfill(screen, 350, 45, 475, 60, cviolet);
-                    textprintf_ex(screen,font,350,50,cblanc,-1,"Vous avez gagné");
+                    play_sample(SonWin, 255, 128, 1000, 0);
+                    rectfill(screen, 350, 580, 475, 600,  cnoir);
+                    textprintf_ex(screen,font,340,570,cblanc,-1,"Vous avez gagné");
                     nbrTicket = nbrTicket + nbrTicketGagne;
-                    rectfill(screen, 300, 545, 500, 560, cviolet);
+                    rectfill(screen, 300, 545, 500, 560,  cnoir);
                     textprintf_ex(screen, font, 300, 550, cblanc, -1, "il vous reste %d tickets", nbrTicket); // Affiche le nouveau texte
 
                 } else {
-                    rectfill(screen, 350, 45, 475, 60, cviolet);
-                    textprintf_ex(screen,font,350,50,cblanc,-1,"Vous avez perdu");
+                    rectfill(screen, 350, 580, 475, 600,  cnoir);
+                    textprintf_ex(screen,font,340,570,cblanc,-1,"Vous avez perdu");
                 }
             }
         }
     }
-
-
-    readkey();
 
     return 0;
 }
