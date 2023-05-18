@@ -25,6 +25,7 @@
 typedef struct {
     int x, y;
     int previous_x, previous_y;
+    int direction;
     int speed;
     int score;
     int tickets;
@@ -70,13 +71,14 @@ void afficher_regles(BITMAP* regles, BITMAP* buffer, const char* file_name) {
     char line[100];
     int y = 250; // y position of the first line
     while (fgets(line, sizeof(line), file) != NULL) {
+        //remove the ^ at the end of the line
+        line[strlen(line) - 1] = '\0';
         textout_ex(buffer, font, line, 200, y, makecol(0, 0, 0), -1);
         y += 20;
     }
 
     fclose(file);
 }
-
 
 // fonction qui gere les collisions de la map
 void check_collision_main(Player * player, BITMAP * calque_collisions, BITMAP * player_sprite, SAMPLE * music_main, BITMAP * regles, BITMAP * buffer) {
@@ -221,7 +223,13 @@ void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player
     clear_to_color(buffer_texte, makecol(255, 0, 255));
     stretch_blit(calque_collisions, buffer, 0, 0, calque_collisions->w, calque_collisions->h, 0, 0, buffer->w, buffer->h);
     stretch_blit(map, buffer, 0, 0, map->w, map->h, 0, 0, buffer->w, buffer->h);
+
+    //Animation du joueur
     masked_blit(player_sprite, buffer, 0, 0, player.x, player.y, player_sprite->w, player_sprite->h);
+
+
+
+
     masked_stretch_blit(titre, buffer, 0, 0, titre->w, titre->h, SCREEN_W/2 - titre->w/1.35, SCREEN_H/2 - titre->h*1.5, titre->w*1.5, titre->h*1.5);
     masked_blit(buffer_texte, buffer, 0, 0, 0, 0, buffer_texte->w, buffer_texte->h);
 
@@ -241,15 +249,19 @@ void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player
 void move_player(Player * player) {
     if (key[KEY_UP]) {
         player->y -= player->speed;
+        player->direction = 1;
     }
     if (key[KEY_DOWN]) {
         player->y += player->speed;
+        player->direction = 2;
     }
     if (key[KEY_LEFT]) {
         player->x -= player->speed;
+        player->direction = 3;
     }
     if (key[KEY_RIGHT]) {
         player->x += player->speed;
+        player->direction = 4;
     }
 }
 
@@ -294,8 +306,17 @@ int main() {
 
     //& reste du code principal
     // fait apparaitre le joueur au centre de l'ecran
-    Player player = {200, 200, 4, 0, 5}; //!{x, y, width, height, speed, score}
+    Player player;
+    player.x = 200;
+    player.y = 200;
+    player.previous_x = player.x;
+    player.previous_y = player.y;
+    player.speed = 5;
 
+//non pas besoin
+//c'et censé ouais
+
+    //genre g voulu build il m'a dit scan for machin g fait ca et le btn a disparu
     play_sample(music_main, 255, 128, 1000, 1);
 
     //& boucle principale du menu (carte du parc)

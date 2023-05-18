@@ -1,9 +1,10 @@
-MES SUPER REGLES : 
-1 -  se laver les dents
-2 -  se laver les mains
-3 -  se laver les pieds
-4 -  se laver les oreilles
-5 -  se laver les cheveux
-6 -  se laver le visage
-7 -  se laver le cou
-8 -  se laver les yeux à l'eau de javel
+GUITAR HERO :
+
+Jeu de Guitar Hero jouable a 2 joueurs !
+
+Appuyez sur les bonnes touches au bon moment pour jouer une note !
+Si vous ratez une note, vous perdez une vie !
+Si votre vie tombe a 0, vous perdez la partie et voter temps de jeu est enregistré !
+Si le premier joueur perd, le second joueur peut continuer a jouer pour essayer de battre le score du premier joueur !
+
+Le joueur qui a tenu le plus longtemps gagne la partie !
