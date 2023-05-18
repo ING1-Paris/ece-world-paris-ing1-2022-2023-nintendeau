@@ -21,13 +21,18 @@
 #include "attractions/header/loader.h"
 #include "attractions/header/paris_hippiques.h"
 
+#define PLAYER2_FILTER makecol(127, 0, 0)   // Red filter for player 2
+
+
 // Structure Player qui contient les informations du joueur
 typedef struct {
     int x, y;
+    int number;
     int previous_x, previous_y;
     int direction, speed;
     int score, tickets;
     int leader;
+    BITMAP * sprite;
 } Player;
 
 // fonction pour ecrire le meilleur score dans le fichier "meilleurs_scores.txt"
@@ -241,17 +246,108 @@ void afficher_score(BITMAP * score_image, BITMAP * buffer, Player player) {
     textprintf_ex(buffer, font, SCREEN_W/2, SCREEN_H/2, makecol(0, 0, 0), -1, "Score: %d", player.score);
 }
 
+/*
+void display_player(Player player, BITMAP * buffer, int frame_counter,  BITMAP * anim_player_haut[4], BITMAP * anim_player_bas[4], BITMAP * anim_player_gauche[4], BITMAP * anim_player_droite[4]) {
+    // Depending on the direction, display the right array of frames if the player is moving or the initial frame if he's not (player.sprite)
+    //if player is moving (x != previous_x or y != previous_y), display, the frames, else display the first frame of the array
+    if (player.x != player.previous_x || player.y != player.previous_y) {
+        if (player.direction == 1) {
+            masked_blit(anim_player_haut[frame_counter], buffer, 0, 0, player.x, player.y, anim_player_haut[frame_counter]->w, anim_player_haut[frame_counter]->h);
+        }
+        else if (player.direction == 2) {
+            masked_blit(anim_player_bas[frame_counter], buffer, 0, 0, player.x, player.y, anim_player_bas[frame_counter]->w, anim_player_bas[frame_counter]->h);
+        }
+        else if (player.direction == 3) {
+            masked_blit(anim_player_gauche[frame_counter], buffer, 0, 0, player.x, player.y, anim_player_gauche[frame_counter]->w, anim_player_gauche[frame_counter]->h);
+        }
+        else if (player.direction == 4) {
+            masked_blit(anim_player_droite[frame_counter], buffer, 0, 0, player.x, player.y, anim_player_droite[frame_counter]->w, anim_player_droite[frame_counter]->h);
+        }
+    }
+    else {
+        if (player.direction == 1) {
+            masked_blit(anim_player_haut[1], buffer, 0, 0, player.x, player.y, anim_player_haut[1]->w, anim_player_haut[1]->h);
+        }
+        else if (player.direction == 2) {
+            masked_blit(anim_player_bas[1], buffer, 0, 0, player.x, player.y, anim_player_bas[1]->w, anim_player_bas[1]->h);
+        }
+        else if (player.direction == 3) {
+            masked_blit(anim_player_gauche[1], buffer, 0, 0, player.x, player.y, anim_player_gauche[1]->w, anim_player_gauche[1]->h);
+        }
+        else if (player.direction == 4) {
+            masked_blit(anim_player_droite[1], buffer, 0, 0, player.x, player.y, anim_player_droite[1]->w, anim_player_droite[1]->h);
+        }
+    }
+}*/
 
-void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player_sprite_1, BITMAP * player_sprite_2, Player player_1, Player player_2, int * can_move, BITMAP * score_image, BITMAP * calque_collisions, BITMAP * buffer_texte) {
+void display_player(Player player, BITMAP* buffer, int frame_counter, BITMAP* anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4]) {
+    // Select the appropriate animation array based on the direction
+    BITMAP** animation_array;
+    if (player.direction == 1) {
+        animation_array = anim_player_haut;
+    }
+    else if (player.direction == 2) {
+        animation_array = anim_player_bas;
+    }
+    else if (player.direction == 3) {
+        animation_array = anim_player_gauche;
+    }
+    else if (player.direction == 4) {
+        animation_array = anim_player_droite;
+    }
+    else {
+        // Invalid direction, do nothing
+        return;
+    }
+
+    // Retrieve the current frame bitmap from the animation array
+    BITMAP* current_frame;
+    if (player.x != player.previous_x || player.y != player.previous_y) {
+        current_frame = animation_array[frame_counter];
+    }
+    else {
+        if (player.direction == 1 || player.direction == 2){
+            current_frame = animation_array[1];
+        }else{
+            current_frame = animation_array[2];
+        }
+    }
+
+    // Create a temporary bitmap for the masked sprite
+    BITMAP* masked_sprite = create_bitmap(current_frame->w, current_frame->h);
+
+    // Apply the mask to the sprite
+    clear(masked_sprite);
+    blit(current_frame, masked_sprite, 0, 0, 0, 0, current_frame->w, current_frame->h);
+
+    if (player.number == 2) {
+        // Apply the color filter only for player 2
+        int filter = PLAYER2_FILTER;
+        set_trans_blender(0, 0, 0, 255);
+        draw_lit_sprite(masked_sprite, masked_sprite, 0, 0, filter);
+    }
+
+    // Draw the masked sprite
+    masked_blit(masked_sprite, buffer, 0, 0, player.x, player.y, masked_sprite->w, masked_sprite->h);
+
+    // Destroy the temporary bitmap
+    destroy_bitmap(masked_sprite);
+}
+
+
+
+
+
+void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player_sprite_1, BITMAP * player_sprite_2, Player player_1, Player player_2, int * can_move, BITMAP * score_image, BITMAP * calque_collisions, BITMAP * buffer_texte, int frame_counter, BITMAP * anim_player_haut[4], BITMAP * anim_player_bas[4], BITMAP * anim_player_gauche[4], BITMAP * anim_player_droite[4]) {
 
     clear_bitmap(buffer);
     clear_to_color(buffer_texte, makecol(255, 0, 255));
     stretch_blit(calque_collisions, buffer, 0, 0, calque_collisions->w, calque_collisions->h, 0, 0, buffer->w, buffer->h);
     stretch_blit(map, buffer, 0, 0, map->w, map->h, 0, 0, buffer->w, buffer->h);
 
-    //Animation du joueur
-    masked_blit(player_sprite_1, buffer, 0, 0, player_1.x, player_1.y, player_sprite_1->w, player_sprite_1->h);
-    masked_blit(player_sprite_2, buffer, 0, 0, player_2.x, player_2.y, player_sprite_2->w, player_sprite_2->h);
+    //Animation du joueur : 
+    display_player(player_1, buffer, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
+    display_player(player_2, buffer, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
 
     masked_stretch_blit(titre, buffer, 0, 0, titre->w, titre->h, SCREEN_W/2 - titre->w/1.35, SCREEN_H/2 - titre->h*1.5, titre->w*1.5, titre->h*1.5);
     masked_blit(buffer_texte, buffer, 0, 0, 0, 0, buffer_texte->w, buffer_texte->h);
@@ -275,15 +371,15 @@ void move_player(Player * player, int UP, int DOWN, int LEFT, int RIGHT) {
         player->y -= player->speed;
         player->direction = 1;
     }
-    if (key[DOWN]) {
+    else if (key[DOWN]) {
         player->y += player->speed;
         player->direction = 2;
     }
-    if (key[LEFT]) {
+    else if (key[LEFT]) {
         player->x -= player->speed;
         player->direction = 3;
     }
-    if (key[RIGHT]) {
+    else if (key[RIGHT]) {
         player->x += player->speed;
         player->direction = 4;
     }
@@ -313,15 +409,15 @@ int main() {
     show_mouse(screen);
 
     //! VARIABLES
-    int frame_count = 0;
+    int frame_counter = 0;
     int can_move    = 0;
 
     //! CHARGEMENT DES BITMAPS
     BITMAP * buffer_texte      = create_bitmap(SCREEN_W, SCREEN_H);
     BITMAP * buffer            = create_bitmap(SCREEN_W, SCREEN_H);
     BITMAP * calque_collisions = image_loader("attractions/assets/collision_v3.bmp");
-    BITMAP * player_sprite_1    = image_loader("attractions/assets/palais_des_glaces/player_1.bmp");
-    BITMAP * player_sprite_2    = image_loader("attractions/assets/palais_des_glaces/player_2.bmp");
+    BITMAP * player_sprite_1   = image_loader("attractions/assets/palais_des_glaces/player_1.bmp");
+    BITMAP * player_sprite_2   = image_loader("attractions/assets/palais_des_glaces/player_2.bmp");
     BITMAP * ending_screen     = image_loader("attractions/assets/ending_screen.bmp");
     BITMAP * score_image       = image_loader("attractions/assets/score.bmp");
     BITMAP * regles            = image_loader("attractions/assets/lancer_jeu.bmp");
@@ -329,33 +425,62 @@ int main() {
     BITMAP * map               = image_loader("attractions/assets/map_v3.bmp");
     SAMPLE * music_main        = sound_loader("attractions/assets/music_main.wav");
 
+    //! Chargement des animations
+    // Load the bitmaps in separate arrays
+    BITMAP * anim_player_haut[4];
+    BITMAP * anim_player_bas[4];
+    BITMAP * anim_player_gauche[4];
+    BITMAP * anim_player_droite[4];
+
+    // Load the bitmaps in the arrays
+    for (int i = 1; i < 5; i++) {
+        // Construct the file paths using sprintf
+        char file_path[100];
+        sprintf(file_path, "attractions/assets/anim_player_haut/frame_%d.bmp", i);
+        anim_player_haut[i] = image_loader(file_path);
+
+        sprintf(file_path, "attractions/assets/anim_player_bas/frame_%d.bmp", i);
+        anim_player_bas[i] = image_loader(file_path);
+
+        sprintf(file_path, "attractions/assets/anim_player_gauche/frame_%d.bmp", i);
+        anim_player_gauche[i] = image_loader(file_path);
+
+        sprintf(file_path, "attractions/assets/anim_player_droite/frame_%d.bmp", i);
+        anim_player_droite[i] = image_loader(file_path);
+    }
+
 
     //& reste du code principal
     // fait apparaitre le joueur au centre de l'ecran
     Player player_1;
+    player_1.sprite = player_sprite_1;
+    player_1.number = 1;
     player_1.x = 520;
     player_1.y = 150;
     player_1.previous_x = player_1.x;
     player_1.previous_y = player_1.y;
     player_1.speed = 5;
     player_1.leader = 1;
+    player_1.direction = 2; //player facing down first
 
     Player player_2;
+    player_2.sprite = player_sprite_2;
+    player_2.number = 2;
     player_2.x = 590;
     player_2.y = 150;
     player_2.previous_x = player_2.x;
     player_2.previous_y = player_2.y;
     player_2.speed = 5;
     player_2.leader = 0;
+    player_2.direction = 2; //player facing down first
 
-
-    //genre g voulu build il m'a dit scan for machin g fait ca et le btn a disparu
+    //Musique du menu
     play_sample(music_main, 255, 128, 1000, 1);
 
     //& boucle principale du menu (carte du parc)
     while (!key[KEY_M]) {
 
-        afficher_map(titre, buffer, map, player_sprite_1, player_sprite_2, player_1, player_2, &can_move, score_image, calque_collisions, buffer);
+        afficher_map(titre, buffer, map, player_sprite_1, player_sprite_2, player_1, player_2, &can_move, score_image, calque_collisions, buffer, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
         check_collision_main(&player_2, &player_1, calque_collisions, player_sprite_2, music_main, regles, buffer, ending_screen);
         check_collision_main(&player_1, &player_2, calque_collisions, player_sprite_1, music_main, regles, buffer, ending_screen);
 
@@ -378,7 +503,8 @@ int main() {
 
 
         // passer a la frame suivante de l'animation du joueur (4 frames)
-        frame_count = (frame_count + 1) % 4;
+        frame_counter = (frame_counter + 1) % 4;
+        (frame_counter == 0) ? frame_counter += 4 : frame_counter;
 
         vsync();
         blit(buffer, screen, 0, 0, 0, 0, buffer->w, buffer->h);

@@ -12,7 +12,7 @@ BITMAP* image_loader(const char* filepath){
     if (!img) {
         img = load_bitmap(filepath, NULL);
         if (!img) {
-            allegro_message("Erreur d'importation d'd'image");
+            allegro_message("Erreur d'importation d'image : %s", filepath);
             allegro_exit();
             exit(EXIT_FAILURE);
         }
