@@ -25,10 +25,9 @@
 typedef struct {
     int x, y;
     int previous_x, previous_y;
-    int direction;
-    int speed;
-    int score;
-    int tickets;
+    int direction, speed;
+    int score, tickets;
+    int leader;
 } Player;
 
 // fonction pour ecrire le meilleur score dans le fichier "meilleurs_scores.txt"
@@ -92,7 +91,7 @@ void show_ending_screen(BITMAP * buffer, BITMAP * ending_screen) {
 }
 
 // fonction qui gere les collisions de la map
-void check_collision_main(Player * player, BITMAP * calque_collisions, BITMAP * player_sprite_1, SAMPLE * music_main, BITMAP * regles, BITMAP * buffer, BITMAP * ending_screen) {
+void check_collision_main(Player * player, Player * player_2, BITMAP * calque_collisions, BITMAP * player_sprite_1, SAMPLE * music_main, BITMAP * regles, BITMAP * buffer, BITMAP * ending_screen) {
 
     int active = 0;
 
@@ -160,7 +159,7 @@ void check_collision_main(Player * player, BITMAP * calque_collisions, BITMAP * 
                 player->x = x;
                 player->y = y;
             }// si le joueur est sur un jeu, on lance l'attraction correspondante
-            else if (color_array[i] != ground && color_array[i] != sortie_color) {
+            else if (color_array[i] != ground && color_array[i] != sortie_color && player->leader) {
                 afficher_regles(regles, buffer, game);
                 if (key[KEY_SPACE]) {
                     stop_sample(music_main);
@@ -197,11 +196,21 @@ void check_collision_main(Player * player, BITMAP * calque_collisions, BITMAP * 
                     else if (strcmp(game, "flappy_bird") == 0) {
                         printf("flappy_bird\n");
                     }
+
+                    if (player->leader) {
+                        player->leader = 0;
+                        player_2->leader = 1;
+                    }
+                    else if (!player->leader) {
+                        player->leader = 1;
+                        player_2->leader = 0;
+                    }
+
                     //replacer le joueur au milieu de la map et redéfinir la fenetre
                     set_gfx_mode(GFX_AUTODETECT_WINDOWED, 1200, 800, 0, 0);
+                    play_sample(music_main, 255, 128, 1000, 1);
                     player->y = 300;
                     player->x = 300;
-                    play_sample(music_main, 255, 128, 1000, 1);
                 }
             }
             player->previous_x = player->x;
@@ -324,18 +333,20 @@ int main() {
     //& reste du code principal
     // fait apparaitre le joueur au centre de l'ecran
     Player player_1;
-    player_1.x = 200;
-    player_1.y = 200;
+    player_1.x = 520;
+    player_1.y = 150;
     player_1.previous_x = player_1.x;
     player_1.previous_y = player_1.y;
     player_1.speed = 5;
+    player_1.leader = 1;
 
     Player player_2;
-    player_2.x = 200;
-    player_2.y = 200;
+    player_2.x = 590;
+    player_2.y = 150;
     player_2.previous_x = player_2.x;
     player_2.previous_y = player_2.y;
     player_2.speed = 5;
+    player_2.leader = 0;
 
 
     //genre g voulu build il m'a dit scan for machin g fait ca et le btn a disparu
@@ -345,8 +356,15 @@ int main() {
     while (!key[KEY_M]) {
 
         afficher_map(titre, buffer, map, player_sprite_1, player_sprite_2, player_1, player_2, &can_move, score_image, calque_collisions, buffer);
-        check_collision_main(&player_1, calque_collisions, player_sprite_1, music_main, regles, buffer, ending_screen);
-        check_collision_main(&player_2, calque_collisions, player_sprite_2, music_main, regles, buffer, ending_screen);
+        check_collision_main(&player_2, &player_1, calque_collisions, player_sprite_2, music_main, regles, buffer, ending_screen);
+        check_collision_main(&player_1, &player_2, calque_collisions, player_sprite_1, music_main, regles, buffer, ending_screen);
+
+        // alternance des leaders
+        if (player_1.leader)
+            textprintf_ex(buffer, font, 10, 10, makecol(0, 0, 0), -1, "Joueur 1 leader");
+        if (player_2.leader)
+            textprintf_ex(buffer, font, 10, 10, makecol(0, 0, 0), -1, "Joueur 2 leader");
+
 
         if (can_move) {
             move_player(&player_1, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT);
