@@ -80,8 +80,19 @@ void afficher_regles(BITMAP* regles, BITMAP* buffer, const char* file_name) {
     fclose(file);
 }
 
+
+void show_ending_screen(BITMAP * buffer, BITMAP * ending_screen) {
+    masked_stretch_blit(ending_screen, buffer, 0, 0, ending_screen->w, ending_screen->h, 0, 0, SCREEN_W, SCREEN_H);
+    textout_ex(buffer, font, "Appuyez sur ECHAP pour quitter", 550, 600, makecol(0, 0, 0), -1);
+    //blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+    if (key[KEY_ESC]) {
+        allegro_exit();
+        exit(EXIT_SUCCESS);
+    }
+}
+
 // fonction qui gere les collisions de la map
-void check_collision_main(Player * player, BITMAP * calque_collisions, BITMAP * player_sprite, SAMPLE * music_main, BITMAP * regles, BITMAP * buffer) {
+void check_collision_main(Player * player, BITMAP * calque_collisions, BITMAP * player_sprite, SAMPLE * music_main, BITMAP * regles, BITMAP * buffer, BITMAP * ending_screen) {
 
     int active = 0;
 
@@ -94,16 +105,17 @@ void check_collision_main(Player * player, BITMAP * calque_collisions, BITMAP * 
     int palais_des_glaces_color = makecol(30, 124, 184);// value in int : 0x1E7CB8
     int paris_hippiques_color   = makecol(127, 0, 127);
     int geometry_dash_color     = makecol(0, 0, 127);
-    int tape_taupe_color        = makecol(255, 255, 0);
     int guitar_hero_color       = makecol(127, 0, 0);
-    int jackpot_color           = makecol(0, 127, 127);
-    int tag_color               = makecol(127, 127, 127);
-    int snake_color             = makecol(0, 127, 0);
     int flappy_bird_color       = makecol(0, 255, 255);
+    int tape_taupe_color        = makecol(255, 255, 0);
+    int jackpot_color           = makecol(0, 127, 127);
+    int sortie_color            = makecol(0, 0, 255);
+    int snake_color             = makecol(0, 127, 0);
+    int tag_color               = makecol(127, 127, 127);
 
-    int color_array[11] = {ground, wall, palais_des_glaces_color, paris_hippiques_color, geometry_dash_color, tape_taupe_color, guitar_hero_color, jackpot_color, tag_color, snake_color , flappy_bird_color};
+    int color_array[12] = {ground, wall, palais_des_glaces_color, paris_hippiques_color, geometry_dash_color, tape_taupe_color, guitar_hero_color, jackpot_color, tag_color, snake_color , flappy_bird_color, sortie_color};
 
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < 12; i++) {
         // on regarde la couleur des pixels aux 4 coins de la hitbox du joueur
         if (getpixel(calque_collisions, (player->x)*calque_collisions->w/SCREEN_W, (player->y + player_sprite->h/1.3)*calque_collisions->h/SCREEN_H) == color_array[i] || getpixel(calque_collisions, (player->x + player_sprite->w)*calque_collisions->w/SCREEN_W, (player->y + player_sprite->h/1.3)*calque_collisions->h/SCREEN_H) == color_array[i] || getpixel(calque_collisions, (player->x)*calque_collisions->w/SCREEN_W, (player->y + player_sprite->h)*calque_collisions->h/SCREEN_H) == color_array[i] || getpixel(calque_collisions, (player->x + player_sprite->w)*calque_collisions->w/SCREEN_W, (player->y + player_sprite->h)*calque_collisions->h/SCREEN_H) == color_array[i]) {
 
@@ -135,7 +147,11 @@ void check_collision_main(Player * player, BITMAP * calque_collisions, BITMAP * 
             }
             else if (color_array[i] == flappy_bird_color) {
                 game = "flappy_bird";
-            }else{
+            }
+            else if (color_array[i] == sortie_color) {
+                show_ending_screen(buffer, ending_screen);
+            }
+            else {
                 game = "none";
             }
             // si le joueur est sur une case mur, on le replace a sa position precedente
@@ -144,7 +160,7 @@ void check_collision_main(Player * player, BITMAP * calque_collisions, BITMAP * 
                 player->x = x;
                 player->y = y;
             }// si le joueur est sur un jeu, on lance l'attraction correspondante
-            else if (color_array[i] != ground) {
+            else if (color_array[i] != ground && color_array[i] != sortie_color) {
                 afficher_regles(regles, buffer, game);
                 if (key[KEY_SPACE]) {
                     stop_sample(music_main);
@@ -227,9 +243,6 @@ void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player
     //Animation du joueur
     masked_blit(player_sprite, buffer, 0, 0, player.x, player.y, player_sprite->w, player_sprite->h);
 
-
-
-
     masked_stretch_blit(titre, buffer, 0, 0, titre->w, titre->h, SCREEN_W/2 - titre->w/1.35, SCREEN_H/2 - titre->h*1.5, titre->w*1.5, titre->h*1.5);
     masked_blit(buffer_texte, buffer, 0, 0, 0, 0, buffer_texte->w, buffer_texte->h);
 
@@ -290,17 +303,18 @@ int main() {
 
     //! VARIABLES
     int frame_count = 0;
-    int can_move = 0;
+    int can_move    = 0;
 
     //! CHARGEMENT DES BITMAPS
-    BITMAP * buffer            = create_bitmap(SCREEN_W, SCREEN_H);
     BITMAP * buffer_texte      = create_bitmap(SCREEN_W, SCREEN_H);
+    BITMAP * buffer            = create_bitmap(SCREEN_W, SCREEN_H);
     BITMAP * calque_collisions = image_loader("attractions/assets/collision_v3.bmp");
     BITMAP * player_sprite     = image_loader("attractions/assets/anim_player_bas/frame_1.bmp");
+    BITMAP * ending_screen     = image_loader("attractions/assets/ending_screen.bmp");
     BITMAP * score_image       = image_loader("attractions/assets/score.bmp");
+    BITMAP * regles            = image_loader("attractions/assets/lancer_jeu.bmp");
     BITMAP * titre             = image_loader("attractions/assets/Titre.bmp");
     BITMAP * map               = image_loader("attractions/assets/map_v3.bmp");
-    BITMAP * regles            = image_loader("attractions/assets/lancer_jeu.bmp");
     SAMPLE * music_main        = sound_loader("attractions/assets/music_main.wav");
 
 
@@ -313,9 +327,6 @@ int main() {
     player.previous_y = player.y;
     player.speed = 5;
 
-//non pas besoin
-//c'et censé ouais
-
     //genre g voulu build il m'a dit scan for machin g fait ca et le btn a disparu
     play_sample(music_main, 255, 128, 1000, 1);
 
@@ -323,7 +334,7 @@ int main() {
     while (!key[KEY_M]) {
 
         afficher_map(titre, buffer, map, player_sprite, player, &can_move, score_image, calque_collisions, buffer);
-        check_collision_main(&player, calque_collisions, player_sprite, music_main, regles, buffer);
+        check_collision_main(&player, calque_collisions, player_sprite, music_main, regles, buffer, ending_screen);
 
         if (can_move) {
             move_player(&player);
