@@ -18,6 +18,7 @@
 #include "attractions/header/palais_des_glaces.h"
 #include "attractions/header/snake.h"
 #include "attractions/header/loader.h"
+#include "attractions/header/paris_hippiques.h"
 
 
 // Structure Player qui contient les informations du joueur
@@ -108,6 +109,8 @@ void check_collision_main(Player * player, BITMAP * calque_collisions, BITMAP * 
                     }
                     else if (color_array[i] == paris_hippiques_color) {
                         printf("paris_hippiques\n");
+                        paris_hippiques();
+                        set_gfx_mode(GFX_AUTODETECT_WINDOWED, 1200, 800, 0, 0);
                     }
                     else if (color_array[i] == geometry_dash_color) {
                         printf("geometry_dash\n");
