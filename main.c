@@ -10,6 +10,7 @@
 //& les fichiers .h seront inclus dans le main.c, dans lequel le code principal sera ecrit.
 
 #include <stdio.h>
+#include <string.h>
 #include <Allegro.h>
 
 #include "attractions/header/tag.h"
@@ -20,7 +21,6 @@
 #include "attractions/header/loader.h"
 #include "attractions/header/paris_hippiques.h"
 
-
 // Structure Player qui contient les informations du joueur
 typedef struct {
     int x, y;
@@ -29,7 +29,6 @@ typedef struct {
     int score;
     int tickets;
 } Player;
-
 
 // fonction pour ecrire le meilleur score dans le fichier "meilleurs_scores.txt"
 void write_best_score(int score) {
@@ -60,8 +59,25 @@ void write_best_score(int score) {
 }
 
 
-void afficher_regles(BITMAP * regles, BITMAP * buffer) {
+void afficher_regles(BITMAP * regles, BITMAP * buffer, const char * file_name) {
     masked_stretch_blit(regles, buffer, 0, 0, regles->w, regles->h, 0, 0, SCREEN_W, SCREEN_H);
+    //fetch rules from file and display them (location : attractions/assets/(game_name)/(game_name).txt)
+    char filepath[50] = "../attractions/assets/";
+    strcat(filepath, file_name);
+    strcat(filepath, "/rules.txt");
+    printf("On essaye d'afficher les regles du jeu %s\n", filepath);
+    FILE * file = fopen(filepath, "r");
+    if (!file) {
+        allegro_message("File %s not found", filepath);
+    }
+    //display everything that is in the file
+    char line[100];
+    int y = 250; // y position of the first line
+    while (fgets(line, 100, file) != NULL) {
+        textout_ex(buffer, font, line, 200, y, makecol(0, 0, 0), -1);
+        y += 20;
+    }
+    fclose(file);
 }
 
 
@@ -76,7 +92,7 @@ void check_collision_main(Player * player, BITMAP * calque_collisions, BITMAP * 
     int ground = makecol(0, 255, 0);
     int wall   = makecol(255, 0, 0);
 
-    int palais_des_glaces_color = makecol(30, 124, 184);
+    int palais_des_glaces_color = makecol(30, 124, 184);// value in int : 0x1E7CB8
     int paris_hippiques_color   = makecol(127, 0, 127);
     int geometry_dash_color     = makecol(0, 0, 127);
     int tape_taupe_color        = makecol(255, 255, 0);
@@ -91,52 +107,83 @@ void check_collision_main(Player * player, BITMAP * calque_collisions, BITMAP * 
     for (int i = 0; i < 11; i++) {
         // on regarde la couleur des pixels aux 4 coins de la hitbox du joueur
         if (getpixel(calque_collisions, (player->x)*calque_collisions->w/SCREEN_W, (player->y + player_sprite->h/1.3)*calque_collisions->h/SCREEN_H) == color_array[i] || getpixel(calque_collisions, (player->x + player_sprite->w)*calque_collisions->w/SCREEN_W, (player->y + player_sprite->h/1.3)*calque_collisions->h/SCREEN_H) == color_array[i] || getpixel(calque_collisions, (player->x)*calque_collisions->w/SCREEN_W, (player->y + player_sprite->h)*calque_collisions->h/SCREEN_H) == color_array[i] || getpixel(calque_collisions, (player->x + player_sprite->w)*calque_collisions->w/SCREEN_W, (player->y + player_sprite->h)*calque_collisions->h/SCREEN_H) == color_array[i]) {
+
+            //check the color
+            const char* game;
+            if (color_array[i] == palais_des_glaces_color) {
+                game = "palais_des_glaces";
+            }
+            else if (color_array[i] == paris_hippiques_color) {
+                game = "paris_hippiques";
+            }
+            else if (color_array[i] == geometry_dash_color) {
+                game = "geometry_dash";
+            }
+            else if (color_array[i] == tape_taupe_color) {
+                game = "tape_taupe";
+            }
+            else if (color_array[i] == guitar_hero_color) {
+                game = "guitar_hero";
+            }
+            else if (color_array[i] == jackpot_color) {
+                game = "jackpot";
+            }
+            else if (color_array[i] == tag_color) {
+                game = "tag";
+            }
+            else if (color_array[i] == snake_color) {
+                game = "snake";
+            }
+            else if (color_array[i] == flappy_bird_color) {
+                game = "flappy_bird";
+            }else{
+                game = "none";
+            }
             // si le joueur est sur une case mur, on le replace a sa position precedente
             active = 0;
             if (color_array[i] == wall) {
                 player->x = x;
                 player->y = y;
-            }
-
-            // si le joueur est sur un jeu, on lance l'attraction correspondante
+            }// si le joueur est sur un jeu, on lance l'attraction correspondante
             else if (color_array[i] != ground) {
-                afficher_regles(regles, buffer);
+                afficher_regles(regles, buffer, game);
                 if (key[KEY_SPACE]) {
                     stop_sample(music_main);
-                    if (color_array[i] == palais_des_glaces_color) {
+                    if (strcmp(game, "palais_des_glaces") == 0) {
                         printf("palais_des_glaces\n");
                         palais_des_glaces();
                     }
-                    else if (color_array[i] == paris_hippiques_color) {
+                    else if (strcmp(game, "paris_hippiques") == 0) {
                         printf("paris_hippiques\n");
                         paris_hippiques();
-                        set_gfx_mode(GFX_AUTODETECT_WINDOWED, 1200, 800, 0, 0);
                     }
-                    else if (color_array[i] == geometry_dash_color) {
+                    else if (strcmp(game, "geometry_dash") == 0) {
                         printf("geometry_dash\n");
                         geometry_dash();
                     }
-                    else if (color_array[i] == tape_taupe_color) {
+                    else if (strcmp(game, "tape_taupe") == 0) {
                         printf("tape_taupe\n");
                     }
-                    else if (color_array[i] == guitar_hero_color) {
+                    else if (strcmp(game, "guitar_hero") == 0) {
                         printf("guitar_hero\n");
                         guitar_hero();
                     }
-                    else if (color_array[i] == jackpot_color) {
+                    else if (strcmp(game, "jackpot") == 0) {
                         printf("jackpot\n");
                     }
-                    else if (color_array[i] == tag_color) {
+                    else if (strcmp(game, "tag") == 0) {
                         printf("tag\n");
                         tag();
                     }
-                    else if (color_array[i] == snake_color) {
+                    else if (strcmp(game, "snake") == 0) {
                         printf("snake\n");
                         snake();
                     }
-                    else if (color_array[i] == flappy_bird_color) {
+                    else if (strcmp(game, "flappy_bird") == 0) {
                         printf("flappy_bird\n");
                     }
+                    //replacer le joueur au milieu de la map et redéfinir la fenetre
+                    set_gfx_mode(GFX_AUTODETECT_WINDOWED, 1200, 800, 0, 0);
                     player->y = 300;
                     player->x = 300;
                     play_sample(music_main, 255, 128, 1000, 1);
