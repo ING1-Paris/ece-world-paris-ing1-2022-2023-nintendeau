@@ -92,7 +92,7 @@ void show_ending_screen(BITMAP * buffer, BITMAP * ending_screen) {
 }
 
 // fonction qui gere les collisions de la map
-void check_collision_main(Player * player, BITMAP * calque_collisions, BITMAP * player_sprite, SAMPLE * music_main, BITMAP * regles, BITMAP * buffer, BITMAP * ending_screen) {
+void check_collision_main(Player * player, BITMAP * calque_collisions, BITMAP * player_sprite_1, SAMPLE * music_main, BITMAP * regles, BITMAP * buffer, BITMAP * ending_screen) {
 
     int active = 0;
 
@@ -117,7 +117,7 @@ void check_collision_main(Player * player, BITMAP * calque_collisions, BITMAP * 
 
     for (int i = 0; i < 12; i++) {
         // on regarde la couleur des pixels aux 4 coins de la hitbox du joueur
-        if (getpixel(calque_collisions, (player->x)*calque_collisions->w/SCREEN_W, (player->y + player_sprite->h/1.3)*calque_collisions->h/SCREEN_H) == color_array[i] || getpixel(calque_collisions, (player->x + player_sprite->w)*calque_collisions->w/SCREEN_W, (player->y + player_sprite->h/1.3)*calque_collisions->h/SCREEN_H) == color_array[i] || getpixel(calque_collisions, (player->x)*calque_collisions->w/SCREEN_W, (player->y + player_sprite->h)*calque_collisions->h/SCREEN_H) == color_array[i] || getpixel(calque_collisions, (player->x + player_sprite->w)*calque_collisions->w/SCREEN_W, (player->y + player_sprite->h)*calque_collisions->h/SCREEN_H) == color_array[i]) {
+        if (getpixel(calque_collisions, (player->x)*calque_collisions->w/SCREEN_W, (player->y + player_sprite_1->h/1.3)*calque_collisions->h/SCREEN_H) == color_array[i] || getpixel(calque_collisions, (player->x + player_sprite_1->w)*calque_collisions->w/SCREEN_W, (player->y + player_sprite_1->h/1.3)*calque_collisions->h/SCREEN_H) == color_array[i] || getpixel(calque_collisions, (player->x)*calque_collisions->w/SCREEN_W, (player->y + player_sprite_1->h)*calque_collisions->h/SCREEN_H) == color_array[i] || getpixel(calque_collisions, (player->x + player_sprite_1->w)*calque_collisions->w/SCREEN_W, (player->y + player_sprite_1->h)*calque_collisions->h/SCREEN_H) == color_array[i]) {
 
             //check the color
             const char* game;
@@ -211,12 +211,12 @@ void check_collision_main(Player * player, BITMAP * calque_collisions, BITMAP * 
         // collisions avec les bordures de la fenetre
         else if (player->x < 0)
             player->x = 0;
-        else if (player->x > SCREEN_W - player_sprite->w)
-            player->x = SCREEN_W - player_sprite->w;
+        else if (player->x > SCREEN_W - player_sprite_1->w)
+            player->x = SCREEN_W - player_sprite_1->w;
         else if (player->y < 0)
             player->y = 0;
-        else if (player->y > SCREEN_H - player_sprite->h)
-            player->y = SCREEN_H - player_sprite->h;
+        else if (player->y > SCREEN_H - player_sprite_1->h)
+            player->y = SCREEN_H - player_sprite_1->h;
 
         // actualisation de la position precedente
         else {
@@ -233,7 +233,7 @@ void afficher_score(BITMAP * score_image, BITMAP * buffer, Player player) {
 }
 
 
-void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player_sprite, Player player, int * can_move, BITMAP * score_image, BITMAP * calque_collisions, BITMAP * buffer_texte) {
+void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player_sprite_1, BITMAP * player_sprite_2, Player player_1, Player player_2, int * can_move, BITMAP * score_image, BITMAP * calque_collisions, BITMAP * buffer_texte) {
 
     clear_bitmap(buffer);
     clear_to_color(buffer_texte, makecol(255, 0, 255));
@@ -241,7 +241,8 @@ void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player
     stretch_blit(map, buffer, 0, 0, map->w, map->h, 0, 0, buffer->w, buffer->h);
 
     //Animation du joueur
-    masked_blit(player_sprite, buffer, 0, 0, player.x, player.y, player_sprite->w, player_sprite->h);
+    masked_blit(player_sprite_1, buffer, 0, 0, player_1.x, player_1.y, player_sprite_1->w, player_sprite_1->h);
+    masked_blit(player_sprite_2, buffer, 0, 0, player_2.x, player_2.y, player_sprite_2->w, player_sprite_2->h);
 
     masked_stretch_blit(titre, buffer, 0, 0, titre->w, titre->h, SCREEN_W/2 - titre->w/1.35, SCREEN_H/2 - titre->h*1.5, titre->w*1.5, titre->h*1.5);
     masked_blit(buffer_texte, buffer, 0, 0, 0, 0, buffer_texte->w, buffer_texte->h);
@@ -253,26 +254,27 @@ void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player
     }
 
     // afficher le score si le joueur est sur la case "score"
-    if (940 < player.x && player.x < 1000 && 100 < player.y && player.y < 200) {
-        afficher_score(score_image, buffer_texte, player);
+    if (940 < player_1.x && player_1.x < 1000 && 100 < player_1.y && player_1.y < 200 || 940 < player_2.x && player_2.x < 1000 && 100 < player_2.y && player_2.y < 200) {
+        afficher_score(score_image, buffer_texte, player_1);
+        afficher_score(score_image, buffer_texte, player_2);
     }
 }
 
 
-void move_player(Player * player) {
-    if (key[KEY_UP]) {
+void move_player(Player * player, int UP, int DOWN, int LEFT, int RIGHT) {
+    if (key[UP]) {
         player->y -= player->speed;
         player->direction = 1;
     }
-    if (key[KEY_DOWN]) {
+    if (key[DOWN]) {
         player->y += player->speed;
         player->direction = 2;
     }
-    if (key[KEY_LEFT]) {
+    if (key[LEFT]) {
         player->x -= player->speed;
         player->direction = 3;
     }
-    if (key[KEY_RIGHT]) {
+    if (key[RIGHT]) {
         player->x += player->speed;
         player->direction = 4;
     }
@@ -309,7 +311,8 @@ int main() {
     BITMAP * buffer_texte      = create_bitmap(SCREEN_W, SCREEN_H);
     BITMAP * buffer            = create_bitmap(SCREEN_W, SCREEN_H);
     BITMAP * calque_collisions = image_loader("attractions/assets/collision_v3.bmp");
-    BITMAP * player_sprite     = image_loader("attractions/assets/anim_player_bas/frame_1.bmp");
+    BITMAP * player_sprite_1    = image_loader("attractions/assets/palais_des_glaces/player_1.bmp");
+    BITMAP * player_sprite_2    = image_loader("attractions/assets/palais_des_glaces/player_2.bmp");
     BITMAP * ending_screen     = image_loader("attractions/assets/ending_screen.bmp");
     BITMAP * score_image       = image_loader("attractions/assets/score.bmp");
     BITMAP * regles            = image_loader("attractions/assets/lancer_jeu.bmp");
@@ -320,12 +323,20 @@ int main() {
 
     //& reste du code principal
     // fait apparaitre le joueur au centre de l'ecran
-    Player player;
-    player.x = 200;
-    player.y = 200;
-    player.previous_x = player.x;
-    player.previous_y = player.y;
-    player.speed = 5;
+    Player player_1;
+    player_1.x = 200;
+    player_1.y = 200;
+    player_1.previous_x = player_1.x;
+    player_1.previous_y = player_1.y;
+    player_1.speed = 5;
+
+    Player player_2;
+    player_2.x = 200;
+    player_2.y = 200;
+    player_2.previous_x = player_2.x;
+    player_2.previous_y = player_2.y;
+    player_2.speed = 5;
+
 
     //genre g voulu build il m'a dit scan for machin g fait ca et le btn a disparu
     play_sample(music_main, 255, 128, 1000, 1);
@@ -333,16 +344,18 @@ int main() {
     //& boucle principale du menu (carte du parc)
     while (!key[KEY_M]) {
 
-        afficher_map(titre, buffer, map, player_sprite, player, &can_move, score_image, calque_collisions, buffer);
-        check_collision_main(&player, calque_collisions, player_sprite, music_main, regles, buffer, ending_screen);
+        afficher_map(titre, buffer, map, player_sprite_1, player_sprite_2, player_1, player_2, &can_move, score_image, calque_collisions, buffer);
+        check_collision_main(&player_1, calque_collisions, player_sprite_1, music_main, regles, buffer, ending_screen);
+        check_collision_main(&player_2, calque_collisions, player_sprite_2, music_main, regles, buffer, ending_screen);
 
         if (can_move) {
-            move_player(&player);
+            move_player(&player_1, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT);
+            move_player(&player_2, KEY_W, KEY_S, KEY_A, KEY_D);
         }
 
         // test pour le score
-        if (mouse_x > player.x && mouse_x < player.x + player_sprite->w && mouse_y > player_sprite->h && mouse_y < player.y + player_sprite->h) {
-            player.score++;
+        if (mouse_x > player_1.x && mouse_x < player_1.x + player_sprite_1->w && mouse_y > player_sprite_1->h && mouse_y < player_1.y + player_sprite_1->h) {
+            player_1.score++;
         }
 
 
