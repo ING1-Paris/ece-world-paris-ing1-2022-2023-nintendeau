@@ -61,16 +61,11 @@ void write_best_score(int score) {
 
 void afficher_regles(BITMAP * regles, BITMAP * buffer, const char * file_name) {
     masked_stretch_blit(regles, buffer, 0, 0, regles->w, regles->h, 0, 0, SCREEN_W, SCREEN_H);
-    //fetch rules from file and display them (location : attractions/assets/(game_name)/(game_name).txt)
+    //fetch rules from file and display them (location : attractions/assets/(game_name)/rules.txt)
     char filepath[50] = "../attractions/assets/";
     strcat(filepath, file_name);
     strcat(filepath, "/rules.txt");
-    printf("On essaye d'afficher les regles du jeu %s\n", filepath);
-    FILE * file = fopen(filepath, "r");
-    if (!file) {
-        allegro_message("File %s not found", filepath);
-    }
-    //display everything that is in the file
+    FILE * file = file_loader(filepath, "r");
     char line[100];
     int y = 250; // y position of the first line
     while (fgets(line, 100, file) != NULL) {

@@ -37,3 +37,19 @@ SAMPLE* sound_loader(const char* filepath){
     }
     return sound;
 }
+
+FILE *file_loader(const char* filepath, const char* mode){
+    FILE *file = fopen(filepath, mode);
+    if (!file) {
+        char clion_filepath[100];
+        strcpy(clion_filepath, "../");
+        strcat(clion_filepath, filepath);
+        file = fopen(clion_filepath, mode);
+        if (!file) {
+            allegro_message("Erreur d'importation de fichier : %s", filepath);
+            allegro_exit();
+            exit(EXIT_FAILURE);
+        }
+    }
+    return file;
+}
