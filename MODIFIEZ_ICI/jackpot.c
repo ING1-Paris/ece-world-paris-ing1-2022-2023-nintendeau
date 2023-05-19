@@ -68,7 +68,6 @@ int main(int argc, char *argv[])
     crouge=makecol(255,0,0);
     cbleu=makecol(0,0,255);
     cvert= makecol(0,255,0);
-    cviolet = makecol(163,73,164);
     cnoir = makecol(0,0,0);
 
     fin=0;
@@ -80,7 +79,7 @@ int main(int argc, char *argv[])
     draw_sprite(screen, dessprite3, 485, 273);
 
 
-    while (!fin) {
+    while (!fin && !key[KEY_ESC] ) {
         if (nbrTicket <= 0) {
             rectfill(screen, 300, 545, 500, 560, cnoir);
             textprintf_ex(screen, font, 300, 550, cblanc, -1, "Vous n'avez plus de tickets !");
@@ -176,7 +175,7 @@ int main(int argc, char *argv[])
             }
         }
     }
-
-    return 0;
+    allegro_exit();
+    EXIT_SUCCESS;
 }
 END_OF_MAIN();
