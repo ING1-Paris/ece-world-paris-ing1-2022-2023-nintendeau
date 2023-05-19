@@ -199,7 +199,7 @@ int paris_hippiques() {
 
 
         //boucle de jeu principal
-        while (!key[KEY_ESC]) {
+        while (!key[KEY_ESC] && gagne == false) {
             compteur++;
             if(compteur % 4==0){ //changer d'image toutes les 4 frames (pour ralentir l'animation)
                 //changer d'image
