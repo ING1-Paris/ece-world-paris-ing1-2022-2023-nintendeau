@@ -95,7 +95,7 @@ void show_ending_screen(BITMAP * buffer, BITMAP * ending_screen) {
     }
 }
 
-// fonction qui gere les collisions de la map
+
 void check_collision_main(Player * player, Player * player_2, BITMAP * calque_collisions, BITMAP * player_sprite_1, SAMPLE * music_main, BITMAP * regles, BITMAP * buffer, BITMAP * ending_screen, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4]) {
 
     int active = 0;
@@ -170,7 +170,7 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
                     stop_sample(music_main);
                     if (strcmp(game, "palais_des_glaces") == 0) {
                         printf("palais_des_glaces\n");
-                        palais_des_glaces();
+                        palais_des_glaces(PLAYER2_FILTER, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
                     }
                     else if (strcmp(game, "paris_hippiques") == 0) {
                         printf("paris_hippiques\n");
@@ -246,9 +246,10 @@ void afficher_score(BITMAP * score_image, BITMAP * buffer, Player player) {
     textprintf_ex(buffer, font, SCREEN_W/2, SCREEN_H/2, makecol(0, 0, 0), -1, "Score: %d", player.score);
 }
 
+
 void display_player(Player player, BITMAP* buffer, int frame_counter, BITMAP* anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4]) {
     // Select the appropriate animation array based on the direction
-    BITMAP** animation_array;
+    BITMAP ** animation_array;
     if (player.direction == 1) {
         animation_array = anim_player_haut;
     }
@@ -267,7 +268,7 @@ void display_player(Player player, BITMAP* buffer, int frame_counter, BITMAP* an
     }
 
     // Retrieve the current frame bitmap from the animation array
-    BITMAP* current_frame;
+    BITMAP * current_frame;
     if (player.x != player.previous_x || player.y != player.previous_y) {
         current_frame = animation_array[frame_counter];
     }
@@ -280,7 +281,7 @@ void display_player(Player player, BITMAP* buffer, int frame_counter, BITMAP* an
     }
 
     // Create a temporary bitmap for the masked sprite
-    BITMAP* masked_sprite = create_bitmap(current_frame->w, current_frame->h);
+    BITMAP * masked_sprite = create_bitmap(current_frame->w, current_frame->h);
 
     // Apply the mask to the sprite
     clear(masked_sprite);
@@ -301,9 +302,6 @@ void display_player(Player player, BITMAP* buffer, int frame_counter, BITMAP* an
 }
 
 
-
-
-
 void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player_sprite_1, BITMAP * player_sprite_2, Player player_1, Player player_2, int * can_move, BITMAP * score_image, BITMAP * calque_collisions, BITMAP * buffer_texte, int frame_counter, BITMAP * anim_player_haut[4], BITMAP * anim_player_bas[4], BITMAP * anim_player_gauche[4], BITMAP * anim_player_droite[4]) {
 
     clear_bitmap(buffer);
@@ -311,7 +309,7 @@ void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player
     stretch_blit(calque_collisions, buffer, 0, 0, calque_collisions->w, calque_collisions->h, 0, 0, buffer->w, buffer->h);
     stretch_blit(map, buffer, 0, 0, map->w, map->h, 0, 0, buffer->w, buffer->h);
 
-    //Animation du joueur : 
+    //Animation du joueur :
     display_player(player_1, buffer, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
     display_player(player_2, buffer, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
 
@@ -376,7 +374,7 @@ int main() {
 
     //! VARIABLES
     int frame_counter = 0;
-    int can_move    = 0;
+    int can_move      = 0;
 
     //! CHARGEMENT DES BITMAPS
     BITMAP * buffer_texte      = create_bitmap(SCREEN_W, SCREEN_H);
@@ -393,10 +391,10 @@ int main() {
 
     //! Chargement des animations
     // Load the bitmaps in separate arrays
-    BITMAP * anim_player_haut[4];
-    BITMAP * anim_player_bas[4];
     BITMAP * anim_player_gauche[4];
     BITMAP * anim_player_droite[4];
+    BITMAP * anim_player_haut[4];
+    BITMAP * anim_player_bas[4];
 
     // Load the bitmaps in the arrays
     for (int i = 1; i < 5; i++) {
@@ -417,7 +415,7 @@ int main() {
 
 
     //& reste du code principal
-    // fait apparaitre le joueur au centre de l'ecran
+
     Player player_1;
     player_1.sprite = player_sprite_1;
     player_1.number = 1;
@@ -450,7 +448,7 @@ int main() {
         check_collision_main(&player_2, &player_1, calque_collisions, player_sprite_2, music_main, regles, buffer, ending_screen, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
         check_collision_main(&player_1, &player_2, calque_collisions, player_sprite_1, music_main, regles, buffer, ending_screen, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
 
-        // alternance des leaders
+        // afficher le leader
         if (player_1.leader)
             textprintf_ex(buffer, font, 10, 10, makecol(0, 0, 0), -1, "Joueur 1 leader");
         if (player_2.leader)
@@ -460,11 +458,6 @@ int main() {
         if (can_move) {
             move_player(&player_1, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT);
             move_player(&player_2, KEY_W, KEY_S, KEY_A, KEY_D);
-        }
-
-        // test pour le score
-        if (mouse_x > player_1.x && mouse_x < player_1.x + player_sprite_1->w && mouse_y > player_sprite_1->h && mouse_y < player_1.y + player_sprite_1->h) {
-            player_1.score++;
         }
 
 

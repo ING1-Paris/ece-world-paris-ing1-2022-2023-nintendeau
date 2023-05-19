@@ -29,6 +29,8 @@ typedef struct {
     int previous_x;
     int previous_y;
     int speed;
+    int direction;
+    int id;
 } Player;
 
 
@@ -55,9 +57,8 @@ void generer_labyrinthe(Cell *** cell_grid, Cell * current_cell, Cell ** stack, 
 void show_start_menu_maze(BITMAP * buffer, BITMAP * titre);
 void show_distance_to_finish(Player * player_1, Player * player_2, BITMAP * buffer);
 int check_visited(Cell *** cell_grid);
-
-
-int palais_des_glaces() {
+void show_player(BITMAP * buffer, Player * player, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4],int frame_counter, int player_color);
+int palais_des_glaces(int player_color, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4]) {
 
     set_window_title("Palais des Glaces");
 
@@ -67,10 +68,12 @@ int palais_des_glaces() {
     Player * player_1 = initialiser_joueur();
     player_1->x = SCREEN_H - CELL_SIZE/2;
     player_1->y = SCREEN_H - CELL_SIZE/2 - player_1->size;
+    player_1->id = 1;
 
     Player * player_2 = initialiser_joueur();
     player_2->x = SCREEN_H - CELL_SIZE/2 - player_1->size;
     player_2->y = SCREEN_H - CELL_SIZE/2;
+    player_2->id = 2;
 
     //* On initialise les BITMAPS
     BITMAP * buffer = create_bitmap(SCREEN_W, SCREEN_H);
@@ -102,6 +105,8 @@ int palais_des_glaces() {
     Cell ** stack = malloc(sizeof(Cell*) * SIZE * SIZE);
     int stack_size = 0;
 
+    int frame_counter = 0;
+
 
     time_t start_time, end_time;
     int temps;
@@ -129,11 +134,18 @@ int palais_des_glaces() {
         rectfill(maze, 2, 2, CELL_SIZE - 2, CELL_SIZE - 2, makecol(100, 200, 100));
         rectfill(maze, SCREEN_H - CELL_SIZE + 2, SCREEN_H - CELL_SIZE + 2, SCREEN_H - 2, SCREEN_H - 2, makecol(100, 100, 200));
 
+        frame_counter = (frame_counter + 1) % 4;
+        (frame_counter == 0) ? frame_counter = 4 : frame_counter;
+
         //* Affichage du labyrinthe et des joueurs
         blit(maze, buffer, 0, 0, 0, 0, SCREEN_H, SCREEN_H);
-        masked_stretch_blit(player_sprite_1, buffer, 0, 0, player_sprite_1->w, player_sprite_1->h, player_1->x, player_1->y - 10, player_1->size, player_1->size + 10);
-        masked_stretch_blit(player_sprite_2, buffer, 0, 0, player_sprite_2->w, player_sprite_2->h, player_2->x, player_2->y - 10, player_2->size, player_2->size + 10);
+        //masked_stretch_blit(player_sprite_1, buffer, 0, 0, player_sprite_1->w, player_sprite_1->h, player_1->x, player_1->y - 10, player_1->size, player_1->size + 10);
+        //masked_stretch_blit(player_sprite_2, buffer, 0, 0, player_sprite_2->w, player_sprite_2->h, player_2->x, player_2->y - 10, player_2->size, player_2->size + 10);
 
+        printf("on tente d'afficher le joueur 1\n");
+        show_player(buffer, player_1, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, frame_counter, player_color);
+        printf("on tente d'afficher le joueur 2\n");
+        show_player(buffer, player_2, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, frame_counter, player_color);
         //* Collisions et mouvements
         check_collision(player_1, maze);
         check_collision(player_2, maze);
@@ -228,6 +240,7 @@ Player * initialiser_joueur() {
     player->previous_x = 0;
     player->previous_y = 0;
     player->speed = 3;
+    player->direction = 1;
 
     return player;
 }
@@ -363,29 +376,37 @@ void move_players(Player * player_1, Player * player_2) {
     //* Joueur 1
     if (key[KEY_UP]) {
         player_1->y -= player_1->speed;
+        player_1->direction = 1;
     }
     if (key[KEY_DOWN]) {
         player_1->y += player_1->speed;
+        player_1->direction = 2;
     }
     if (key[KEY_LEFT]) {
         player_1->x -= player_1->speed;
+        player_1->direction = 3;
     }
     if (key[KEY_RIGHT]) {
         player_1->x += player_1->speed;
+        player_1->direction = 4;
     }
 
     //* Joueur 2
     if (key[KEY_W]) {
         player_2->y -= player_2->speed;
+        player_2->direction = 1;
     }
     if (key[KEY_S]) {
         player_2->y += player_2->speed;
+        player_2->direction = 2;
     }
     if (key[KEY_A]) {
         player_2->x -= player_2->speed;
+        player_2->direction = 3;
     }
     if (key[KEY_D]) {
         player_2->x += player_2->speed;
+        player_2->direction = 4;
     }
 
 }
@@ -511,4 +532,60 @@ void show_distance_to_finish(Player * player_1, Player * player_2, BITMAP * buff
 
     textprintf_ex(buffer, font, 900, 100, makecol(255, 255, 255), -1, "Joueur 1 a %dm de la fin", distance_1);
     textprintf_ex(buffer, font, 900, 150, makecol(255, 255, 255), -1, "Joueur 2 a %dm de la fin", distance_2);
+}
+
+
+void show_player(BITMAP * buffer, Player * player, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4],int frame_counter, int player_color){
+    // Select the appropriate animation array based on the direction
+    BITMAP ** animation_array;
+
+    if (player->direction == 1) {
+        animation_array = anim_player_haut;
+    }
+    else if (player->direction == 2) {
+        animation_array = anim_player_bas;
+    }
+    else if (player->direction == 3) {
+        animation_array = anim_player_gauche;
+    }
+    else if (player->direction == 4) {
+        animation_array = anim_player_droite;
+    }
+    else {
+        // Invalid direction, do nothing
+        return;
+    }
+
+    // Retrieve the current frame bitmap from the animation array
+    BITMAP * current_frame;
+    if (player->x != player->previous_x || player->y != player->previous_y) {
+        current_frame = animation_array[frame_counter];
+    }
+    else {
+        if (player->direction == 1 || player->direction == 2){
+            current_frame = animation_array[1];
+        }else{
+            current_frame = animation_array[2];
+        }
+    }
+
+    // Create a temporary bitmap for the masked sprite
+    BITMAP* masked_sprite = create_bitmap(player->size, player->size + 10);
+
+    // Apply the mask to the sprite
+    clear(masked_sprite);
+    stretch_blit(current_frame, masked_sprite, 0, 0, current_frame->w, current_frame->h, 0, 0, masked_sprite->w, masked_sprite->h);
+
+    if (player->id == 2) {
+        // Apply the color filter only for player 2
+        int filter = player_color;
+        set_trans_blender(0, 0, 0, 255);
+        draw_lit_sprite(masked_sprite, masked_sprite, 0, 0, filter);
+    }
+
+    // Draw the masked sprite
+    masked_blit(masked_sprite, buffer, 0, 0, player->x, player->y - 10, masked_sprite->w, masked_sprite->h);
+
+    // Destroy the temporary bitmap
+    destroy_bitmap(masked_sprite);
 }
