@@ -64,6 +64,7 @@ int main() {
             if (!game_over1 && oiseau1_y > 0 && key[KEY_SPACE]) {
                 vitesse1 = -SAUT;
                 play_sample(saut, 255, 128, 1000, 0);
+                rotate_sprite(buffer, oiseau1, oiseau1_x, oiseau1_y, itofix(-64));
             }
             if (!game_over2 && oiseau2_y > 0 && key[KEY_ENTER]) {
                 vitesse2 = -SAUT;
@@ -164,16 +165,16 @@ int main() {
         }
         if (game_over1 && game_over2) {
             if(score1 > score2){
-                rest(1000);
+                rest(2000);
                 allegro_message("Le joueur 1 gagne !");
 
 
             } else if(score1 < score2){
-                rest(1000);
+                rest(2000);
                 allegro_message("Le joueur 2 gagne !");
 
             } else {
-                rest(1000);
+                rest(2000);
                 allegro_message("Egalité !");
             }
             gameovergeneral = true;
