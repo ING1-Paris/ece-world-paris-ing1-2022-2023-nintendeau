@@ -13,13 +13,17 @@
 #include <string.h>
 #include <Allegro.h>
 
+#include "attractions/header/loader.h"
+
 #include "attractions/header/tag.h"
 #include "attractions/header/geometry_dash.h"
 #include "attractions/header/guitar_hero.h"
 #include "attractions/header/palais_des_glaces.h"
 #include "attractions/header/snake.h"
-#include "attractions/header/loader.h"
 #include "attractions/header/paris_hippiques.h"
+#include "attractions/header/tape_taupe.h"
+#include "attractions/header/jackpot.h"
+#include "attractions/header/flappy_bird.h"
 
 #define PLAYER2_FILTER makecol(127, 0, 0)   // Red filter for player 2
 
@@ -182,6 +186,7 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
                     }
                     else if (strcmp(game, "tape_taupe") == 0) {
                         printf("tape_taupe\n");
+                        tape_taupe();
                     }
                     else if (strcmp(game, "guitar_hero") == 0) {
                         printf("guitar_hero\n");
@@ -189,6 +194,7 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
                     }
                     else if (strcmp(game, "jackpot") == 0) {
                         printf("jackpot\n");
+                        jackpot();
                     }
                     else if (strcmp(game, "tag") == 0) {
                         printf("tag\n");
@@ -200,6 +206,7 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
                     }
                     else if (strcmp(game, "flappy_bird") == 0) {
                         printf("flappy_bird\n");
+                        flappy_bird();
                     }
 
                     if (player->leader) {

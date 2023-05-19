@@ -24,7 +24,7 @@
 #include <time.h>
 #include <allegro.h>
 #include <stdbool.h>
-#include "../header/SNAKE.h"
+#include "../header/snake.h"
 #include "../header/loader.h"
 
 //* Constantes pour la taille des blocs et de l'écran
@@ -47,8 +47,6 @@ typedef struct food {
 } food;
 
 //définition des fonctions :
-BITMAP* image_loader(const char* filepath);
-SAMPLE* sound_loader(const char* filepath);
 void init_SNAKE(SNAKE *head, int x, int y);
 void init_food(food *food);
 void lib_memoire(SNAKE *head, food *Food, SNAKE *head2, food *Food2, BITMAP *game, BITMAP *buffer, SAMPLE* music);

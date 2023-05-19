@@ -1,5 +1,6 @@
-#ifndef jackpot
-#define jackpot
+#ifndef JACKPOT_H
+#define JACKPOT_H
 
+int jackpot();
 
 #endif // jackpot

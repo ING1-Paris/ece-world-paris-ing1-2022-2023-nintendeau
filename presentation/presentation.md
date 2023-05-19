@@ -1,5 +1,5 @@
 ---
-marp: false
+marp: true
 theme: projet
 paginate: true
 _paginate: false

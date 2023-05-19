@@ -1,5 +1,6 @@
-#ifndef tape_taupe
-#define tape_taupe
+#ifndef TAPE_TAUPE_H
+#define TAPE_TAUPE_H
 
+int tape_taupe();
 
 #endif // tape_taupe

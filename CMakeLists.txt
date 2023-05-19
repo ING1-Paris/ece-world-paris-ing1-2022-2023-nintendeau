@@ -14,5 +14,8 @@ attractions/source/guitar_hero.c       attractions/header/guitar_hero.h
 attractions/source/palais_des_glaces.c attractions/header/palais_des_glaces.h
 attractions/source/snake.c             attractions/header/snake.h
 attractions/source/paris_hippiques.c   attractions/header/paris_hippiques.h
+attractions/source/tape_taupe.c        attractions/header/tape_taupe.h
+attractions/source/jackpot.c           attractions/header/jackpot.h
+attractions/source/flappy_bird.c       attractions/header/flappy_bird.h
 )
 target_link_libraries(ece-world-paris-ing1-2022-2023-nintendeau -lmingw32 -lalleg44)
