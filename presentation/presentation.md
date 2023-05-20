@@ -26,19 +26,18 @@ _footer: Algorithmique Avancée et Bibliothèque Graphique - 2022-2023
 
 # ECE World
 
-Equipe X
+Nintendeau
 
 ---
 
-# Equipe X
+# Equipe Nintendeau
 
 ![bg right:50%](./images/equipe.avif)
 
-- Tata Jaja
-- Toto Jojo
-- Tyty Jyjy
-- Tutu Juju
-- Titi Jiji
+- DALLE Léon
+- DE VULPIAN Alfred
+- INNOCENT Mathéo
+- DEROUICH Shaïma
 
 ---
 
@@ -48,13 +47,16 @@ Equipe X
 
 ## Thème
 
-Lorem ipsum dolor sit amet, **consectetur** adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-
+- Jeux de fête foraine
+- 9 jeux 
+- 2 joueurs 
+- 1 classement
+- 5 tickets par joueur
 ---
 
 # Carte `1/2`
 
-*Réalisée par : **Toto**, **Tata**.*
+*Réalisée par : **Léon**, **Alfred**.*
 
 Décrire ici les fonctionnalités implémentées : choix joueurs, saisie des noms, affichage des scores/classement... Comment avez-vous fait ? Quels étaient les problèmes rencontrés.
 
@@ -70,9 +72,9 @@ Suite si ça ne tient pas sur une slide.
 
 # Organisation des jeux
 
-Précisez comment les jeux sont organisés ? Sont-ils dans des fichiers séparés ? Dans des dossiers ? Sont-ils éparpillés dans plusieurs fichiers ?
+Les jeux ont tous été enregistrés dans un dossier specialement créé pour eux nommé attractions. Chaque jeu est dans un fichier séparé où l'on retrouve les fonctions principales du jeu, les assets et les CMAKE.
 
-Quels paramètres prennent les jeux ?  La file d'événement par exemple ? Ou est-ce que chaque jeu crée sa propre file ?
+Les jeux prennent en parametres le solde de tickets de chaque joueur,
 
 Comment on lance un jeu et comment on revient à la carte à la fin de la partie ?
 Comment le classement est-il mis à jour ?
