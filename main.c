@@ -482,16 +482,17 @@ int choose_player_color(Player * player){
     return color;
 }
 
-void fade_in_out(BITMAP* bmp, int FADE_SPEED) {
+void welcome_screen() {
     int alpha = 0;
-    int oui = 1;
+    int direction = 1;
     BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
+    BITMAP* bmp = image_loader("attractions/assets/nintendeau.bmp");
 
     while (1) {
         clear_to_color(buffer, makecol(0, 0, 0));
         set_trans_blender(0, 0, 0, alpha);
         draw_trans_sprite(buffer, bmp, 0, 0);
-        alpha += oui * FADE_SPEED;
+        alpha += direction * 4;
         rest(10);  // Adjust the rest time to control the fade speed
 
         // Copy the buffer to the screen
@@ -502,7 +503,7 @@ void fade_in_out(BITMAP* bmp, int FADE_SPEED) {
         vsync();
 
         if (alpha >= 255) {
-            oui = -1;  // Start fading out
+            direction = -1;  // Start fading out
         }
         if (alpha <= 0) {
             break;  // Fading effect complete, exit the loop
@@ -510,6 +511,7 @@ void fade_in_out(BITMAP* bmp, int FADE_SPEED) {
     }
 
     destroy_bitmap(buffer);
+    destroy_bitmap(bmp);
 }
 
 //! fonction principale
@@ -533,8 +535,6 @@ int main() {
     }
 
     show_mouse(screen);
-
-
 
     //! VARIABLES
     int frame_counter = 0;
@@ -601,7 +601,10 @@ int main() {
     player_2.speed = 5;
     player_2.leader = 0;
     player_2.direction = 2; //player facing down first
+    player_1.color =  makecol(255, 0, 0);
+    player_2.color =  makecol(0, 0, 255);
 
+    welcome_screen();
     player_1.color =  choose_player_color(&player_1);
     player_2.color =  choose_player_color(&player_2);
 
@@ -635,7 +638,7 @@ int main() {
         vsync();
         blit(buffer, screen, 0, 0, 0, 0, buffer->w, buffer->h);
     }
-
+    
     readkey();
     allegro_exit();
     return 0;
