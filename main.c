@@ -460,8 +460,6 @@ int choose_player_color(Player * player){
 
             // Draw the masked sprite
             masked_blit(masked_sprite, buffer, 0, 0, SCREEN_W/2, SCREEN_H/2, masked_sprite->w, masked_sprite->h);
-
-            //rectfill(buffer, SCREEN_W / 2 - SQUARE_SIZE / 2, SCREEN_H / 2 + 20,SCREEN_W / 2 + SQUARE_SIZE / 2, SCREEN_H / 2 + 20 + SQUARE_SIZE,makecol(r, g, b));
         }
 
         // Blit the buffer to the screen
@@ -486,14 +484,14 @@ int choose_player_color(Player * player){
 
 void fade_in_out(BITMAP* bmp, int FADE_SPEED) {
     int alpha = 0;
-    int direction = 1;
+    int oui = 1;
     BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
 
     while (1) {
         clear_to_color(buffer, makecol(0, 0, 0));
         set_trans_blender(0, 0, 0, alpha);
         draw_trans_sprite(buffer, bmp, 0, 0);
-        alpha += direction * FADE_SPEED;
+        alpha += oui * FADE_SPEED;
         rest(10);  // Adjust the rest time to control the fade speed
 
         // Copy the buffer to the screen
@@ -504,7 +502,7 @@ void fade_in_out(BITMAP* bmp, int FADE_SPEED) {
         vsync();
 
         if (alpha >= 255) {
-            direction = -1;  // Start fading out
+            oui = -1;  // Start fading out
         }
         if (alpha <= 0) {
             break;  // Fading effect complete, exit the loop
@@ -535,6 +533,8 @@ int main() {
     }
 
     show_mouse(screen);
+
+
 
     //! VARIABLES
     int frame_counter = 0;
@@ -601,9 +601,6 @@ int main() {
     player_2.speed = 5;
     player_2.leader = 0;
     player_2.direction = 2; //player facing down first
-
-    BITMAP * nintendeau = image_loader("attractions/assets/nintendeau.bmp");
-    fade_in_out(nintendeau, 4);
 
     player_1.color =  choose_player_color(&player_1);
     player_2.color =  choose_player_color(&player_2);
