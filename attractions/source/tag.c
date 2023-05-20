@@ -50,7 +50,7 @@ void loadNumberBitmaps(BITMAP *numberBitmaps[10]);
 void displayNumber(BITMAP* destination, BITMAP* numberBitmaps[], int number, int x, int y);
 void draw_background_elements_animation(BITMAP *buffer, BITMAP *torche1, BITMAP *torche2, BITMAP *cheminee1, BITMAP *cheminee2, int compteur);
 
-int tag(int player_color, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4]){
+int tag(int player_color1, int player_color2, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4]){
 
     set_window_title("Chat");
 
@@ -142,8 +142,8 @@ int tag(int player_color, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[
         displayNumber(buffer, numberBitmaps, chrono, 10, 10);
         draw_background_elements_animation(buffer, torche1, torche2, cheminee1, cheminee2, chrono);
         arrow_manager(buffer, bonhomme1, bonhomme2, compteur, fleche_liste, reverse);
-        draw_player(buffer, &bonhomme1, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, frame_counter, player_color);
-        draw_player(buffer, &bonhomme2, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, frame_counter, player_color);
+        draw_player(buffer, &bonhomme1, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, frame_counter, player_color1);
+        draw_player(buffer, &bonhomme2, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, frame_counter, player_color2);
 
         // Refresh screen
         vsync();
@@ -204,12 +204,11 @@ void draw_player(BITMAP * buffer, Bonhomme * bonhomme, BITMAP * anim_player_haut
     clear(masked_sprite);
     blit(current_frame, masked_sprite, 0, 0, 0, 0, current_frame->w, current_frame->h);
 
-    if (bonhomme->number == 2) {
-        // Apply the color filter only for bonhomme 2
-        int filter = player_color;
-        set_trans_blender(0, 0, 0, 255);
-        draw_lit_sprite(masked_sprite, masked_sprite, 0, 0, filter);
-    }
+    // Apply the color filter only for bonhomme 2
+    int filter = player_color;
+    set_trans_blender(0, 0, 0, 255);
+    draw_lit_sprite(masked_sprite, masked_sprite, 0, 0, filter);
+
 
     // Draw the masked sprite
     masked_blit(masked_sprite, buffer, 0, 0, bonhomme->x, bonhomme->y, masked_sprite->w, masked_sprite->h);

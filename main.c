@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 #include <Allegro.h>
 
 #include "attractions/header/loader.h"
@@ -25,8 +26,7 @@
 #include "attractions/header/jackpot.h"
 #include "attractions/header/flappy_bird.h"
 
-#define PLAYER2_FILTER makecol(127, 0, 0)   // Red filter for player 2
-
+//#define PLAYER2_FILTER makecol(127, 0, 0)   // Red filter for player 2
 
 // Structure Player qui contient les informations du joueur
 typedef struct {
@@ -37,6 +37,7 @@ typedef struct {
     int score, tickets;
     int leader;
     BITMAP * sprite;
+    int color;
 } Player;
 
 // fonction pour ecrire le meilleur score dans le fichier "meilleurs_scores.txt"
@@ -174,7 +175,7 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
                     stop_sample(music_main);
                     if (strcmp(game, "palais_des_glaces") == 0) {
                         printf("palais_des_glaces\n");
-                        palais_des_glaces(PLAYER2_FILTER, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
+                        palais_des_glaces(player->color,player_2->color,anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
                     }
                     else if (strcmp(game, "paris_hippiques") == 0) {
                         printf("paris_hippiques\n");
@@ -198,7 +199,7 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
                     }
                     else if (strcmp(game, "tag") == 0) {
                         printf("tag\n");
-                        tag(PLAYER2_FILTER, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
+                        tag(player->color, player_2->color, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
                     }
                     else if (strcmp(game, "snake") == 0) {
                         printf("snake\n");
@@ -294,12 +295,10 @@ void display_player(Player player, BITMAP* buffer, int frame_counter, BITMAP* an
     clear(masked_sprite);
     blit(current_frame, masked_sprite, 0, 0, 0, 0, current_frame->w, current_frame->h);
 
-    if (player.number == 2) {
-        // Apply the color filter only for player 2
-        int filter = PLAYER2_FILTER;
-        set_trans_blender(0, 0, 0, 255);
-        draw_lit_sprite(masked_sprite, masked_sprite, 0, 0, filter);
-    }
+    // Apply the color filter 
+    int filter = player.color;
+    set_trans_blender(0, 0, 0, 255);
+    draw_lit_sprite(masked_sprite, masked_sprite, 0, 0, filter);
 
     // Draw the masked sprite
     masked_blit(masked_sprite, buffer, 0, 0, player.x, player.y, masked_sprite->w, masked_sprite->h);
@@ -356,6 +355,134 @@ void move_player(Player * player, int UP, int DOWN, int LEFT, int RIGHT) {
     }
 }
 
+int choose_player_color(Player * player){
+    BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H); // Double buffer for smooth rendering
+    BITMAP* player_sprite = image_loader("attractions/assets/tag/player_1.bmp");
+    BITMAP * masked_sprite = create_bitmap(player_sprite->w, player_sprite->h);
+    int color = 0;
+    char inputText[9 + 1] = {0}; // Buffer to store user input
+    int textLength = 0; // Current length of the input text
+    int r, g, b; // RGB color values
+    bool colorSet = false; // Flag to indicate if the color is set
+
+    bool done = false;
+
+    while (!done) {
+        while (keypressed()) {
+            int key = readkey() & 0xff;
+
+            if (key == 13) { // Enter key to quit
+                done = true;
+                break;
+            } else if (key == 8) { // Backspace key
+                if (textLength > 0) {
+                    inputText[textLength - 1] = '\0';
+                    textLength--;
+                }
+            } else {
+                if (textLength < 9) {
+                    inputText[textLength] = key;
+                    textLength++;
+                }
+            }
+        }
+
+        clear_to_color(buffer, makecol(0, 0, 0));
+        
+       // Display the entered numbers with slashes
+        char formattedText[9 + 3] = {0};
+        if (textLength >= 1) {
+            formattedText[0] = inputText[0];
+        }
+        if (textLength >= 2) {
+            formattedText[1] = inputText[1];
+        }
+        if (textLength >= 3) {
+            formattedText[2] = inputText[2];
+            formattedText[3] = '/';
+        } else {
+            formattedText[2] = '/';
+        }
+        if (textLength >= 4) {
+            formattedText[4] = inputText[3];
+        }
+        if (textLength >= 5) {
+            formattedText[5] = inputText[4];
+        }
+        if (textLength >= 6) {
+            formattedText[6] = inputText[5];
+            formattedText[7] = '/';
+        } else {
+            formattedText[6] = '/';
+        }
+        if (textLength >= 7) {
+            formattedText[8] = inputText[6];
+        }
+        if (textLength >= 8) {
+            formattedText[9] = inputText[7];
+        }
+        if (textLength >= 9) {
+            formattedText[10] = inputText[8];
+        }
+
+        // Display the text and the num of the player
+        textprintf_centre_ex(buffer, font, SCREEN_W / 2, SCREEN_H / 2 - 30, makecol(255, 255, 255), -1, "Joueur %d, Choisissez la couleur de votre personnage (Valeur RGB 0-255/0-255/0-255)", player->number);
+        textout_centre_ex(buffer, font, formattedText, SCREEN_W / 2, SCREEN_H / 2 - 10, makecol(255, 255, 255), -1);
+
+        if (textLength == 9) {
+            // Extract the RGB values from the input text
+            char rStr[4], gStr[4], bStr[4];
+            strncpy(rStr, inputText, 3);
+            strncpy(gStr, inputText + 3, 3);
+            strncpy(bStr, inputText + 6, 3);
+            rStr[3] = gStr[3] = bStr[3] = '\0';
+
+            // Convert the RGB values to integers
+            r = atoi(rStr);
+            g = atoi(gStr);
+            b = atoi(bStr);
+
+            // Validate the RGB values
+            if (r >= 0 && r <= 255 && g >= 0 && g <= 255 && b >= 0 && b <= 255) {
+                colorSet = true;
+            }
+        }
+
+        if (colorSet) {
+            //display the player with a color filter on it
+            // Apply the mask to the sprite
+            clear(masked_sprite);
+            blit(player_sprite, masked_sprite, 0, 0, 0, 0, player_sprite->w, player_sprite->h);
+            // Apply the color filter only for player 2
+            int filter = makecol(r, g, b);
+            set_trans_blender(0, 0, 0, 255);
+            draw_lit_sprite(masked_sprite, masked_sprite, 0, 0, filter);
+
+            // Draw the masked sprite
+            masked_blit(masked_sprite, buffer, 0, 0, SCREEN_W/2, SCREEN_H/2, masked_sprite->w, masked_sprite->h);
+
+            //rectfill(buffer, SCREEN_W / 2 - SQUARE_SIZE / 2, SCREEN_H / 2 + 20,SCREEN_W / 2 + SQUARE_SIZE / 2, SCREEN_H / 2 + 20 + SQUARE_SIZE,makecol(r, g, b));
+        }
+
+        // Blit the buffer to the screen
+        blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+
+        vsync();
+
+        color = makecol(r, g, b);
+
+        //Quick way to escape player color selection
+        if(key[KEY_ESC]){
+             color = (player->number == 1) ? makecol(0, 0, 0) : makecol(0, 255, 0);
+            done = true;
+        }
+    }
+
+    destroy_bitmap(masked_sprite);
+    destroy_bitmap(buffer);
+    destroy_bitmap(player_sprite);
+    return color;
+}
 
 //! fonction principale
 int main() {
@@ -444,6 +571,9 @@ int main() {
     player_2.speed = 5;
     player_2.leader = 0;
     player_2.direction = 2; //player facing down first
+
+    player_1.color =  choose_player_color(&player_1);
+    player_2.color =  choose_player_color(&player_2);
 
     //Musique du menu
     play_sample(music_main, 255, 128, 1000, 1);

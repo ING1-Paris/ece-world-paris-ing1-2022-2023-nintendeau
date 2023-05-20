@@ -58,7 +58,7 @@ void show_start_menu_maze(BITMAP * buffer, BITMAP * titre);
 void show_distance_to_finish(Player * player_1, Player * player_2, BITMAP * buffer);
 int check_visited(Cell *** cell_grid);
 void show_player(BITMAP * buffer, Player * player, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4],int frame_counter, int player_color);
-int palais_des_glaces(int player_color, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4]) {
+int palais_des_glaces(int player_color1, int player_color2, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4]) {
 
     set_window_title("Palais des Glaces");
 
@@ -143,9 +143,9 @@ int palais_des_glaces(int player_color, BITMAP * anim_player_haut[4], BITMAP* an
         //masked_stretch_blit(player_sprite_2, buffer, 0, 0, player_sprite_2->w, player_sprite_2->h, player_2->x, player_2->y - 10, player_2->size, player_2->size + 10);
 
         printf("on tente d'afficher le joueur 1\n");
-        show_player(buffer, player_1, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, frame_counter, player_color);
+        show_player(buffer, player_1, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, frame_counter, player_color1);
         printf("on tente d'afficher le joueur 2\n");
-        show_player(buffer, player_2, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, frame_counter, player_color);
+        show_player(buffer, player_2, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, frame_counter, player_color2);
         //* Collisions et mouvements
         check_collision(player_1, maze);
         check_collision(player_2, maze);
@@ -576,12 +576,11 @@ void show_player(BITMAP * buffer, Player * player, BITMAP * anim_player_haut[4],
     clear(masked_sprite);
     stretch_blit(current_frame, masked_sprite, 0, 0, current_frame->w, current_frame->h, 0, 0, masked_sprite->w, masked_sprite->h);
 
-    if (player->id == 2) {
-        // Apply the color filter only for player 2
-        int filter = player_color;
-        set_trans_blender(0, 0, 0, 255);
-        draw_lit_sprite(masked_sprite, masked_sprite, 0, 0, filter);
-    }
+    // Apply the color filter 
+    int filter = player_color;
+    set_trans_blender(0, 0, 0, 255);
+    draw_lit_sprite(masked_sprite, masked_sprite, 0, 0, filter);
+
 
     // Draw the masked sprite
     masked_blit(masked_sprite, buffer, 0, 0, player->x, player->y - 10, masked_sprite->w, masked_sprite->h);
