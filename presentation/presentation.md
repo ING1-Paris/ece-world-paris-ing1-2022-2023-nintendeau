@@ -47,7 +47,7 @@ Nintendeau
 
 ## Thème
 
-- Jeux de fête foraine
+- Fête foraine 
 - 9 jeux 
 - 2 joueurs 
 - 1 classement
@@ -74,26 +74,24 @@ Suite si ça ne tient pas sur une slide.
 
 Les jeux ont tous été enregistrés dans un dossier specialement créé pour eux nommé attractions. Chaque jeu est dans un fichier séparé où l'on retrouve les fonctions principales du jeu, les assets et les CMAKE.
 
-Les jeux prennent en parametres le solde de tickets de chaque joueur,
+Les jeux prennent en parametres le solde de tickets de chaque joueur et leurs choix de jeux. Ils retournent le solde de tickets de chaque joueur à la fin de la partie.
 
-Comment on lance un jeu et comment on revient à la carte à la fin de la partie ?
-Comment le classement est-il mis à jour ?
+Pour lancer un jeu, il suffit de se diriger vers une des nombreuses maisons qui sont sur la map,les regles s'afficheront sur un parchemin, il suffira de cliquer sur espace pour executer le jeu.
 
 
 ---
 
 ![bg right:40%](images/peche_canards.jpg)
 
-# Pêche aux canards
+# GUITAR HERO
 
-*Réalisé par : **Toto** (40%), **Tata** (60%).*
+*Réalisé par : **Alfred** (100%)*
 
-Décrire le fonctionnement du jeu dans les grandes lignes. Comment vous l'avez conçu.
-- Les canards vont de la droite à la gauche.
-- Lorsqu'ils ont disparu, ils ont 1 chance sur 50 de réapparaitre à droite.
-- Les canards vont à une vitesse différente (tirée aléatoirement).
-- La collision des canards est détectée.
-- etc.
+- Il y'a 4 touches (A, Z, E, R) qui correspondent aux 4 cordes de la guitare.
+- Les notes tombent du haut de l'écran vers le bas.
+- Le joueur doit appuyer sur la touche correspondant à la note au bon moment.
+- Si le joueur appuie sur la touche au bon moment, il gagne un point.
+- Si le joueur appuie sur la touche au mauvais moment, il perd et donne la main au joueur suivant.
 
 <sup>:bulb: Remplacez les images par des captures d'écran de votre jeu.</sup>
 
@@ -101,32 +99,84 @@ Décrire le fonctionnement du jeu dans les grandes lignes. Comment vous l'avez c
 
 ![bg right:40%](images/peche_canards.jpg)
 
-# Pêche aux canards
 
-Pour chaque jeu (bien détailler au moins un jeu par personne), précisez les structures de données (structures importantes, tableaux importants, listes chainées...) et les fonctions importantes (avec leur prototype).
+# GUITAR HERO
+
 
 ### Structures
 
-<div class="mermaid">
-%%{init: {'theme':'neutral'}}%%
-classDiagram
-    class Canard
-    Canard : int x, y
-    Canard : int vitesse
-    class Canne
-    Canne : int x, y
-    Canne : Canard* canard
-</div>
+- `struct Note`
+    - `int x`
+    - `int y`
+    - `int vitesse`
+    - `int touche`
+    - `int estAppuyee`
+    - `int estAffichee`
+
+---
+![bg right:40%](images/peche_canards.jpg)
+
+### Fonctions
+
+- `void initialiserNotes()`
+- `void afficherNotes()`
+- `void detecterAppuiTouche()`
+- `void afficherScore()`
+- `void afficherGagnant()`
+
 
 ### Tableaux
 
-- `Canard canards[20]`
+- `struct Note notes[20]`
+---
+
+![bg right:40%](images/peche_canards.jpg)
+
+### Graphe d'appel
+<br>
+
+<div class="mermaid">
+%%{init: {'theme':'neutral'}}%%
+flowchart LR
+    GuitarHero --> afficherNotes
+    GuitarHero --> detecterAppuiTouche
+    GuitarHero --> afficherScore
+    GuitarHero --> afficherGagnant
+</div> GuitarHero --> initialiserNotes
+   
+
 
 ---
 
 ![bg right:40%](images/peche_canards.jpg)
 
-# Pêche aux canards
+# GUITAR HERO
+
+### Logigramme
+
+
+
+
+
+---
+![bg right:40%](images/peche_canards.jpg)
+
+# Paris hippiques
+
+*Réalisé par : **Shaïma** (100%)*
+
+-Le jeu se joue à deux joueurs.
+-Il y a 5 tickets par joueur.
+-Les 2 joueurs choisissent un cheval chacun.
+-Les chevaux se déplacent tous à une vitesse aléatoire.
+-Le premier cheval à atteindre la ligne d'arrivée gagne la course et le joueur qui a choisi le cheval gagnant gagne 1 ticket. 
+
+
+---
+
+![bg right:40%](images/peche_canards.jpg)
+
+# Paris hippiques
 
 ### Graphe d'appel
 
@@ -135,52 +185,284 @@ classDiagram
 <div class="mermaid">
 %%{init: {'theme':'neutral'}}%%
 flowchart LR
-    pecheAuxCanards --> initialiserCanards
-    initialiserCanards --> positionnerCanard
-    pecheAuxCanards --> deplacerCanards
-    deplacerCanards --> deplacerCanard
-    pecheAuxCanards --> detecterCollisionCanards
+    parisHippiques --> initialiserChoixCheval
+    initialiserChoixCheval --> positionnerCheval
+    parisHippiques --> deplacerChevaux
+    deplacerChevaux --> detecterLigneArrivee
+    detecterLigneArrivee --> ChevalGagnant
+    ChevalGagnant --> afficherGagnant
+    afficherGagnant --> afficherScore
+    afficherScore --> afficherGagnant
 </div>
+
+
+---
+# Structures
+
+- `struct Cheval`
+    - `int x`
+    - `int vitesse`
+    - `int xArrivee`
+    - `int choixjoueur1,choixjoueur2`
+
+![bg right:40%](images/peche_canards.jpg)
+
+---
+
+# Fonctions
+![bg right:40%](images/peche_canards.jpg)
+
+- `int main` (tout  est regroupé dans le main)
+- `initialiserChoixCheval()`
+- `positionnerCheval()`
+- `deplacerChevaux()`
+- `InitaliserVitesseAleatoire()`
+- `detecterLigneArrivee()`
+- `ChevalGagnant()`
+- `afficherGagnant()`
+
+---
+
+# Logigramme
+![bg right:40%](images/peche_canards.jpg)
+
+
+---
+![bg right:40%](images/peche_canards.jpg)
+
+# Paris hippiques
+
+*Réalisé par : **Léon** (100%)*
+
+-Le jeu se joue à deux joueurs.
+-Il y a 5 tickets par joueur.
+-Les 2 joueurs se voient attribuer chacun un serpent.
+-Le but du jeu est de manger le plus de pommes possible tout en évitant de se mordre la queue, de se prendre un mur ou le corps du serpent adverse.
 
 
 ---
 
 ![bg right:40%](images/peche_canards.jpg)
 
-# Pêche aux canards
+# Snake à 2 joueurs
 
-### Logigramme
+### Graphe d'appel
 
-Que vous jugez pertinent (image ou Mermaid.js)
+<br>
+
+<div class="mermaid">
+%%{init: {'theme':'neutral'}}%%
+flowchart LR
+    snake --> initialiserSerpent
+    initialiserSerpent --> afficherSerpent
+    snake --> deplacerSerpent
+    deplacerSerpent --> detecterCollision
+    detecterCollision --> afficherGagnant
+    afficherGagnant --> afficherScore
+    afficherScore --> afficherGagnant
+</div>
+
+
+---
+# Structures
+
+- `struct Serpent`
+    - `int x`
+    - `int y`
+    - `int vitesse`
+    - `int direction`
+    - `int taille`
+    - `int estVivant`
+    - `int estAffiche`
+    - `int estMange`
+    - `int estMort`
+    
+
+![bg right:40%](images/peche_canards.jpg)
+
+---
+
+# Fonctions
+![bg right:40%](images/peche_canards.jpg)
+
+
+- `void initialiserSerpent()`
+- `void afficherSerpent()`
+- `void deplacerSerpent()`
+- `void detecterCollision()`
+- `void afficherGagnant()`
+- `void afficherScore()`
+
+
+---
+
+# Logigramme
+![bg right:40%](images/peche_canards.jpg)
 
 
 
 ---
 
-# Bilan collectif
+![bg right:40%](images/peche_canards.jpg)
+
+# Jackpot
+
+*Réalisé par : **Mathéo** (100%)*
+
+- Le jeu se joue à deux joueurs.
+- Il y a 5 tickets par joueur.
+- A l'aide du bouton START, le joueur lance la machine.
+- Les roues tournent et s'arrêtent aléatoirement sur un symbole.
+- Si les 3 symboles sont identiques, le joueur gagne 1 ticket.
+- Si les 3 symboles sont différents, le joueur perd 1 ticket.
+
+
+
+
 
 ---
 
+![bg right:40%](images/peche_canards.jpg)
+
+# Jackpot
+
+### Graphe d'appel
+
+<br>
+
+<div class="mermaid">
+%%{init: {'theme':'neutral'}}%%
+flowchart LR
+    jackpot --> initialiserJackpot
+    initialiserJackpot --> afficherJackpot
+    jackpot --> lancerJackpot
+    lancerJackpot --> afficherJackpot
+    lancerJackpot --> detecterGagnant
+    detecterGagnant --> afficherGagnant
+    afficherGagnant --> afficherScore
+    afficherScore --> afficherGagnant
+</div>
+
+---
+# Structures
+
+- `struct Jackpot`
+    - `int x`
+    - `int y`
+    - `int signe1`
+    - `int signe2`
+    - `int signe3`
+    - `bool estGagnant`
+
+
+![bg right:40%](images/peche_canards.jpg)
+
+---
+
+# Fonctions
+![bg right:40%](images/peche_canards.jpg)
+
+- `int main()` (tout est regroupé dans le main)
+- `void initialiserJackpot()`
+- `void afficherJackpot()`
+- `void lancerJackpot()`
+- `void detecterGagnant()`
+- `void afficherGagnant()`
+- `void afficherScore()`
+
+
+---
+
+# Logigramme
+![bg right:40%](images/peche_canards.jpg)
+
+
+---
+![bg right:40%](images/peche_canards.jpg)
+
+# Snake à 2 joueurs
+
+*Réalisé par : **Léon** (100%)*
+
+-Le jeu se joue à deux joueurs.
+-Il y a 5 tickets par joueur.
+-Les 2 joueurs se voient attribuer chacun un serpent.
+-Le but du jeu est de manger le plus de pommes possible tout en évitant de se mordre la queue, de se prendre un mur ou le corps du serpent adverse.
+
+
+---
+
+![bg right:40%](images/peche_canards.jpg)
+
+# Snake à 2 joueurs
+
+### Graphe d'appel
+
+<br>
+
+<div class="mermaid">
+%%{init: {'theme':'neutral'}}%%
+flowchart LR
+    snake --> initialiserSerpent
+    initialiserSerpent --> afficherSerpent
+    snake --> deplacerSerpent
+    deplacerSerpent --> detecterCollision
+    detecterCollision --> afficherGagnant
+    afficherGagnant --> afficherScore
+    afficherScore --> afficherGagnant
+</div>
+
+
+---
+# Structures
+
+- `struct Serpent`
+    - `int x`
+    - `int y`
+    - `int vitesse`
+    - `int direction`
+    - `int taille`
+    - `int estVivant`
+    - `int estAffiche`
+    - `int estMange`
+    - `int estMort`
+    
+
+![bg right:40%](images/peche_canards.jpg)
+
+---
+
+# Fonctions
+![bg right:40%](images/peche_canards.jpg)
+
+
+- `void initialiserSerpent()`
+- `void afficherSerpent()`
+- `void deplacerSerpent()`
+- `void detecterCollision()`
+- `void afficherGagnant()`
+- `void afficherScore()`
+---
 <!--
 _class: lead
 -->
 
 # Les slides suivantes ne seront pas présentées oralement lors de la soutenance mais doivent figurer dans la présentation. Nous les survolerons rapidement.
 
+
+
 ---
 
-# Toto
+# BILAN
 
 ## Tâches réalisées (pour chaque membre de l'équipe)
 
-- `✅ 100%` Tâche 1
-- `✅ 80%` Tâche 2
-    - *Développer ici pourquoi cette tâche n'est pas terminée à 100%. (exemple : on aurait pu améliorer...).*
-- `❌ 20%` Tâche 3
-    - *Développer ici pourquoi cette tâche n'a pas été terminée.*
-- `❌ 20%` Tâche 4
-    - *Développer ici pourquoi cette tâche n'a pas été terminée.*
-    - *Développer ici pourquoi cette tâche n'a pas été terminée.*
+- `✅ 100%` Créer une carte, 2 joueurs et un classement (carte.c)
+    - *Pour certains jeux, les regles et les scores ne sont pas affichés mais c'est en route.*
+- `✅ 100%` Terminer les 9 jeux (jeu.c)
+    - *Tous les jeux sont terminés.*
+- `❌ 80%` Relier la carte aux jeux (carte.c)
+    - *Les jeux sont reliés à la carte mais l'execution des programmes demeure tres instable (beaucoup de crashs).*
 
 ---
 
@@ -191,11 +473,11 @@ Si vous deviez vous répartir des points, comment feriez-vous ?
 <div class="mermaid">
 %%{init: {'theme':'neutral'}}%%
 pie showData
-    "Toto Jojo" : 20
-    "Tata Jaja" : 20
-    "Tyty Jyjy" : 10
-    "Tutu Juju" : 40
-    "Titi Jiji" : 10
+    "Shaïma" : 20
+    "Mathéo" : 20
+    "Léon" : 30
+    "Alfred" : 30
+    
 </div>
 
 ---
@@ -204,54 +486,18 @@ pie showData
 
 | Jeu | Avancement | Problèmes / reste |
 | --- | --- | --- |
-| Pêche aux canards | 100% | - |
-| Tir aux ballons | 100% | - |
-| Guitar Hero | 60% | Ne se synchronise pas avec la musique. Bug lors de l'appui sur deux touches en même temps (ne traite que la première note). |
+| Paris hippiques | 100% | - |
+| Guitar Hero | 100% | - |
+| Snake | 100% | - |
+| Jackpot | 100% | - |
+| Floppybird | 90% | Jeu totalement fonctionnel, seul petit soucis avec la marge de collision entre l'obstacle et l'oiseau  |
+| The Maze | -% | pas plus d'infos |
+| Tape-taupe | 100% | - |
+| Geometry dash | -% | pas plus d'infos |
+| Attrape Chat | -% | pas plus d'infos |
 
-Vous pouvez faire ce tableau sur plusieurs slides en dupliquant l'en-tête.
 
----
 
 <!--
 _class: lead
 -->
-# Quelques éléments que vous pouvez utiliser à votre guise dans votre présentation
-
----
-
-# Schémas et Graphes
-
-Vous pouvez utiliser [Mermaid.js](https://mermaid.js.org/) pour générer des schémas. Regardez la documentation.
-
----
-
-# Slide avec du code
-
-
-```C
-for(int i = 0; i < 5; i++) {
-    printf("%d ", i);
-}
-```
-
-> 0 1 2 3 4 
-
-
----
-
-# Emojis
-
-https://gist.github.com/rxaviers/7360908
-
----
-
-# Thème 
-
-Vous pouvez personnaliser l'affichage de votre présentation avec le langage CSS en modifiant le fichier `theme.css`.
-
----
-
-# Export PDF
-
-Depuis récemment, l'export (**`Export Slide Deck...`**) en PDF oublie parfois des éléments. 
-Si c'est le cas, nous vous conseillons d'exporter en fichier PowerPoint (pptx), puis de l'exporter en PDF depuis PowerPoint.
