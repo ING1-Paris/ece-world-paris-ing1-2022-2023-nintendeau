@@ -187,12 +187,15 @@ int tape_taupe(){
     gagnant = verifierscores(pJ1, pJ2, cblanc);
     rest (3000) ;
     rectfill(screen, 290, 15, 600, 50, cnoir);
+    int winner = 0;
     if (gagnant == 1) {
         textprintf_ex(screen, font, 300, 40, cblanc, -1, "Joueur 1 a gagné 1 ticket");
+        winner = 1;
     } else if (gagnant == 2) {
         textprintf_ex(screen, font, 300, 40, cblanc, -1, "Joueur 2 a gagné 1 ticket");
+        winner = 2;
     }
     
     readkey();
-    return 0;
+    return winner;
 }

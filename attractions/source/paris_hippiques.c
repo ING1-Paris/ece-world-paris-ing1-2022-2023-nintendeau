@@ -113,6 +113,8 @@ int paris_hippiques() {
     destroy_bitmap(choixjoueur2);
     stop_sample(music); //arret de la musique d'accueil
 
+    int winner = 0;
+
 
     if (key[KEY_ENTER]){
 
@@ -312,17 +314,20 @@ int paris_hippiques() {
                     soldeticket1 += 1;
                     soldeticket2 -= 1;
                     allegro_message("Joueur 1,remporte la course !");
+                    winner = 1;
                     stop_sample(music2);
                 }else if(choix2 ==4){
                     score2 ++;
                     soldeticket2 += 1;
                     soldeticket1 -= 1;
                     allegro_message("Joueur 2,remporte la course !");
+                    winner = 2;
                     stop_sample(music2);
                 } else{
                     soldeticket1 -= 1;
                     soldeticket2 -= 1;
                     allegro_message("Match nul ! Solde J1 = %d, Solde J2 = %d",soldeticket1,soldeticket2);
+                    winner = 0;
                     stop_sample(music2);
                 }
             }
@@ -333,7 +338,7 @@ int paris_hippiques() {
         stop_sample(music2);
 
     }
-    return 0;
+    return winner;
 }
 
 void choix(){

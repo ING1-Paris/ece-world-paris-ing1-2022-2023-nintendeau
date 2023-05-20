@@ -79,6 +79,7 @@ int geometry_dash() {
     int compteur_frames = 0;
     int SPACE = KEY_SPACE;
     int UP = KEY_UP;
+    int winner;
 
     clock_t start, end;
     double time_spent;
@@ -123,7 +124,7 @@ int geometry_dash() {
 
         //* Si l'un des deux joueurs meurt
         if (player_1->life == false && player_2->life == false) {
-            int winner;
+            
 
             // définir le gagnant
             if (!player_1->life) {
@@ -147,7 +148,13 @@ int geometry_dash() {
         compteur_frames++;
     }
     stop_sample(music);
-    return 0;
+    if (winner == 1) {
+        return 1;
+    } else if(winner == 2){
+        return 2;
+    }else{
+        return 0;
+    }
 }
 
 

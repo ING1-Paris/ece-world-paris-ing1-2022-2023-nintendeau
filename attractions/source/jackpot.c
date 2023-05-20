@@ -7,8 +7,7 @@
 
 #define MAX_IMAGES_CASE 3
 
-
-int jackpot()
+int jackpot(Playerh* player)
 {
     srand(time(NULL));
     int cblanc, crouge, cbleu, cvert, cviolet, cnoir;
@@ -168,3 +167,6 @@ int jackpot()
     destroy_sample(SortieCase);
     destroy_sample(Roulette);
 }
+
+
+// Structure Player qui contient les informations du joueur

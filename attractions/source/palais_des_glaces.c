@@ -52,7 +52,7 @@ void check_collision(Player * player, BITMAP * maze);
 void move_players(Player * player_1, Player * player_2);
 void remove_wall(Cell * current_cell, Cell * chosen_neighbour);
 void wait_to_quit();
-void check_victory(Player * player_1, Player * player_2, time_t start_time, time_t end_time, BITMAP * buffer, SAMPLE * win_music, SAMPLE * music, int * temps);
+int check_victory(Player * player_1, Player * player_2, time_t start_time, time_t end_time, BITMAP * buffer, SAMPLE * win_music, SAMPLE * music, int * temps);
 void generer_labyrinthe(Cell *** cell_grid, Cell * current_cell, Cell ** stack, int stack_size, BITMAP * maze, BITMAP * buffer);
 void show_start_menu_maze(BITMAP * buffer, BITMAP * titre);
 void show_distance_to_finish(Player * player_1, Player * player_2, BITMAP * buffer);
@@ -106,6 +106,7 @@ int palais_des_glaces(int player_color1, int player_color2, BITMAP * anim_player
     int stack_size = 0;
 
     int frame_counter = 0;
+    int winner = 0;
 
 
     time_t start_time, end_time;
@@ -156,7 +157,7 @@ int palais_des_glaces(int player_color1, int player_color2, BITMAP * anim_player
         masked_blit(mask, buffer, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
         rectfill(buffer, SCREEN_W * 2/3, 70, SCREEN_W, 70, makecol(255, 255, 255));
         rectfill(buffer, SCREEN_H, 0, SCREEN_H, SCREEN_H, makecol(255, 255, 255));
-        check_victory(player_1, player_2, start_time, end_time, buffer, win_music, bcg_music, &temps);
+        winner = check_victory(player_1, player_2, start_time, end_time, buffer, win_music, bcg_music, &temps);
         masked_stretch_blit(titre, buffer, 0, 0, titre->w, titre->h, 810, 10, 380, 50);
         show_distance_to_finish(player_1, player_2, buffer);
         blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
@@ -166,7 +167,7 @@ int palais_des_glaces(int player_color1, int player_color2, BITMAP * anim_player
     free_grid(cell_grid);
     destroy_sample(bcg_music);
     destroy_sample(win_music);
-    return 0;
+    return winner;
 }
 
 void show_grid(Cell *** cell_grid, BITMAP * maze, BITMAP * buffer) {
@@ -451,7 +452,7 @@ void wait_to_quit() {
 }
 
 
-void check_victory(Player * player_1, Player * player_2, time_t start_time, time_t end_time, BITMAP * buffer, SAMPLE * win_music, SAMPLE * music, int * temps) {
+int check_victory(Player * player_1, Player * player_2, time_t start_time, time_t end_time, BITMAP * buffer, SAMPLE * win_music, SAMPLE * music, int * temps) {
 
     //* Si un des joueurs arrive à la fin du labyrinthe, on affiche le temps qu'il a mis pour le finir
     if (player_1->x <= CELL_SIZE && player_1->y <= CELL_SIZE || player_2->x <= CELL_SIZE && player_2->y <= CELL_SIZE) {
@@ -462,9 +463,11 @@ void check_victory(Player * player_1, Player * player_2, time_t start_time, time
 
         if (player_1->x <= CELL_SIZE && player_1->y <= CELL_SIZE) {
             textprintf_ex(screen, font, 500, 400, makecol(255, 255, 255), -1, "PLAYER 1 WINS : %d s", *temps);
+            return 1;
         }
         else {
             textprintf_ex(screen, font, 500, 400, makecol(255, 255, 255), -1, "PLAYER 2 WINS : %d s", *temps);
+            return 2;
         }
 
         wait_to_quit();
@@ -476,6 +479,7 @@ void check_victory(Player * player_1, Player * player_2, time_t start_time, time
         (*temps) = (int)difftime(end_time, start_time);
         textprintf_ex(buffer, font, 900, 200, makecol(255, 255, 255), -1, "TEMPS : %d s", *temps);
     }
+    return 0;
 }
 
 

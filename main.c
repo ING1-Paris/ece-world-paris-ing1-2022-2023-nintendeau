@@ -111,6 +111,8 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
     int ground = makecol(0, 255, 0);
     int wall   = makecol(255, 0, 0);
 
+    int winner = 0;
+
     int palais_des_glaces_color = makecol(30, 124, 184);// value in int : 0x1E7CB8
     int paris_hippiques_color   = makecol(127, 0, 127);
     int geometry_dash_color     = makecol(0, 0, 127);
@@ -175,39 +177,35 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
                     stop_sample(music_main);
                     if (strcmp(game, "palais_des_glaces") == 0) {
                         printf("palais_des_glaces\n");
-                        palais_des_glaces(player->color,player_2->color,anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
+                        winner = palais_des_glaces(player->color,player_2->color,anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
                     }
                     else if (strcmp(game, "paris_hippiques") == 0) {
                         printf("paris_hippiques\n");
-                        paris_hippiques();
+                        winner = paris_hippiques();
                     }
                     else if (strcmp(game, "geometry_dash") == 0) {
                         printf("geometry_dash\n");
-                        geometry_dash();
+                        winner = geometry_dash();
                     }
                     else if (strcmp(game, "tape_taupe") == 0) {
                         printf("tape_taupe\n");
-                        tape_taupe();
+                        winner = tape_taupe();
                     }
                     else if (strcmp(game, "guitar_hero") == 0) {
                         printf("guitar_hero\n");
-                        guitar_hero();
-                    }
-                    else if (strcmp(game, "jackpot") == 0) {
-                        printf("jackpot\n");
-                        jackpot();
+                        winner = guitar_hero();
                     }
                     else if (strcmp(game, "tag") == 0) {
                         printf("tag\n");
-                        tag(player->color, player_2->color, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
+                        winner = tag(player->color, player_2->color, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
                     }
                     else if (strcmp(game, "snake") == 0) {
                         printf("snake\n");
-                        snake();
+                        winner = snake();
                     }
                     else if (strcmp(game, "flappy_bird") == 0) {
                         printf("flappy_bird\n");
-                        flappy_bird();
+                        winner = flappy_bird();
                     }
 
                     if (player->leader) {
@@ -217,6 +215,37 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
                     else if (!player->leader) {
                         player->leader = 1;
                         player_2->leader = 0;
+                    }
+
+                    //remove 1 ticket to the two players (1 ticket to play)
+                    player->tickets -= 1;
+                    player_2->tickets -= 1;
+
+
+                    //Manage the players : 
+                    if (winner == 1){
+                        //add 1 or 2 tickets to the winner (50% chance to win 1 or 2 tickets)
+                        player->tickets += rand() % 2 + 1;
+                        //remove 1 ticket to the loser
+                        player_2->tickets -= 1;
+                    }else if(winner == 2){
+                        //add 1 or 2 tickets to the winner (50% chance to win 1 or 2 tickets)
+                        player_2->tickets += rand() % 2 + 1;
+                        //remove 1 ticket to the loser
+                        player->tickets -= 1;
+                    }else{
+                        //winner = 0 : something went wrong or no winner at all
+                        //printf("No winner\n");
+                    }
+
+                    if (strcmp(game, "jackpot") == 0) {
+                        printf("jackpot\n");
+                        if (player->leader) {
+                            jackpot(&player);
+                        }
+                        else if (!player->leader) {
+                            jackpot(&player_2);
+                        }
                     }
 
                     //replacer le joueur au milieu de la map et redéfinir la fenetre
@@ -334,7 +363,6 @@ void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player
         afficher_score(score_image, buffer_texte, player_2);
     }
 }
-
 
 void move_player(Player * player, int UP, int DOWN, int LEFT, int RIGHT) {
     if (key[UP]) {
@@ -590,6 +618,7 @@ int main() {
     player_1.speed = 5;
     player_1.leader = 1;
     player_1.direction = 2; //player facing down first
+    player_1.tickets = 5;
 
     Player player_2;
     player_2.sprite = player_sprite_2;
@@ -601,8 +630,7 @@ int main() {
     player_2.speed = 5;
     player_2.leader = 0;
     player_2.direction = 2; //player facing down first
-    player_1.color =  makecol(255, 0, 0);
-    player_2.color =  makecol(0, 0, 255);
+    player_2.tickets = 5;
 
     welcome_screen();
     player_1.color =  choose_player_color(&player_1);
@@ -617,17 +645,25 @@ int main() {
         afficher_map(titre, buffer, map, player_sprite_1, player_sprite_2, player_1, player_2, &can_move, score_image, calque_collisions, buffer, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
         check_collision_main(&player_2, &player_1, calque_collisions, player_sprite_2, music_main, regles, buffer, ending_screen, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
         check_collision_main(&player_1, &player_2, calque_collisions, player_sprite_1, music_main, regles, buffer, ending_screen, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
-
+    
         // afficher le leader
         if (player_1.leader)
             textprintf_ex(buffer, font, 10, 10, makecol(0, 0, 0), -1, "Joueur 1 leader");
         if (player_2.leader)
             textprintf_ex(buffer, font, 10, 10, makecol(0, 0, 0), -1, "Joueur 2 leader");
 
+        // afficher le nombre de tickets
+        textprintf_ex(buffer, font, 10, 30, makecol(0, 0, 0), -1, "Joueur 1 tickets : %d", player_1.tickets);
+        textprintf_ex(buffer, font, 10, 50, makecol(0, 0, 0), -1, "Joueur 2 tickets : %d", player_2.tickets);
 
         if (can_move) {
             move_player(&player_1, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT);
             move_player(&player_2, KEY_W, KEY_S, KEY_A, KEY_D);
+        }
+
+        //if one player has no more tickets, the game ends
+        if (player_1.tickets == 0 || player_2.tickets == 0) {
+            break;
         }
 
 
@@ -638,8 +674,19 @@ int main() {
         vsync();
         blit(buffer, screen, 0, 0, 0, 0, buffer->w, buffer->h);
     }
-    
+    rest(1000);
+    if(player_1.tickets == 0 || player_2.tickets == 0){
+        //display a black screen and the winner on it until a key is pressed: 
+        if(player_1.tickets == 0){
+            textprintf_ex(buffer, font, 10, 10, makecol(0, 0, 0), -1, "Joueur 2 a gagne");
+        }
+        else{
+            textprintf_ex(buffer, font, 10, 10, makecol(0, 0, 0), -1, "Joueur 1 a gagne");
+        }
+    }
+    rest(1000);
     readkey();
+
     allegro_exit();
     return 0;
 }END_OF_MAIN();

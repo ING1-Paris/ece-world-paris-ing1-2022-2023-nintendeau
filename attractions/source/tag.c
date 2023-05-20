@@ -163,15 +163,24 @@ int tag(int player_color1, int player_color2, BITMAP * anim_player_haut[4], BITM
             break;
         }
     }
-
+    int winner = 0;
     //Let's see who lost (who has the highest score)
-    (bonhomme1.score > bonhomme2.score)? printf("Player 1 lost !\n"): printf("Player 2 lost !\n");
+    if (bonhomme1.score > bonhomme2.score){
+        printf("Le joueur 1 a perdu !\n");
+        winner = 2;
+    }else if (bonhomme1.score < bonhomme2.score){
+        printf("Le joueur 2 a perdu !\n");
+        winner = 1;
+    }else{
+        printf("Egalité !\n");
+        winner = 0;
+    }
+    
 
     // Fermeture d'Allegro
     lib_memory(buffer, calque_collisions, map, bonhomme1.sprite, bonhomme2.sprite, torche1, torche2, cheminee1, cheminee2, jump, music);
 
-    //allegro_exit();
-    return 0;
+    return winner;
 }
 
 void draw_player(BITMAP * buffer, Bonhomme * bonhomme, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4],int frame_counter, int player_color){

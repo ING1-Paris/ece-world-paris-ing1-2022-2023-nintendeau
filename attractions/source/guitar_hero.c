@@ -191,7 +191,7 @@ int guitar_hero() {
                 gagnant = victory(player_1->temps, player_2->temps);
                 fin_partie(buffer, gagnant);
                 destroy_sample(music);
-                return 0;
+                return gagnant;
             }
         }
 

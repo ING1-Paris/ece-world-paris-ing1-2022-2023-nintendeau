@@ -167,15 +167,16 @@ int flappy_bird() {
             if(score1 > score2){
                 rest(2000);
                 allegro_message("Le joueur 1 gagne !");
-
+                return 1;
 
             } else if(score1 < score2){
                 rest(2000);
                 allegro_message("Le joueur 2 gagne !");
-
+                return 2;
             } else {
                 rest(2000);
                 allegro_message("Egalité !");
+                return 0;
             }
             gameovergeneral = true;
         }

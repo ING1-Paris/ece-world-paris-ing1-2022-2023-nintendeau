@@ -90,6 +90,7 @@ int snake(){
     SAMPLE *music = sound_loader("attractions/assets/snake/music.wav");
     play_sample(music, 255, 127, 1000, 1);
 
+    int winner = 0;
 
     //Boucle principale
     while(!key[KEY_ESC] && !game_over){
@@ -120,8 +121,10 @@ int snake(){
         if (looser != 0) {
             if (looser == 1) {
                 printf("Game Over ! first player loosed !\n");
+                winner = 2;
             }else{
                 printf("Game Over ! second player loosed !\n");
+                winner = 1;
             }
             game_over = 1;
         }
@@ -145,7 +148,7 @@ int snake(){
 
     //¤Fin du programme
     lib_memoire(head1, food1, head2, food2, buffer, game, music);
-    return 0;
+    return winner;
 }
 
 
