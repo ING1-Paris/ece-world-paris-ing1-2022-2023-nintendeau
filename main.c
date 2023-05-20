@@ -662,7 +662,7 @@ int main() {
         }
 
         //if one player has no more tickets, the game ends
-        if (player_1.tickets == 0 || player_2.tickets == 0) {
+        if (player_1.tickets <= 0 || player_2.tickets <= 0) {
             break;
         }
 
@@ -675,16 +675,17 @@ int main() {
         blit(buffer, screen, 0, 0, 0, 0, buffer->w, buffer->h);
     }
     rest(1000);
-    if(player_1.tickets == 0 || player_2.tickets == 0){
+    if(player_1.tickets <= 0 || player_2.tickets <= 0){
         //display a black screen and the winner on it until a key is pressed: 
-        if(player_1.tickets == 0){
-            textprintf_ex(buffer, font, 10, 10, makecol(0, 0, 0), -1, "Joueur 2 a gagne");
+        if (player_1.tickets <= 0) {
+            textprintf_ex(buffer, font, 10, 10, makecol(255, 255, 255), -1, "Joueur 2 a gagne !");
         }
-        else{
-            textprintf_ex(buffer, font, 10, 10, makecol(0, 0, 0), -1, "Joueur 1 a gagne");
+        else {
+            textprintf_ex(buffer, font, 10, 10, makecol(255, 255, 255), -1, "Joueur 1 a gagne !");
         }
+        blit(buffer, screen, 0, 0, 0, 0, buffer->w, buffer->h);
     }
-    rest(1000);
+    rest(5000);
     readkey();
 
     allegro_exit();
