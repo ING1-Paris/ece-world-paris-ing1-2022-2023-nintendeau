@@ -484,6 +484,36 @@ int choose_player_color(Player * player){
     return color;
 }
 
+void fade_in_out(BITMAP* bmp, int FADE_SPEED) {
+    int alpha = 0;
+    int direction = 1;
+    BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
+
+    while (1) {
+        clear_to_color(buffer, makecol(0, 0, 0));
+        set_trans_blender(0, 0, 0, alpha);
+        draw_trans_sprite(buffer, bmp, 0, 0);
+        alpha += direction * FADE_SPEED;
+        rest(10);  // Adjust the rest time to control the fade speed
+
+        // Copy the buffer to the screen
+        acquire_screen();
+        blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+        release_screen();
+
+        vsync();
+
+        if (alpha >= 255) {
+            direction = -1;  // Start fading out
+        }
+        if (alpha <= 0) {
+            break;  // Fading effect complete, exit the loop
+        }
+    }
+
+    destroy_bitmap(buffer);
+}
+
 //! fonction principale
 int main() {
 
@@ -571,6 +601,9 @@ int main() {
     player_2.speed = 5;
     player_2.leader = 0;
     player_2.direction = 2; //player facing down first
+
+    BITMAP * nintendeau = image_loader("attractions/assets/nintendeau.bmp");
+    fade_in_out(nintendeau, 4);
 
     player_1.color =  choose_player_color(&player_1);
     player_2.color =  choose_player_color(&player_2);
