@@ -33,13 +33,13 @@ void dessinerRectangleBleu(int x, int y, int cbleu, int crouge, int compteur, in
 void lancerLeDecompte(int cnoir, int cblanc) {
 
     rectfill(screen, 200, 40, 610, 60, cnoir);
-    textprintf_ex(screen, font, 300, 40, cblanc, -1, "le jeu va commencez dans 3 ");
+    textprintf_ex(screen, font, 300, 40, cblanc, -1, "le jeu va commencer dans 3 ");
     rest(1000);
     rectfill(screen, 200, 40, 610, 60, cnoir);
-    textprintf_ex(screen, font, 300, 40, cblanc, -1, "le jeu va commencez dans 2 ");
+    textprintf_ex(screen, font, 300, 40, cblanc, -1, "le jeu va commencer dans 2 ");
     rest(1000);
     rectfill(screen, 300, 40, 510, 60, cnoir);
-    textprintf_ex(screen, font, 300, 40, cblanc, -1, "le jeu va commencez dans 1 ");
+    textprintf_ex(screen, font, 300, 40, cblanc, -1, "le jeu va commencer dans 1 ");
     rest(1000);
     rectfill(screen, 200, 40, 610, 60, cnoir);
     textprintf_ex(screen, font, 380, 40, cblanc, -1, "START ! ");
