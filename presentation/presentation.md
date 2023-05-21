@@ -232,7 +232,7 @@ flowchart LR
 ---
 
 # Logigramme
-![bg right:40%](images/algorigramme_course_hippique.png)
+![bg right:40%](images/algorigramme_course_hippique_image.png)
 
 
 ---
@@ -743,6 +743,8 @@ _class: lead
 ---
 
 # Schémas et Graphes
+
+![bg right : 100%](./images/commit.jpeg)
 
 
 ---
