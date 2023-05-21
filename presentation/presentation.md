@@ -715,6 +715,17 @@ _class: lead
 
 ---
 
+# Bilan individuel
+Matheo : projet amusant et interessant. grande comprehension de Github et de la bibliotheque Allegro. Meilleure organisation et meilleure gestion du temps.
+
+Shaima :
+
+Leon :
+
+Alfred :
+
+---
+
 # Investissement
 
 Si vous deviez vous répartir des points, comment feriez-vous ?
