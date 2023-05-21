@@ -15,7 +15,7 @@ int jackpot(Player* player)
     int v7 = 1, vviande = 2,vcoeur = 3;
     int fin;
     int nbrTicket = 5 ;
-    int nbrTicketGagne = 2 ;
+    int nbrTicketGagne = 3 ;
 
     if (set_gfx_mode(GFX_AUTODETECT_WINDOWED,800,600,0,0)!=0)
     {
