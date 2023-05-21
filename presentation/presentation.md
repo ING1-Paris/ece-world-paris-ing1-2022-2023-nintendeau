@@ -43,7 +43,7 @@ Nintendeau
 
 # ECE World
 
-![bg right:50% 198%](./images/Screenshot 2023-05-20 161612.png)
+![bg right:50% 198%](./images/eceworld.png)
 
 ## Thème
 
