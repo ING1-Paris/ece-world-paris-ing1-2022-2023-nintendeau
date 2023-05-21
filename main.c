@@ -171,6 +171,7 @@ void show_ending_screen(BITMAP * buffer, BITMAP * ending_screen, SAMPLE * music_
     }
 }
 
+
 void display_player(Player player, BITMAP* buffer, int frame_counter, BITMAP* anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4]) {
     // Select the appropriate animation array based on the direction
     BITMAP ** animation_array;
@@ -222,6 +223,7 @@ void display_player(Player player, BITMAP* buffer, int frame_counter, BITMAP* an
     // Destroy the temporary bitmap
     destroy_bitmap(masked_sprite);
 }
+
 
 void circle_effect(BITMAP* buffer, Player player_1, Player player_2, int frame_counter, BITMAP * anim_player_haut[4], BITMAP * anim_player_bas[4], BITMAP * anim_player_gauche[4], BITMAP * anim_player_droite[4], int type, bool title)
 {
@@ -446,12 +448,44 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
 }
 
 
-void afficher_score(BITMAP * score_image, BITMAP * buffer, Player player) {
+void afficher_score(BITMAP * score_image, BITMAP * buffer, FILE * fichier_scores) {
+
     masked_stretch_blit(score_image, buffer, 0, 0, score_image->w, score_image->h, 0, 0, SCREEN_W, SCREEN_H);
-    textprintf_ex(buffer, font, SCREEN_W/2, SCREEN_H/2, makecol(0, 0, 0), -1, "Score: %d", player.score);
+
+    // parcours du fichier des scores et affichage des scores
+
+    float score;
+    for (int i = 0; i < 9; i++) {
+
+        char * game = malloc(sizeof(char) * 20);
+
+        if (i == 0)
+            strcpy(game, "geometry_dash");
+        else if (i == 1)
+            strcpy(game, "snake");
+        else if (i == 2)
+            strcpy(game, "tape_taupe");
+        else if (i == 3)
+            strcpy(game, "flappy_bird");
+        else if (i == 4)
+            strcpy(game, "jackpot");
+        else if (i == 5)
+            strcpy(game, "guitar_hero");
+        else if (i == 6)
+            strcpy(game, "paris_hippiques");
+        else if (i == 7)
+            strcpy(game, "palais_des_glaces");
+        else if (i == 8)
+            strcpy(game, "tag");
+
+        fscanf(fichier_scores, "%f", &score);
+        textprintf_ex(buffer, font, 300, 200 + i * 50, makecol(0, 0, 0), -1, "%s : %.2f", game, score);
+    }
+    rewind(fichier_scores);
 }
 
-void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player_sprite_1, BITMAP * player_sprite_2, Player player_1, Player player_2, int * can_move, BITMAP * score_image, BITMAP * calque_collisions, BITMAP * buffer_texte, int frame_counter, BITMAP * anim_player_haut[4], BITMAP * anim_player_bas[4], BITMAP * anim_player_gauche[4], BITMAP * anim_player_droite[4]) {
+
+void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player_sprite_1, BITMAP * player_sprite_2, Player player_1, Player player_2, int * can_move, BITMAP * score_image, BITMAP * calque_collisions, BITMAP * buffer_texte, int frame_counter, BITMAP * anim_player_haut[4], BITMAP * anim_player_bas[4], BITMAP * anim_player_gauche[4], BITMAP * anim_player_droite[4], FILE * fichier_scores) {
 
     clear_bitmap(buffer);
     clear_to_color(buffer_texte, makecol(255, 0, 255));
@@ -473,8 +507,7 @@ void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player
 
     // afficher le score si le joueur est sur la case "score"
     if (940 < player_1.x && player_1.x < 1000 && 100 < player_1.y && player_1.y < 200 || 940 < player_2.x && player_2.x < 1000 && 100 < player_2.y && player_2.y < 200) {
-        afficher_score(score_image, buffer_texte, player_1);
-        afficher_score(score_image, buffer_texte, player_2);
+        afficher_score(score_image, buffer_texte, fichier_scores);
     }
 }
 
@@ -726,6 +759,9 @@ int main() {
     BITMAP * map               = image_loader("attractions/assets/map_v3.bmp");
     SAMPLE * music_main        = sound_loader("attractions/assets/music_main.wav");
 
+    // affichage des meileurs scores de chaque jeux
+    FILE * fichier_scores = file_loader("attractions/assets/best_scores.txt", "r");
+
     //! Chargement des animations
     // Load the bitmaps in separate arrays
     BITMAP * anim_player_gauche[4];
@@ -788,7 +824,7 @@ int main() {
 
     //& boucle principale du menu (carte du parc)
     while (!key[KEY_P]) {
-        afficher_map(titre, buffer, map, player_sprite_1, player_sprite_2, player_1, player_2, &can_move, score_image, calque_collisions, buffer, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
+        afficher_map(titre, buffer, map, player_sprite_1, player_sprite_2, player_1, player_2, &can_move, score_image, calque_collisions, buffer, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, fichier_scores);
         //afficher le nom des joueurs au dessus de leur tête
         textprintf_ex(buffer, font, player_1.x - 10, player_1.y - 20, player_1.color, -1, "%s", player_1.name);
         textprintf_ex(buffer, font, player_2.x - 10, player_2.y - 20, player_2.color, -1, "%s", player_2.name);
@@ -826,6 +862,7 @@ int main() {
         vsync();
         blit(buffer, screen, 0, 0, 0, 0, buffer->w, buffer->h);
     }
+    fclose(fichier_scores);
 
     circle_effect(buffer, player_1, player_2, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, 2, FALSE);
 
