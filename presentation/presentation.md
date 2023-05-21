@@ -744,38 +744,15 @@ _class: lead
 
 # Schémas et Graphes
 
-![bg right : 100%](./images/commit.jpeg)
+![bg : 70%](./images/commit.jpeg)
+_footer: Comits et activités des membres de l'équipe
 
+---
+![bg : 70%](./images/frequence_code.jpeg)
 
 ---
 
-# Slide avec du code
-
-
-```C
-for(int i = 0; i < 5; i++) {
-    printf("%d ", i);
-}
-```
-
-> 0 1 2 3 4 
-
+![bg : 70%](./images/frequence_commit.jpeg)
 
 ---
-
-# Emojis
-
-https://gist.github.com/rxaviers/7360908
-
----
-
-# Thème 
-
-Vous pouvez personnaliser l'affichage de votre présentation avec le langage CSS en modifiant le fichier `theme.css`.
-
----
-
-# Export PDF
-
-Depuis récemment, l'export (**`Export Slide Deck...`**) en PDF oublie parfois des éléments. 
-Si c'est le cas, nous vous conseillons d'exporter en fichier PowerPoint (pptx), puis de l'exporter en PDF depuis PowerPoint.
+# Merci de nous avoir écoutés !
