@@ -1,10 +1,16 @@
 GUITAR HERO :
 
-Jeu de Guitar Hero jouable a 2 joueurs !
+Cette tour immense heberge un concert de Heavy Metal, jouez de la guitare l'un apres l'autre et faites le meilleur score !
 
-Appuyez sur les bonnes touches au bon moment pour jouer une note !
-Si vous ratez une note, vous perdez une vie !
-Si votre vie tombe a 0, vous perdez la partie et voter temps de jeu est enregistré !
-Si le premier joueur perd, le second joueur peut continuer a jouer pour essayer de battre le score du premier joueur !
+TOUCHES :
+    -> 4 cordes : D, F, J, K (de droite a gauche)
 
-Le joueur qui a tenu le plus longtemps gagne la partie !
+BUT :
+    -> Tenir le plus longtemps possible sans mourir
+
+Attention, chaque erreur vous coute une vie !
+Si vous perdez vos 10 vies, c'est le Game Over !
+
+Le joueur qui a le meilleur temps gagne !
+
+Bonne chance !
