@@ -5,7 +5,7 @@
 #include "../header/tape_taupe.h"
 #include "../header/loader.h"
 
-void dessinerRectangleBleu(int x, int y, int cbleu, int crouge, int compteur, int joueuractif, int* J1, int* J2, BITMAP* dessprite1 , BITMAP* dessprite2, BITMAP* dessprite3, BITMAP* dessprite4, SAMPLE* taupe_bonk){
+void popTaupe(int x, int y, int cbleu, int crouge, int compteur, int joueuractif, int* J1, int* J2, BITMAP* dessprite1 , BITMAP* dessprite2, BITMAP* dessprite3, BITMAP* dessprite4, SAMPLE* taupe_bonk){
     for (int i = 0; i < compteur; i++) {
         draw_sprite(screen, dessprite2, x, y);
         if (mouse_b) {
@@ -76,7 +76,7 @@ int verifierscores(int* J1, int* J2, int cblanc, char * nom1, char * nom2){
 }
 
 
-void dessinerRectangleBleu(int x, int y, int cbleu, int crouge, int compteur, int joueuractif, int* J1, int* J2, BITMAP* dessprite1 , BITMAP* dessprite2, BITMAP* dessprite3, BITMAP* dessprite4, SAMPLE* taupe_bonk);
+void popTaupe(int x, int y, int cbleu, int crouge, int compteur, int joueuractif, int* J1, int* J2, BITMAP* dessprite1 , BITMAP* dessprite2, BITMAP* dessprite3, BITMAP* dessprite4, SAMPLE* taupe_bonk);
 void lancerLeDecompte(int cnoir, int cblanc);
 void afficherScores(int* J1, int* J2, int cbleu, int crouge, int cblanc, int cnoir);
 int verifierscores(int* J1, int* J2, int cblanc, char * nom1, char * nom2);
@@ -150,31 +150,31 @@ int tape_taupe(char * nom1, char * nom2, float scores[2]){
         //affichage des rectangles bleus (taupe qui sortent)
         if (rectbleu == 1) {
             printf("rectbleu vaut 1\n");
-            dessinerRectangleBleu(120, 80, cbleu, crouge, compteur, joueuractif, pJ1, pJ2,dessprite1, dessprite2, dessprite3, dessprite4, son3);
+            popTaupe(120, 80, cbleu, crouge, compteur, joueuractif, pJ1, pJ2,dessprite1, dessprite2, dessprite3, dessprite4, son3);
         }else if (rectbleu == 2) {
             printf("rectbleu vaut 2\n");
-            dessinerRectangleBleu(320, 80, cbleu, crouge, compteur, joueuractif, pJ1, pJ2,dessprite1, dessprite2, dessprite3, dessprite4, son3);
+            popTaupe(320, 80, cbleu, crouge, compteur, joueuractif, pJ1, pJ2,dessprite1, dessprite2, dessprite3, dessprite4, son3);
         }else if (rectbleu == 3) {
             printf("rectbleu vaut 3\n");
-            dessinerRectangleBleu(520, 80, cbleu, crouge, compteur, joueuractif, pJ1, pJ2,dessprite1, dessprite2, dessprite3, dessprite4,  son3);
+            popTaupe(520, 80, cbleu, crouge, compteur, joueuractif, pJ1, pJ2,dessprite1, dessprite2, dessprite3, dessprite4,  son3);
         }else if (rectbleu == 4) {
             printf("rectbleu vaut 4\n");
-            dessinerRectangleBleu(120, 230, cbleu, crouge, compteur, joueuractif, pJ1, pJ2,dessprite1, dessprite2, dessprite3, dessprite4, son3);
+            popTaupe(120, 230, cbleu, crouge, compteur, joueuractif, pJ1, pJ2,dessprite1, dessprite2, dessprite3, dessprite4, son3);
         }else if (rectbleu == 5) {
             printf("rectbleu vaut 5\n");
-            dessinerRectangleBleu(320, 230, cbleu, crouge, compteur, joueuractif, pJ1, pJ2, dessprite1,dessprite2, dessprite3, dessprite4,  son3);
+            popTaupe(320, 230, cbleu, crouge, compteur, joueuractif, pJ1, pJ2, dessprite1,dessprite2, dessprite3, dessprite4,  son3);
         }else if (rectbleu == 6) {
             printf("rectbleu vaut 6\n");
-            dessinerRectangleBleu(520, 230, cbleu, crouge, compteur, joueuractif, pJ1, pJ2,dessprite1, dessprite2, dessprite3, dessprite4, son3);
+            popTaupe(520, 230, cbleu, crouge, compteur, joueuractif, pJ1, pJ2,dessprite1, dessprite2, dessprite3, dessprite4, son3);
         }else if (rectbleu == 7) {
             printf("rectbleu vaut 7\n");
-            dessinerRectangleBleu(120, 380, cbleu, crouge, compteur, joueuractif, pJ1, pJ2,dessprite1, dessprite2, dessprite3, dessprite4, son3);
+            popTaupe(120, 380, cbleu, crouge, compteur, joueuractif, pJ1, pJ2,dessprite1, dessprite2, dessprite3, dessprite4, son3);
         }else if (rectbleu == 8) {
             printf("rectbleu vaut 8\n");
-            dessinerRectangleBleu(320, 380, cbleu, crouge, compteur, joueuractif, pJ1, pJ2,dessprite1, dessprite2, dessprite3, dessprite4, son3);
+            popTaupe(320, 380, cbleu, crouge, compteur, joueuractif, pJ1, pJ2,dessprite1, dessprite2, dessprite3, dessprite4, son3);
         }else if (rectbleu == 9) {
             printf("rectbleu vaut 9\n");
-            dessinerRectangleBleu(520, 380, cbleu, crouge, compteur, joueuractif, pJ1, pJ2, dessprite1,dessprite2, dessprite3, dessprite4, son3);
+            popTaupe(520, 380, cbleu, crouge, compteur, joueuractif, pJ1, pJ2, dessprite1,dessprite2, dessprite3, dessprite4, son3);
 
         }
         //verification du nbr de tours pour changer de joueur
