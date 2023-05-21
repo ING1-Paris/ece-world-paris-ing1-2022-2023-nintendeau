@@ -30,6 +30,7 @@ void dessinerRectangleBleu(int x, int y, int cbleu, int crouge, int compteur, in
     draw_sprite(screen, dessprite1 ,x,y);
 }
 
+
 void lancerLeDecompte(int cnoir, int cblanc) {
 
     rectfill(screen, 200, 40, 610, 60, cnoir);
@@ -48,6 +49,7 @@ void lancerLeDecompte(int cnoir, int cblanc) {
 
 }
 
+
 void afficherScores(int* J1, int* J2, int cbleu, int crouge, int cblanc, int cnoir) {
     rectfill(screen, 0, 0, 800, 72, cblanc);
     rectfill(screen, 2, 2, 797, 70, cnoir);
@@ -57,7 +59,8 @@ void afficherScores(int* J1, int* J2, int cbleu, int crouge, int cblanc, int cno
     textprintf_ex(screen, font, 10, 20, cblanc, -1, "Joueur 2 : %d",  *J2);
 }
 
-int verifierscores(int* J1, int* J2, int cblanc, char nom1, char nom2){
+
+int verifierscores(int* J1, int* J2, int cblanc, char * nom1, char * nom2){
     if (*J1 > *J2) {
         textprintf_ex(screen, font, 300, 20, cblanc, -1, "%s a gagné avec %d points",nom1, *J1);
         textprintf_ex(screen, font, 300, 40, cblanc, -1, "%s a perdu avec %d points",nom2, *J2);
@@ -73,8 +76,13 @@ int verifierscores(int* J1, int* J2, int cblanc, char nom1, char nom2){
 }
 
 
+void dessinerRectangleBleu(int x, int y, int cbleu, int crouge, int compteur, int joueuractif, int* J1, int* J2, BITMAP* dessprite1 , BITMAP* dessprite2, BITMAP* dessprite3, BITMAP* dessprite4, SAMPLE* taupe_bonk);
+void lancerLeDecompte(int cnoir, int cblanc);
+void afficherScores(int* J1, int* J2, int cbleu, int crouge, int cblanc, int cnoir);
+int verifierscores(int* J1, int* J2, int cblanc, char * nom1, char * nom2);
 
-int tape_taupe(char nom1, char nom2){
+
+int tape_taupe(char * nom1, char * nom2){
 
     if (set_gfx_mode(GFX_AUTODETECT_WINDOWED, 800, 600, 0, 0) != 0) {
         allegro_message("prb gfx mode");
@@ -195,7 +203,7 @@ int tape_taupe(char nom1, char nom2){
         textprintf_ex(screen, font, 300, 40, cblanc, -1, "%s a gagné 1 ticket", nom2);
         winner = 2;
     }
-    
+
     readkey();
     return winner;
 }

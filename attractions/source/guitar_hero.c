@@ -14,7 +14,7 @@ typedef struct {
     double temps;
     int life;
     int id;
-    char name;
+    char name[100];
 } Player;
 
 
@@ -34,7 +34,7 @@ int victory (int temps_1, int temps_2);
 void afficher_stats(Player * player, BITMAP * buffer, int duration);
 void afficher_boutons(BITMAP * stage, int positions[5], int couleurs[5]);
 void afficher_final_screen(int duration, BITMAP * buffer, BITMAP * game_over);
-void fin_partie(BITMAP * buffer, int gagnant, char nom1, char nom2);
+void fin_partie(BITMAP * buffer, int gagnant, char * nom1, char * nom2);
 void afficher(BITMAP * buffer, BITMAP * stage, int positions[4], int couleurs[4]);
 void afficher_cordes(BITMAP * stage, int positions[4], int couleurs[4]);
 void afficher_note(BITMAP * stage, Note * note);
@@ -42,7 +42,7 @@ void free_memory(BITMAP * buffer, BITMAP * stage, BITMAP * logo, BITMAP * backgr
 void play_guitar(Note * note, int positions[4], SAMPLE * music);
 void show_start_menu_guitar_hero(BITMAP * buffer, BITMAP * title);
 
-int guitar_hero(char nom1, char nom2, float scores[2]) {
+int guitar_hero(char * nom1, char * nom2, float scores[2]) {
 
     set_window_title("Guitar Hero");
 
@@ -50,9 +50,9 @@ int guitar_hero(char nom1, char nom2, float scores[2]) {
 
     // initialisation des joueurs
     Player * player_1 = creer_joueur(1);
-    player_1->name = nom1;
+    strcpy(player_1->name, nom1);
     Player * player_2 = creer_joueur(2);
-    player_1->name = nom2;
+    strcpy(player_2->name, nom2);
     Player * player   = player_1;
 
     // initialisation et chargement des bitmaps
@@ -262,7 +262,7 @@ int victory (int temps_1, int temps_2) {
 }
 
 
-void fin_partie(BITMAP * buffer, int gagnant, char nom1, char nom2) {
+void fin_partie(BITMAP * buffer, int gagnant, char * nom1, char * nom2) {
 
     if (gagnant != 0) {
         if (gagnant == 1){
@@ -270,7 +270,7 @@ void fin_partie(BITMAP * buffer, int gagnant, char nom1, char nom2) {
         }else{
             textprintf_ex(buffer, font, SCREEN_W / 2 - 70, SCREEN_H / 2 + 80, makecol(255, 255, 255), -1,"%s gagne !",nom2);
         }
-        
+
     }
     else {
         textprintf_ex(buffer, font, SCREEN_W / 2 - 47, SCREEN_H / 2 + 80, makecol(255, 255, 255), -1, "Egalite !");

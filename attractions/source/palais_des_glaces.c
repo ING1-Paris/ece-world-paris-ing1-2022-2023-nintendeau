@@ -31,7 +31,7 @@ typedef struct {
     int speed;
     int direction;
     int id;
-    char name;
+    char name[100];
 } Player;
 
 
@@ -58,8 +58,8 @@ void generer_labyrinthe(Cell *** cell_grid, Cell * current_cell, Cell ** stack, 
 void show_start_menu_maze(BITMAP * buffer, BITMAP * titre);
 void show_distance_to_finish(Player * player_1, Player * player_2, BITMAP * buffer);
 int check_visited(Cell *** cell_grid);
-void show_player(BITMAP * buffer, Player * player, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4],int frame_counter, int player_color);
-int palais_des_glaces(char nom1, char nom2, int player_color1, int player_color2, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4]) {
+void show_player(BITMAP * buffer, Player * player, BITMAP * anim_player_haut[4], BITMAP * anim_player_bas[4], BITMAP * anim_player_gauche[4], BITMAP * anim_player_droite[4],int frame_counter, int player_color);
+int palais_des_glaces(char * nom1, char * nom2, int player_color1, int player_color2, BITMAP * anim_player_haut[4], BITMAP * anim_player_bas[4], BITMAP * anim_player_gauche[4], BITMAP * anim_player_droite[4]) {
 
     set_window_title("Palais des Glaces");
 
@@ -70,18 +70,18 @@ int palais_des_glaces(char nom1, char nom2, int player_color1, int player_color2
     player_1->x = SCREEN_H - CELL_SIZE/2;
     player_1->y = SCREEN_H - CELL_SIZE/2 - player_1->size;
     player_1->id = 1;
-    player_1->name = nom1;
+    strcpy(player_1->name, nom1);
 
     Player * player_2 = initialiser_joueur();
     player_2->x = SCREEN_H - CELL_SIZE/2 - player_1->size;
     player_2->y = SCREEN_H - CELL_SIZE/2;
     player_2->id = 2;
-    player_2->name = nom2;
+    strcpy(player_2->name, nom2);
 
     //* On initialise les BITMAPS
     BITMAP * buffer = create_bitmap(SCREEN_W, SCREEN_H);
-    BITMAP * maze = create_bitmap(SCREEN_H, SCREEN_H);
-    BITMAP * mask = create_bitmap(SCREEN_W, SCREEN_H);
+    BITMAP * maze   = create_bitmap(SCREEN_H, SCREEN_H);
+    BITMAP * mask   = create_bitmap(SCREEN_W, SCREEN_H);
 
     BITMAP * titre           = image_loader("attractions/assets/palais_des_glaces/maze_run.bmp");
     BITMAP * player_sprite_1 = image_loader("attractions/assets/palais_des_glaces/player_1.bmp");
@@ -109,7 +109,7 @@ int palais_des_glaces(char nom1, char nom2, int player_color1, int player_color2
     int stack_size = 0;
 
     int frame_counter = 0;
-    int winner = 0;
+    int game_winner = 0;
 
 
     time_t start_time, end_time;
@@ -143,8 +143,6 @@ int palais_des_glaces(char nom1, char nom2, int player_color1, int player_color2
 
         //* Affichage du labyrinthe et des joueurs
         blit(maze, buffer, 0, 0, 0, 0, SCREEN_H, SCREEN_H);
-        //masked_stretch_blit(player_sprite_1, buffer, 0, 0, player_sprite_1->w, player_sprite_1->h, player_1->x, player_1->y - 10, player_1->size, player_1->size + 10);
-        //masked_stretch_blit(player_sprite_2, buffer, 0, 0, player_sprite_2->w, player_sprite_2->h, player_2->x, player_2->y - 10, player_2->size, player_2->size + 10);
 
         show_player(buffer, player_1, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, frame_counter, player_color1);
         show_player(buffer, player_2, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, frame_counter, player_color2);
@@ -158,7 +156,7 @@ int palais_des_glaces(char nom1, char nom2, int player_color1, int player_color2
         masked_blit(mask, buffer, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
         rectfill(buffer, SCREEN_W * 2/3, 70, SCREEN_W, 70, makecol(255, 255, 255));
         rectfill(buffer, SCREEN_H, 0, SCREEN_H, SCREEN_H, makecol(255, 255, 255));
-        winner = check_victory(player_1, player_2, start_time, end_time, buffer, win_music, bcg_music, &temps);
+        game_winner = check_victory(player_1, player_2, start_time, end_time, buffer, win_music, bcg_music, &temps);
         masked_stretch_blit(titre, buffer, 0, 0, titre->w, titre->h, 810, 10, 380, 50);
         show_distance_to_finish(player_1, player_2, buffer);
         blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
@@ -168,7 +166,7 @@ int palais_des_glaces(char nom1, char nom2, int player_color1, int player_color2
     free_grid(cell_grid);
     destroy_sample(bcg_music);
     destroy_sample(win_music);
-    return winner;
+    return game_winner;
 }
 
 void show_grid(Cell *** cell_grid, BITMAP * maze, BITMAP * buffer) {

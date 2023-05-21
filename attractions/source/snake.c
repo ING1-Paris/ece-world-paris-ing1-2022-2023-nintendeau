@@ -57,7 +57,7 @@ void gestion_mouvements(SNAKE *head1, SNAKE *head2);
 int collision_mort(SNAKE *head1, SNAKE *head2);
 int collision_food(SNAKE *head, food *food);
 
-int snake(char nom1, char nom2){
+int snake(char * nom1, char * nom2){
 
     set_window_title("SNAKE");
 

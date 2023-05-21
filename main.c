@@ -97,6 +97,7 @@ void ecrire_best_score(float * scores, char * game) {
     rename("../attractions/assets/temp.txt", "../attractions/assets/best_scores.txt");
 }
 
+
 void welcome_screen() {
     int alpha = 0;
     int direction = 1;
@@ -116,7 +117,7 @@ void welcome_screen() {
         acquire_screen();
         blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
         release_screen();
-        //play sample only once 
+        //play sample only once
         vsync();
 
         if (alpha >= 130 && !do_once) {
@@ -223,7 +224,7 @@ void display_player(Player player, BITMAP* buffer, int frame_counter, BITMAP* an
 }
 
 void circle_effect(BITMAP* buffer, Player player_1, Player player_2, int frame_counter, BITMAP * anim_player_haut[4], BITMAP * anim_player_bas[4], BITMAP * anim_player_gauche[4], BITMAP * anim_player_droite[4], int type, bool title)
-{   
+{
     BITMAP * titre = image_loader("attractions/assets/Titre.bmp");
     BITMAP * map  = image_loader("attractions/assets/map_v3.bmp");
     BITMAP * mask = create_bitmap(SCREEN_W, SCREEN_H);
@@ -256,7 +257,7 @@ void circle_effect(BITMAP* buffer, Player player_1, Player player_2, int frame_c
             blit(buffer, screen, 0, 0, 0, 0, buffer->w, buffer->h);
         }
     }
-    
+
     destroy_bitmap(mask);
 }
 
@@ -267,8 +268,11 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
 
     int x = player->previous_x;
     int y = player->previous_y;
-    char nom1 = player->name;
-    char nom2 = player_2->name;
+    char nom1[100];
+    char nom2[100];
+
+    strcpy(nom1, player->name);
+    strcpy(nom2, player_2->name);
 
     int ground = makecol(0, 255, 0);
     int wall   = makecol(255, 0, 0);
@@ -514,7 +518,7 @@ int choose_player_name_color(Player * player){
 
     bool done = false;
 
-    while (!done) 
+    while (!done)
     {
         clear_to_color(buffer, makecol(0, 0, 0));
 
@@ -586,7 +590,7 @@ int choose_player_name_color(Player * player){
         }
 
         clear_to_color(buffer, makecol(0, 0, 0));
-        
+
        // Display the entered numbers with slashes
         char formattedText[9 + 3] = {0};
         if (textLength >= 1) {
@@ -788,12 +792,12 @@ int main() {
         //afficher le nom des joueurs au dessus de leur tête
         textprintf_ex(buffer, font, player_1.x - 10, player_1.y - 20, player_1.color, -1, "%s", player_1.name);
         textprintf_ex(buffer, font, player_2.x - 10, player_2.y - 20, player_2.color, -1, "%s", player_2.name);
-        
+
         check_collision_main(&player_2, &player_1, calque_collisions, player_sprite_2, music_main, regles, buffer, ending_screen, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, scores);
         check_collision_main(&player_1, &player_2, calque_collisions, player_sprite_1, music_main, regles, buffer, ending_screen, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, scores);
 
-        
-        
+
+
         // afficher le leader
         if (player_1.leader)
             textprintf_ex(buffer, font, 10, 10, makecol(0, 0, 0), -1, "%s leader", player_1.name);
@@ -827,7 +831,7 @@ int main() {
 
     if(player_1.tickets <= 0 || player_2.tickets <= 0){
         rest(1000);
-        //display a black screen and the winner on it until a key is pressed: 
+        //display a black screen and the winner on it until a key is pressed:
         if (player_1.tickets <= 0) {
             textprintf_ex(buffer, font, 10, 10, makecol(255, 255, 255), -1, "%s a gagne !", player_2.name);
         }

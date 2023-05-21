@@ -7,9 +7,9 @@
 #define SCREEN_WIDTH 1500
 #define SCREEN_HEIGHT 700
 
-void choix(char nom1, char nom2);
+void choix(char * nom1, char * nom2);
 
-int paris_hippiques(char nom1, char nom2) {
+int paris_hippiques(char * nom1, char * nom2) {
     SAMPLE *music = sound_loader("attractions/assets/paris_hippiques/accueil.wav");
     play_sample(music, 255, 128, 1000, 1); //permet de jouer de la musique en boucle
 
@@ -341,7 +341,7 @@ int paris_hippiques(char nom1, char nom2) {
     return winner;
 }
 
-void choix(char nom1, char nom2){
+void choix(char * nom1, char * nom2){
 
     BITMAP *accueil = image_loader("attractions/assets/paris_hippiques/accueil.bmp"); //création d'un bitmap
     BITMAP *choixjoueur1 = image_loader("attractions/assets/paris_hippiques/choixjoueur1.bmp");

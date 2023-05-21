@@ -1,10 +1,10 @@
-JACKPOT : 
-Bienvenue au JACKPOT, là où tout est possible. 
+JACKPOT :
+Bienvenue au JACKPOT, là où tout est possible.
 Le joueur qui a choisi cette attraction est le seul à jouer, il est prêt à tout !
 Testez votre chance, elle determinera l'issue jeu !
 
 Jouer vous coûte un ticket,
-si les 3 cases du JACKPOT sont identiques, vous gagnez 2 tickets
+si les 3 cases du JACKPOT sont identiques, vous gagnez 3 tickets
 sinon, vous aurez juste perdu un ticket en faisant confiance à votre chance.
 
 pour actionner le JACKPOT, appuyez sur le bouton START à droite de la machine.

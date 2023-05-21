@@ -15,7 +15,7 @@
 #define GRAVITE 2.5
 #define SAUT 15
 
-int flappy_bird(char nom1, char nom2) {
+int flappy_bird(char * nom1, char * nom2) {
     set_gfx_mode(GFX_AUTODETECT_WINDOWED, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
 
     srand(time(NULL));
