@@ -32,7 +32,7 @@ Nintendeau
 
 # Equipe Nintendeau
 
-![bg right:50%](./images/equipe.avif)
+![bg :50%](./images/nintendeau.bmp)
 
 - DALLE Léon
 - DE VULPIAN Alfred
