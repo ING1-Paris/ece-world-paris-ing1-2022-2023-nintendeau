@@ -43,9 +43,10 @@ void show_background(BITMAP * buffer, BITMAP * level, Background bg[NB_BACKGROUN
 void move_bcg(int compteur_frames, Background bg[NB_BACKGROUNDS], int largeur);
 void show_game_over(BITMAP * buffer, BITMAP * game_over_text, int winner, double time_spent);
 void show_start_menu_geometry_dash(BITMAP * level, BITMAP * buffer, BITMAP * title, int largeur);
+void write_best_score(float * scores, char * game);
 
 
-int geometry_dash() {
+int geometry_dash(float scores[2]) {
 
     set_window_title("Geometry Dash");
 
@@ -124,14 +125,20 @@ int geometry_dash() {
 
         //* Si l'un des deux joueurs meurt
         if (player_1->life == false && player_2->life == false) {
-            
+
 
             // définir le gagnant
             if (!player_1->life) {
                 winner = 2;
+                scores[1] = time_spent;
+                scores[0] = 0;
             } else {
                 winner = 1;
+                scores[0] = time_spent;
+                scores[1] = 0;
             }
+
+            //write_best_score(scores, "tag");
 
             game_over = true;
 
@@ -147,6 +154,7 @@ int geometry_dash() {
         blit(buffer_2, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
         compteur_frames++;
     }
+
     stop_sample(music);
     if (winner == 1) {
         return 1;
@@ -166,6 +174,77 @@ Player * creer_player() {
     player->life = true;
     player->jump_speed = 0;
     return player;
+}
+
+
+// fonction pour ecrire le meilleur score dans le fichier "meilleurs_scores.txt"
+void write_best_score(float * scores, char * game) {
+
+    // Ouvrir les fichiers best_scores.txt et temp.txt
+    FILE * scores_file = fopen("../attractions/assets/best_scores.txt", "r");
+    FILE * temp_file   = fopen("../attractions/assets/temp.txt", "w");
+
+    if (scores_file == NULL || temp_file == NULL) {
+        scores_file = fopen("attractions\\assets\\best_scores.txt", "r");
+        temp_file   = fopen("attractions\\assets\\temp.txt", "w");
+    }
+
+    // Déterminer le score max dans le tableau scores
+    float score_max = scores[0];
+    if (scores[1] > score_max) {
+        score_max = scores[1];
+    }
+
+    // Déterminer la ligne du fichier best_scores.txt à modifier en fonction du jeu
+    int game_line = -1;
+    if (strcmp(game, "geometry_dash") == 0) {
+        game_line = 1;
+    } else if (strcmp(game, "snake") == 0) {
+        game_line = 2;
+    } else if (strcmp(game, "tape_taupe") == 0) {
+        game_line = 3;
+    } else if (strcmp(game, "flappy_bird") == 0) {
+        game_line = 4;
+    } else if (strcmp(game, "jackpot") == 0) {
+        game_line = 5;
+    } else if (strcmp(game, "guitar_hero") == 0) {
+        game_line = 6;
+    } else if (strcmp(game, "paris_hippiques") == 0) {
+        game_line = 7;
+    } else if (strcmp(game, "palais_des_glaces") == 0) {
+        game_line = 8;
+    } else if (strcmp(game, "tag") == 0) {
+        game_line = 9;
+    }
+
+
+    // Parcourir les lignes du fichier best_scores.txt
+    char contenu_ligne[100];
+    int num_ligne = 1;
+    while (fgets(contenu_ligne, sizeof(contenu_ligne), scores_file) != NULL) {
+        // Si la ligne n'est pas celle du jeu en question, la copier dans temp.txt
+        if (num_ligne != game_line) {
+            fputs(contenu_ligne, temp_file);
+        } else {
+            // Si le score max des joueurs est supérieur au contenu de la ligne, la modifier
+            float current_score;
+            sscanf(contenu_ligne, "%f", &current_score);
+            if (score_max > current_score) {
+                fprintf(temp_file, "%.2f\n", score_max);
+            } else {
+                fputs(contenu_ligne, temp_file);
+            }
+        }
+        num_ligne++;
+    }
+
+    // Fermer les fichiers
+    fclose(scores_file);
+    fclose(temp_file);
+
+    // Supprimer best_scores.txt et renommer temp.txt en "best_scores.txt"
+    remove("../attractions/assets/best_scores.txt");
+    rename("../attractions/assets/temp.txt", "../attractions/assets/best_scores.txt");
 }
 
 

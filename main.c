@@ -41,36 +41,78 @@ typedef struct {
 } Player;
 
 // fonction pour ecrire le meilleur score dans le fichier "meilleurs_scores.txt"
-void write_best_score(int score) {
+void ecrire_best_score(float * scores, char * game) {
 
-    // on ouvre le fichier "meilleurs_scores.txt" en mode ecriture
-    FILE * file = fopen("saves\\meilleurs_scores.txt", "w");
+    // Ouvrir les fichiers best_scores.txt et temp.txt
+    FILE * scores_file = fopen("../attractions/assets/best_scores.txt", "r");
+    FILE * temp_file   = fopen("../attractions/assets/temp.txt", "w");
 
-    // si le fichier n'existe pas, on essaie avec un autre chemin (vscode et Clion)
-    if (!file) {
-        file = fopen("../saves/meilleurs_scores.txt", "w");
+    if (scores_file == NULL || temp_file == NULL) {
+        scores_file = fopen("attractions\\assets\\best_scores.txt", "r");
+        temp_file   = fopen("attractions\\assets\\temp.txt", "w");
+    }
 
-        if (!file) {
-            allegro_message("FILE ERROR");
-            allegro_exit();
-            exit(EXIT_FAILURE);
+    // Déterminer le score max dans le tableau scores
+    float score_max = scores[0];
+    if (scores[1] > score_max) {
+        score_max = scores[1];
+    }
+
+    // Déterminer la ligne du fichier best_scores.txt à modifier en fonction du jeu
+    int game_line = -1;
+    if (strcmp(game, "geometry_dash") == 0) {
+        game_line = 1;
+    } else if (strcmp(game, "snake") == 0) {
+        game_line = 2;
+    } else if (strcmp(game, "tape_taupe") == 0) {
+        game_line = 3;
+    } else if (strcmp(game, "flappy_bird") == 0) {
+        game_line = 4;
+    } else if (strcmp(game, "jackpot") == 0) {
+        game_line = 5;
+    } else if (strcmp(game, "guitar_hero") == 0) {
+        game_line = 6;
+    } else if (strcmp(game, "paris_hippiques") == 0) {
+        game_line = 7;
+    } else if (strcmp(game, "palais_des_glaces") == 0) {
+        game_line = 8;
+    } else if (strcmp(game, "tag") == 0) {
+        game_line = 9;
+    }
+
+
+    // Parcourir les lignes du fichier best_scores.txt
+    char contenu_ligne[100];
+    int num_ligne = 1;
+    while (fgets(contenu_ligne, sizeof(contenu_ligne), scores_file) != NULL) {
+        // Si la ligne n'est pas celle du jeu en question, la copier dans temp.txt
+        if (num_ligne != game_line) {
+            fputs(contenu_ligne, temp_file);
+        } else {
+            // Si le score max des joueurs est supérieur au contenu de la ligne, la modifier
+            float current_score;
+            sscanf(contenu_ligne, "%f", &current_score);
+            if (score_max > current_score) {
+                fprintf(temp_file, "%.2f\n", score_max);
+            } else {
+                fputs(contenu_ligne, temp_file);
+            }
         }
+        num_ligne++;
     }
 
-    int best_score;
-    fscanf(file, "%d", &best_score);
-    if (score > best_score) {
-        fprintf(file, "%d\n", score);
-    }
-    else {
-        fprintf(file, "%d\n", best_score);
-    }
-    fclose(file);
+    // Fermer les fichiers
+    fclose(scores_file);
+    fclose(temp_file);
+
+    // Supprimer best_scores.txt et renommer temp.txt en "best_scores.txt"
+    remove("../attractions/assets/best_scores.txt");
+    rename("../attractions/assets/temp.txt", "../attractions/assets/best_scores.txt");
 }
 
 
-void afficher_regles(BITMAP* regles, BITMAP* buffer, const char* file_name) {
-    masked_stretch_blit(regles, buffer, 0, 0, regles->w, regles->h, 0, 0, SCREEN_W, SCREEN_H);
+void afficher_regles(BITMAP* regles, BITMAP* contenu_ligne, const char* file_name) {
+    masked_stretch_blit(regles, contenu_ligne, 0, 0, regles->w, regles->h, 0, 0, SCREEN_W, SCREEN_H);
     // Fetch rules from file and display them (location: attractions/assets/(game_name)/rules.txt)
     char filepath[200];
     snprintf(filepath, sizeof(filepath), "attractions/assets/%s/rules.txt", file_name);
@@ -82,7 +124,7 @@ void afficher_regles(BITMAP* regles, BITMAP* buffer, const char* file_name) {
     while (fgets(line, sizeof(line), file) != NULL) {
         //remove the ^ at the end of the line
         line[strlen(line) - 1] = '\0';
-        textout_ex(buffer, font, line, 200, y, makecol(0, 0, 0), -1);
+        textout_ex(contenu_ligne, font, line, 200, y, makecol(0, 0, 0), -1);
         y += 20;
     }
 
@@ -90,10 +132,10 @@ void afficher_regles(BITMAP* regles, BITMAP* buffer, const char* file_name) {
 }
 
 
-void show_ending_screen(BITMAP * buffer, BITMAP * ending_screen) {
-    masked_stretch_blit(ending_screen, buffer, 0, 0, ending_screen->w, ending_screen->h, 0, 0, SCREEN_W, SCREEN_H);
-    textout_ex(buffer, font, "Appuyez sur ECHAP pour quitter", 550, 600, makecol(0, 0, 0), -1);
-    //blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+void show_ending_screen(BITMAP * contenu_ligne, BITMAP * ending_screen) {
+    masked_stretch_blit(ending_screen, contenu_ligne, 0, 0, ending_screen->w, ending_screen->h, 0, 0, SCREEN_W, SCREEN_H);
+    textout_ex(contenu_ligne, font, "Appuyez sur ECHAP pour quitter", 550, 600, makecol(0, 0, 0), -1);
+    //blit(contenu_ligne, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
     if (key[KEY_ESC]) {
         allegro_exit();
         exit(EXIT_SUCCESS);
@@ -101,7 +143,7 @@ void show_ending_screen(BITMAP * buffer, BITMAP * ending_screen) {
 }
 
 
-void check_collision_main(Player * player, Player * player_2, BITMAP * calque_collisions, BITMAP * player_sprite_1, SAMPLE * music_main, BITMAP * regles, BITMAP * buffer, BITMAP * ending_screen, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4]) {
+void check_collision_main(Player * player, Player * player_2, BITMAP * calque_collisions, BITMAP * player_sprite_1, SAMPLE * music_main, BITMAP * regles, BITMAP * contenu_ligne, BITMAP * ending_screen, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4], float scores[2]) {
 
     int active = 0;
 
@@ -160,7 +202,7 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
                 game = "flappy_bird";
             }
             else if (color_array[i] == sortie_color) {
-                show_ending_screen(buffer, ending_screen);
+                show_ending_screen(contenu_ligne, ending_screen);
             }
             else {
                 game = "none";
@@ -172,7 +214,7 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
                 player->y = y;
             }// si le joueur est sur un jeu, on lance l'attraction correspondante
             else if (color_array[i] != ground && color_array[i] != sortie_color && player->leader) {
-                afficher_regles(regles, buffer, game);
+                afficher_regles(regles, contenu_ligne, game);
                 if (key[KEY_SPACE]) {
                     stop_sample(music_main);
                     if (strcmp(game, "palais_des_glaces") == 0) {
@@ -185,7 +227,7 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
                     }
                     else if (strcmp(game, "geometry_dash") == 0) {
                         printf("geometry_dash\n");
-                        winner = geometry_dash();
+                        winner = geometry_dash(scores);
                     }
                     else if (strcmp(game, "tape_taupe") == 0) {
                         printf("tape_taupe\n");
@@ -193,7 +235,7 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
                     }
                     else if (strcmp(game, "guitar_hero") == 0) {
                         printf("guitar_hero\n");
-                        winner = guitar_hero();
+                        winner = guitar_hero(scores);
                     }
                     else if (strcmp(game, "tag") == 0) {
                         printf("tag\n");
@@ -222,7 +264,7 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
                     player_2->tickets -= 1;
 
 
-                    //Manage the players : 
+                    //Manage the players :
                     if (winner == 1){
                         //add 1 or 2 tickets to the winner (50% chance to win 1 or 2 tickets)
                         player->tickets += rand() % 2 + 1;
@@ -247,6 +289,8 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
                             jackpot(&player_2);
                         }
                     }
+
+                    ecrire_best_score(scores, game);
 
                     //replacer le joueur au milieu de la map et redéfinir la fenetre
                     set_gfx_mode(GFX_AUTODETECT_WINDOWED, 1200, 800, 0, 0);
@@ -278,13 +322,13 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
 }
 
 
-void afficher_score(BITMAP * score_image, BITMAP * buffer, Player player) {
-    masked_stretch_blit(score_image, buffer, 0, 0, score_image->w, score_image->h, 0, 0, SCREEN_W, SCREEN_H);
-    textprintf_ex(buffer, font, SCREEN_W/2, SCREEN_H/2, makecol(0, 0, 0), -1, "Score: %d", player.score);
+void afficher_score(BITMAP * score_image, BITMAP * contenu_ligne, Player player) {
+    masked_stretch_blit(score_image, contenu_ligne, 0, 0, score_image->w, score_image->h, 0, 0, SCREEN_W, SCREEN_H);
+    textprintf_ex(contenu_ligne, font, SCREEN_W/2, SCREEN_H/2, makecol(0, 0, 0), -1, "Score: %d", player.score);
 }
 
 
-void display_player(Player player, BITMAP* buffer, int frame_counter, BITMAP* anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4]) {
+void display_player(Player player, BITMAP* contenu_ligne, int frame_counter, BITMAP* anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4]) {
     // Select the appropriate animation array based on the direction
     BITMAP ** animation_array;
     if (player.direction == 1) {
@@ -324,32 +368,32 @@ void display_player(Player player, BITMAP* buffer, int frame_counter, BITMAP* an
     clear(masked_sprite);
     blit(current_frame, masked_sprite, 0, 0, 0, 0, current_frame->w, current_frame->h);
 
-    // Apply the color filter 
+    // Apply the color filter
     int filter = player.color;
     set_trans_blender(0, 0, 0, 255);
     draw_lit_sprite(masked_sprite, masked_sprite, 0, 0, filter);
 
     // Draw the masked sprite
-    masked_blit(masked_sprite, buffer, 0, 0, player.x, player.y, masked_sprite->w, masked_sprite->h);
+    masked_blit(masked_sprite, contenu_ligne, 0, 0, player.x, player.y, masked_sprite->w, masked_sprite->h);
 
     // Destroy the temporary bitmap
     destroy_bitmap(masked_sprite);
 }
 
 
-void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player_sprite_1, BITMAP * player_sprite_2, Player player_1, Player player_2, int * can_move, BITMAP * score_image, BITMAP * calque_collisions, BITMAP * buffer_texte, int frame_counter, BITMAP * anim_player_haut[4], BITMAP * anim_player_bas[4], BITMAP * anim_player_gauche[4], BITMAP * anim_player_droite[4]) {
+void afficher_map(BITMAP * titre, BITMAP * contenu_ligne, BITMAP * map, BITMAP * player_sprite_1, BITMAP * player_sprite_2, Player player_1, Player player_2, int * can_move, BITMAP * score_image, BITMAP * calque_collisions, BITMAP * contenu_ligne_texte, int frame_counter, BITMAP * anim_player_haut[4], BITMAP * anim_player_bas[4], BITMAP * anim_player_gauche[4], BITMAP * anim_player_droite[4]) {
 
-    clear_bitmap(buffer);
-    clear_to_color(buffer_texte, makecol(255, 0, 255));
-    stretch_blit(calque_collisions, buffer, 0, 0, calque_collisions->w, calque_collisions->h, 0, 0, buffer->w, buffer->h);
-    stretch_blit(map, buffer, 0, 0, map->w, map->h, 0, 0, buffer->w, buffer->h);
+    clear_bitmap(contenu_ligne);
+    clear_to_color(contenu_ligne_texte, makecol(255, 0, 255));
+    stretch_blit(calque_collisions, contenu_ligne, 0, 0, calque_collisions->w, calque_collisions->h, 0, 0, contenu_ligne->w, contenu_ligne->h);
+    stretch_blit(map, contenu_ligne, 0, 0, map->w, map->h, 0, 0, contenu_ligne->w, contenu_ligne->h);
 
     //Animation du joueur :
-    display_player(player_1, buffer, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
-    display_player(player_2, buffer, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
+    display_player(player_1, contenu_ligne, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
+    display_player(player_2, contenu_ligne, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
 
-    masked_stretch_blit(titre, buffer, 0, 0, titre->w, titre->h, SCREEN_W/2 - titre->w/1.35, SCREEN_H/2 - titre->h*1.5, titre->w*1.5, titre->h*1.5);
-    masked_blit(buffer_texte, buffer, 0, 0, 0, 0, buffer_texte->w, buffer_texte->h);
+    masked_stretch_blit(titre, contenu_ligne, 0, 0, titre->w, titre->h, SCREEN_W/2 - titre->w/1.35, SCREEN_H/2 - titre->h*1.5, titre->w*1.5, titre->h*1.5);
+    masked_blit(contenu_ligne_texte, contenu_ligne, 0, 0, 0, 0, contenu_ligne_texte->w, contenu_ligne_texte->h);
 
     // enlever le titre si la souris est clique
     if (key[KEY_SPACE] || mouse_b & 1) {
@@ -359,10 +403,11 @@ void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player
 
     // afficher le score si le joueur est sur la case "score"
     if (940 < player_1.x && player_1.x < 1000 && 100 < player_1.y && player_1.y < 200 || 940 < player_2.x && player_2.x < 1000 && 100 < player_2.y && player_2.y < 200) {
-        afficher_score(score_image, buffer_texte, player_1);
-        afficher_score(score_image, buffer_texte, player_2);
+        afficher_score(score_image, contenu_ligne_texte, player_1);
+        afficher_score(score_image, contenu_ligne_texte, player_2);
     }
 }
+
 
 void move_player(Player * player, int UP, int DOWN, int LEFT, int RIGHT) {
     if (key[UP]) {
@@ -383,12 +428,13 @@ void move_player(Player * player, int UP, int DOWN, int LEFT, int RIGHT) {
     }
 }
 
+
 int choose_player_color(Player * player){
-    BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H); // Double buffer for smooth rendering
+    BITMAP* contenu_ligne = create_bitmap(SCREEN_W, SCREEN_H); // Double contenu_ligne for smooth rendering
     BITMAP* player_sprite = image_loader("attractions/assets/tag/player_1.bmp");
     BITMAP * masked_sprite = create_bitmap(player_sprite->w, player_sprite->h);
     int color = 0;
-    char inputText[9 + 1] = {0}; // Buffer to store user input
+    char inputText[9 + 1] = {0}; // contenu_ligne to store user input
     int textLength = 0; // Current length of the input text
     int r, g, b; // RGB color values
     bool colorSet = false; // Flag to indicate if the color is set
@@ -415,8 +461,8 @@ int choose_player_color(Player * player){
             }
         }
 
-        clear_to_color(buffer, makecol(0, 0, 0));
-        
+        clear_to_color(contenu_ligne, makecol(0, 0, 0));
+
        // Display the entered numbers with slashes
         char formattedText[9 + 3] = {0};
         if (textLength >= 1) {
@@ -454,8 +500,8 @@ int choose_player_color(Player * player){
         }
 
         // Display the text and the num of the player
-        textprintf_centre_ex(buffer, font, SCREEN_W / 2, SCREEN_H / 2 - 30, makecol(255, 255, 255), -1, "Joueur %d, Choisissez la couleur de votre personnage (Valeur RGB 0-255/0-255/0-255)", player->number);
-        textout_centre_ex(buffer, font, formattedText, SCREEN_W / 2, SCREEN_H / 2 - 10, makecol(255, 255, 255), -1);
+        textprintf_centre_ex(contenu_ligne, font, SCREEN_W / 2, SCREEN_H / 2 - 30, makecol(255, 255, 255), -1, "Joueur %d, Choisissez la couleur de votre personnage (Valeur RGB 0-255/0-255/0-255)", player->number);
+        textout_centre_ex(contenu_ligne, font, formattedText, SCREEN_W / 2, SCREEN_H / 2 - 10, makecol(255, 255, 255), -1);
 
         if (textLength == 9) {
             // Extract the RGB values from the input text
@@ -487,11 +533,11 @@ int choose_player_color(Player * player){
             draw_lit_sprite(masked_sprite, masked_sprite, 0, 0, filter);
 
             // Draw the masked sprite
-            masked_blit(masked_sprite, buffer, 0, 0, SCREEN_W/2, SCREEN_H/2, masked_sprite->w, masked_sprite->h);
+            masked_blit(masked_sprite, contenu_ligne, 0, 0, SCREEN_W/2, SCREEN_H/2, masked_sprite->w, masked_sprite->h);
         }
 
-        // Blit the buffer to the screen
-        blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+        // Blit the contenu_ligne to the screen
+        blit(contenu_ligne, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 
         vsync();
 
@@ -505,27 +551,28 @@ int choose_player_color(Player * player){
     }
 
     destroy_bitmap(masked_sprite);
-    destroy_bitmap(buffer);
+    destroy_bitmap(contenu_ligne);
     destroy_bitmap(player_sprite);
     return color;
 }
 
+
 void welcome_screen() {
     int alpha = 0;
     int direction = 1;
-    BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
+    BITMAP* contenu_ligne = create_bitmap(SCREEN_W, SCREEN_H);
     BITMAP* bmp = image_loader("attractions/assets/nintendeau.bmp");
 
     while (1) {
-        clear_to_color(buffer, makecol(0, 0, 0));
+        clear_to_color(contenu_ligne, makecol(0, 0, 0));
         set_trans_blender(0, 0, 0, alpha);
-        draw_trans_sprite(buffer, bmp, 0, 0);
+        draw_trans_sprite(contenu_ligne, bmp, 0, 0);
         alpha += direction * 4;
         rest(10);  // Adjust the rest time to control the fade speed
 
-        // Copy the buffer to the screen
+        // Copy the contenu_ligne to the screen
         acquire_screen();
-        blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+        blit(contenu_ligne, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
         release_screen();
 
         vsync();
@@ -538,7 +585,7 @@ void welcome_screen() {
         }
     }
 
-    destroy_bitmap(buffer);
+    destroy_bitmap(contenu_ligne);
     destroy_bitmap(bmp);
 }
 
@@ -567,10 +614,11 @@ int main() {
     //! VARIABLES
     int frame_counter = 0;
     int can_move      = 0;
+    int scores[2]     = {0, 0};
 
     //! CHARGEMENT DES BITMAPS
-    BITMAP * buffer_texte      = create_bitmap(SCREEN_W, SCREEN_H);
-    BITMAP * buffer            = create_bitmap(SCREEN_W, SCREEN_H);
+    BITMAP * contenu_ligne_texte      = create_bitmap(SCREEN_W, SCREEN_H);
+    BITMAP * contenu_ligne            = create_bitmap(SCREEN_W, SCREEN_H);
     BITMAP * calque_collisions = image_loader("attractions/assets/collision_v3.bmp");
     BITMAP * player_sprite_1   = image_loader("attractions/assets/palais_des_glaces/player_1.bmp");
     BITMAP * player_sprite_2   = image_loader("attractions/assets/palais_des_glaces/player_2.bmp");
@@ -642,19 +690,19 @@ int main() {
     //& boucle principale du menu (carte du parc)
     while (!key[KEY_M]) {
 
-        afficher_map(titre, buffer, map, player_sprite_1, player_sprite_2, player_1, player_2, &can_move, score_image, calque_collisions, buffer, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
-        check_collision_main(&player_2, &player_1, calque_collisions, player_sprite_2, music_main, regles, buffer, ending_screen, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
-        check_collision_main(&player_1, &player_2, calque_collisions, player_sprite_1, music_main, regles, buffer, ending_screen, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
-    
+        afficher_map(titre, contenu_ligne, map, player_sprite_1, player_sprite_2, player_1, player_2, &can_move, score_image, calque_collisions, contenu_ligne, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
+        check_collision_main(&player_2, &player_1, calque_collisions, player_sprite_2, music_main, regles, contenu_ligne, ending_screen, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, scores);
+        check_collision_main(&player_1, &player_2, calque_collisions, player_sprite_1, music_main, regles, contenu_ligne, ending_screen, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, scores);
+
         // afficher le leader
         if (player_1.leader)
-            textprintf_ex(buffer, font, 10, 10, makecol(0, 0, 0), -1, "Joueur 1 leader");
+            textprintf_ex(contenu_ligne, font, 10, 10, makecol(0, 0, 0), -1, "Joueur 1 leader");
         if (player_2.leader)
-            textprintf_ex(buffer, font, 10, 10, makecol(0, 0, 0), -1, "Joueur 2 leader");
+            textprintf_ex(contenu_ligne, font, 10, 10, makecol(0, 0, 0), -1, "Joueur 2 leader");
 
         // afficher le nombre de tickets
-        textprintf_ex(buffer, font, 10, 30, makecol(0, 0, 0), -1, "Joueur 1 tickets : %d", player_1.tickets);
-        textprintf_ex(buffer, font, 10, 50, makecol(0, 0, 0), -1, "Joueur 2 tickets : %d", player_2.tickets);
+        textprintf_ex(contenu_ligne, font, 10, 30, makecol(0, 0, 0), -1, "Joueur 1 tickets : %d", player_1.tickets);
+        textprintf_ex(contenu_ligne, font, 10, 50, makecol(0, 0, 0), -1, "Joueur 2 tickets : %d", player_2.tickets);
 
         if (can_move) {
             move_player(&player_1, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT);
@@ -672,18 +720,18 @@ int main() {
         (frame_counter == 0) ? frame_counter += 4 : frame_counter;
 
         vsync();
-        blit(buffer, screen, 0, 0, 0, 0, buffer->w, buffer->h);
+        blit(contenu_ligne, screen, 0, 0, 0, 0, contenu_ligne->w, contenu_ligne->h);
     }
     rest(1000);
     if(player_1.tickets <= 0 || player_2.tickets <= 0){
-        //display a black screen and the winner on it until a key is pressed: 
+        //display a black screen and the winner on it until a key is pressed:
         if (player_1.tickets <= 0) {
-            textprintf_ex(buffer, font, 10, 10, makecol(255, 255, 255), -1, "Joueur 2 a gagne !");
+            textprintf_ex(contenu_ligne, font, 10, 10, makecol(255, 255, 255), -1, "Joueur 2 a gagne !");
         }
         else {
-            textprintf_ex(buffer, font, 10, 10, makecol(255, 255, 255), -1, "Joueur 1 a gagne !");
+            textprintf_ex(contenu_ligne, font, 10, 10, makecol(255, 255, 255), -1, "Joueur 1 a gagne !");
         }
-        blit(buffer, screen, 0, 0, 0, 0, buffer->w, buffer->h);
+        blit(contenu_ligne, screen, 0, 0, 0, 0, contenu_ligne->w, contenu_ligne->h);
     }
     rest(5000);
     readkey();

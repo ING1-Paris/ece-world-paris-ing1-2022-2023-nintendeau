@@ -580,7 +580,7 @@ void show_player(BITMAP * buffer, Player * player, BITMAP * anim_player_haut[4],
     clear(masked_sprite);
     stretch_blit(current_frame, masked_sprite, 0, 0, current_frame->w, current_frame->h, 0, 0, masked_sprite->w, masked_sprite->h);
 
-    // Apply the color filter 
+    // Apply the color filter
     int filter = player_color;
     set_trans_blender(0, 0, 0, 255);
     draw_lit_sprite(masked_sprite, masked_sprite, 0, 0, filter);

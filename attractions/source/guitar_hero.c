@@ -11,7 +11,7 @@
 
 
 typedef struct {
-    int temps;
+    double temps;
     int life;
     int id;
 } Player;
@@ -41,7 +41,7 @@ void free_memory(BITMAP * buffer, BITMAP * stage, BITMAP * logo, BITMAP * backgr
 void play_guitar(Note * note, int positions[4], SAMPLE * music);
 void show_start_menu_guitar_hero(BITMAP * buffer, BITMAP * title);
 
-int guitar_hero() {
+int guitar_hero(float scores[2]) {
 
     set_window_title("Guitar Hero");
 
@@ -68,7 +68,7 @@ int guitar_hero() {
     int frame_counter    = 0;
     int intervalle       = MAX_INTERVALLE;
     int liste_boutons[4] = {0};
-    int duration         = 0;
+    double duration       = 0;
     time_t start_time, end_time;
 
     int positions[NB_CORDES] = {stage->w/5, stage->w*2/5, stage->w*3/5, stage->w*4/5, };
@@ -191,6 +191,8 @@ int guitar_hero() {
                 gagnant = victory(player_1->temps, player_2->temps);
                 fin_partie(buffer, gagnant);
                 destroy_sample(music);
+                scores[0] = player_1->temps;
+                scores[1] = player_2->temps;
                 return gagnant;
             }
         }
