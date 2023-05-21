@@ -215,7 +215,6 @@ flowchart LR
     deplacerChevaux --> InitaliserVitesseAleatoire
     parisHippiques --> detecterLigneArrivee
     detecterLigneArrivee --> ChevalGagnant --> ChoixCheval -->afficherGagnant
-
 </div>
 
 ---
@@ -417,7 +416,6 @@ flowchart LR
 
 <div class="mermaid">
 %%{init: {'theme':'neutral'}}%%
-
 graph LR
     FloppyBird --> initialiserOiseau
     initialiserOiseau --> afficherOiseau
@@ -426,7 +424,6 @@ graph LR
     créerCollision --> detecterCollision
     detecterCollision --> afficherScore
     afficherScore --> afficherGagnant
-
 </div>
 
 
@@ -485,7 +482,6 @@ graph LR
     TheMaze --> deplacerPersonnage
     deplacerPersonnage --> detecterSortie
     detecterSortie --> afficherGagant
-    
 </div>
 
 ---
@@ -534,7 +530,6 @@ graph LR
 <br>
 <div class="mermaid">
 %%{init: {'theme':'neutral'}}%%
-
 graph LR
     TapeTaupe --> initialiserTapeTaupe
     initialiserTapeTaupe --> afficherTapeTaupe
@@ -543,7 +538,6 @@ graph LR
     detecterGagnant --> afficherGagnant
     afficherGagnant --> afficherScore
     afficherScore --> afficherGagnant
-
 </div>
 
 ---
@@ -592,7 +586,6 @@ graph LR
 <br>
 <div class="mermaid">
 %%{init: {'theme':'neutral'}}%%
-
 graph LR
     AttrapeChat --> initialiserAttrapeChat
     initialiserAttrapeChat --> afficherAttrapeChat
@@ -601,7 +594,6 @@ graph LR
     detecterGagnant --> afficherGagnant
     afficherGagnant --> afficherScore
     afficherScore --> afficherGagnant
-
 </div>
 
 ---
@@ -737,7 +729,6 @@ pie showData
     "Mathéo" : 20
     "Léon" : 30
     "Alfred" : 30
-    
 </div>
 
 ---
