@@ -220,7 +220,7 @@ flowchart LR
 # Fonctions
 ![bg right:50%](https://th.bing.com/th/id/OIP.55U-8PJe_zHnA7d7grEveQHaGO?pid=ImgDet&rs=1)
 
-- `int main` (tout  est regroupé dans le main)
+- `int main` (tout est regroupé dans le main)
 - `initialiserChoixCheval()`
 - `positionnerCheval()`
 - `deplacerChevaux()`
@@ -232,7 +232,7 @@ flowchart LR
 ---
 
 # Logigramme
-![bg right:40%](images/parishippiques.png)
+![bg right:40%](images/algorigramme_course_hippique.png)
 
 
 ---
@@ -302,7 +302,7 @@ flowchart LR
 ---
 
 # Logigramme
-![bg right:46%](images/snake.png)
+![bg right:46%](images/algorigramme_snake_image.png)
 
 
 
@@ -371,11 +371,10 @@ flowchart LR
 - `void afficherGagnant()`
 - `void afficherScore()`
 
-
 ---
 
 # Logigramme
-![bg right:42%](images/jackpot.png)
+![bg right:42%](images/algorigramme_jackpot_image.png)
 
 
 ---
@@ -687,8 +686,6 @@ _class: lead
 
 # Les slides suivantes ne seront pas présentées oralement lors de la soutenance mais doivent figurer dans la présentation. Nous les survolerons rapidement.
 
-
-
 ---
 
 # BILAN
@@ -711,8 +708,8 @@ Si vous deviez vous répartir des points, comment feriez-vous ?
 <div class="mermaid">
 %%{init: {'theme':'neutral'}}%%
 pie showData
-    "Shaïma" : 25
-    "Mathéo" : 15
+    "Shaïma" : 20
+    "Mathéo" : 20
     "Léon" : 30
     "Alfred" : 30
     
@@ -747,7 +744,6 @@ _class: lead
 
 # Schémas et Graphes
 
-Vous pouvez utiliser [Mermaid.js](https://mermaid.js.org/) pour générer des schémas. Regardez la documentation.
 
 ---
 
