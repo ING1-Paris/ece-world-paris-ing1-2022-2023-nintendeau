@@ -1,6 +1,6 @@
 ---
 marp: true
-theme: gaia
+theme: default
 paginate: true
 _paginate: false
 ---
@@ -733,8 +733,6 @@ pie showData
 
 
 
----
-
 <!--
 _class: lead
 -->
@@ -744,15 +742,21 @@ _class: lead
 
 # Schémas et Graphes
 
-![bg : 70%](./images/commit.jpeg)
-_footer: Comits et activités des membres de l'équipe
+![bg left : 70%](./images/commit.jpeg)
+Comits et activités des membres de l'équipe
 
 ---
-![bg : 70%](./images/frequence_code.jpeg)
+![bg left : 90%](./images/frequence_code.jpeg)
+
+# Comparaison entre l'ajout des éléments et leurs retraits
 
 ---
 
-![bg : 70%](./images/frequence_commit.jpeg)
+![bg right : 80%](./images/frequence_commit.jpeg)
+
+## Comparaison entre les commits et les ajouts de lignes de code dans une periode hebdomadaire
 
 ---
 # Merci de nous avoir écoutés !
+
+![bg right : é0%](./images/nintendeau.bmp)
