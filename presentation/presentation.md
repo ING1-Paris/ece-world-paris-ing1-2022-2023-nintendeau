@@ -1,6 +1,6 @@
 ---
 marp: true
-theme: projet
+theme: gaia
 paginate: true
 _paginate: false
 ---
@@ -703,7 +703,7 @@ _class: lead
     - *Pour certains jeux, les regles et les scores ne sont pas affichés mais c'est en route.*
 - `✅ 100%` Terminer les 9 jeux (jeu.c)
     - *Tous les jeux sont terminés.*
-- `✅ 100%` Relier la carte aux jeux (carte.c)
+- `✅ 100%` Relier la carte aux jeux (main.c)
     - *Les jeux sont reliés à la carte et s'executent normalement.*
 
 ---
