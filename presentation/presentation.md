@@ -74,9 +74,9 @@ Suite si ça ne tient pas sur une slide.
 
 Les jeux ont tous été enregistrés dans un dossier specialement créé pour eux nommé attractions. Chaque jeu est dans un fichier séparé où l'on retrouve les fonctions principales du jeu, les assets et les CMAKE.
 
-Les jeux prennent en parametres le solde de tickets de chaque joueur et leurs choix de jeux. Ils retournent le solde de tickets de chaque joueur à la fin de la partie.
+Les jeux prennent en parametres le solde de tickets de chaque joueur, les scores et les choix faits au debut de chaque partie.
 
-Pour lancer un jeu, il suffit de se diriger vers une des nombreuses maisons qui sont sur la map,les regles s'afficheront sur un parchemin, il suffira de cliquer sur espace pour executer le jeu.
+Pour lancer un jeu, il suffit de diriger son personnage vers l'une des nombreuses maisons presentes sur la carte, les regles seront affichées et il suffira de cliquer sur la barre espace pour executer le jeu.
 
 
 ---
@@ -87,7 +87,7 @@ Pour lancer un jeu, il suffit de se diriger vers une des nombreuses maisons qui 
 
 *Réalisé par : **Alfred** (100%)*
 
-- Il y'a 4 touches (A, Z, E, R) qui correspondent aux 4 cordes de la guitare.
+- Il y'a 4 touches (D, F, J, K) qui correspondent aux 4 cordes de la guitare.
 - Les notes tombent du haut de l'écran vers le bas.
 - Le joueur doit appuyer sur la touche correspondant à la note au bon moment.
 - Si le joueur appuie sur la touche au bon moment, il gagne un point.
@@ -128,22 +128,27 @@ Pour lancer un jeu, il suffit de se diriger vers une des nombreuses maisons qui 
 ### Tableaux
 
 - `struct Note notes[20]`
+
+
 ---
 
 ![bg right:40%](images/peche_canards.jpg)
 
+# GUITAR HERO
+
 ### Graphe d'appel
+
 <br>
 
 <div class="mermaid">
 %%{init: {'theme':'neutral'}}%%
 flowchart LR
+    GuitarHero --> initialiserNotes
     GuitarHero --> afficherNotes
     GuitarHero --> detecterAppuiTouche
     GuitarHero --> afficherScore
     GuitarHero --> afficherGagnant
-</div> GuitarHero --> initialiserNotes
-   
+</div>
 
 
 ---
@@ -185,16 +190,15 @@ flowchart LR
 <div class="mermaid">
 %%{init: {'theme':'neutral'}}%%
 flowchart LR
-    parisHippiques --> initialiserChoixCheval
-    initialiserChoixCheval --> positionnerCheval
+    parisHippiques --> initialiserChoixcheval
+    initialiserPosition --> positionnerCheval
     parisHippiques --> deplacerChevaux
-    deplacerChevaux --> detecterLigneArrivee
+    deplacerChevaux --> InitaliserVitesseAleatoire
+    parisHippiques --> detecterLigneArrivee
     detecterLigneArrivee --> ChevalGagnant
     ChevalGagnant --> afficherGagnant
-    afficherGagnant --> afficherScore
-    afficherScore --> afficherGagnant
-</div>
 
+</div>
 
 ---
 # Structures
@@ -230,7 +234,7 @@ flowchart LR
 ---
 ![bg right:40%](images/peche_canards.jpg)
 
-# Paris hippiques
+# Snake à 2 joueurs
 
 *Réalisé par : **Léon** (100%)*
 
@@ -316,10 +320,6 @@ flowchart LR
 - Si les 3 symboles sont identiques, le joueur gagne 1 ticket.
 - Si les 3 symboles sont différents, le joueur perd 1 ticket.
 
-
-
-
-
 ---
 
 ![bg right:40%](images/peche_canards.jpg)
@@ -380,21 +380,22 @@ flowchart LR
 ---
 ![bg right:40%](images/peche_canards.jpg)
 
-# Snake à 2 joueurs
+# JEUX BONUS
 
-*Réalisé par : **Léon** (100%)*
+## FloppyBird
 
--Le jeu se joue à deux joueurs.
--Il y a 5 tickets par joueur.
--Les 2 joueurs se voient attribuer chacun un serpent.
--Le but du jeu est de manger le plus de pommes possible tout en évitant de se mordre la queue, de se prendre un mur ou le corps du serpent adverse.
+*Réalisé par : **Shaïma** (100%)*
 
+- Le jeu se joue à 2 joueurs.
+- Le premier joueur pourra controler son oiseau grace à la touche espace, l'autre avec la touche entrée.
+- Le but du jeu sera de faire le plus grand score possible en essayant de ne pas se heurter aux obstacles.
+- Le gagnant se verra attribuer un ticket supplémentaire.
 
 ---
 
 ![bg right:40%](images/peche_canards.jpg)
 
-# Snake à 2 joueurs
+
 
 ### Graphe d'appel
 
@@ -402,31 +403,28 @@ flowchart LR
 
 <div class="mermaid">
 %%{init: {'theme':'neutral'}}%%
-flowchart LR
-    snake --> initialiserSerpent
-    initialiserSerpent --> afficherSerpent
-    snake --> deplacerSerpent
-    deplacerSerpent --> detecterCollision
-    detecterCollision --> afficherGagnant
-    afficherGagnant --> afficherScore
+
+graph LR
+    FloppyBird --> initialiserOiseau
+    initialiserOiseau --> afficherOiseau
+    FloppyBird --> deplacerOiseau
+    deplacerOiseau --> créerCollision
+    créerCollision --> detecterCollision
+    detecterCollision --> afficherScore
     afficherScore --> afficherGagnant
+
 </div>
 
 
 ---
 # Structures
 
-- `struct Serpent`
+- `struct Oiseau`
     - `int x`
     - `int y`
     - `int vitesse`
-    - `int direction`
-    - `int taille`
-    - `int estVivant`
-    - `int estAffiche`
-    - `int estMange`
-    - `int estMort`
-    
+    - `bool obstacletouche`
+
 
 ![bg right:40%](images/peche_canards.jpg)
 
@@ -435,14 +433,275 @@ flowchart LR
 # Fonctions
 ![bg right:40%](images/peche_canards.jpg)
 
-
-- `void initialiserSerpent()`
-- `void afficherSerpent()`
-- `void deplacerSerpent()`
+- `int main()` (tout est regroupé dans le main)
+- `void initialiserOiseau()`
+- `void afficherOiseau()`
+- `void deplacerOiseau()`
+- `void créerCollision()`
 - `void detecterCollision()`
 - `void afficherGagnant()`
 - `void afficherScore()`
 ---
+
+
+# Logigramme
+
+![bg right:40%](images/peche_canards.jpg)
+
+---
+
+![bg right:40%](images/peche_canards.jpg)
+
+# JEUX BONUS
+
+## The Maze
+![bg right:40%](images/peche_canards.jpg)
+
+*Réalisé par : **Alfred** (100%)*
+
+- Le jeu se joue à 2 joueurs.
+- Le premier joueur pourra controler son personnage grace aux touches ZQSD, l'autre avec les flèches directionnelles.
+- Le but du jeu sera de faire le plus grand score possible en essayant de ne pas se heurter aux murs mais de trouver la sortie du labyrinthe en premier.
+- Le gagnant se verra attribuer un ticket supplémentaire.
+
+---
+# Graphe d'appel
+
+<br>
+
+<div class="mermaid">
+%%{init: {'theme':'neutral'}}%%
+graph LR
+    TheMaze --> initialiserPersonnage
+    initialiserPersonnage --> afficherPersonnage
+    TheMaze --> deplacerPersonnage
+    deplacerPersonnage --> detecterSortie
+    detecterSortie --> afficherGagant
+    
+</div>
+
+---
+
+# Structures
+
+- `struct Personnage`
+    - `int x`
+    - `int y`
+    - `int vitesse`
+    - `bool estGagnant`
+
+![bg right:40%](images/peche_canards.jpg)
+
+---
+
+# Fonctions
+
+- `int main()` (tout est regroupé dans le main)
+- `void initialiserPersonnage()`
+- `void afficherPersonnage()`
+- `void deplacerPersonnage()`
+- `void detecterSortie()`
+- `void determinerGagnant()`
+
+![bg right:40%](images/peche_canards.jpg)
+
+---
+# Logigramme
+
+![bg right:40%](images/peche_canards.jpg)
+---
+
+![bg right:40%](images/peche_canards.jpg)
+# Tape taupe
+
+*Réalisé par : **Mathéo** (100%)*
+
+- Le jeu se joue à 2 joueurs.
+- Le joueur doit taper sur les taupes qui sortent du trou.
+- Le joueur gagne 1 point par taupe tapée.
+- Le joueur perd 1 point si il tape sur un trou vide.
+- Le joueur qui a le plus de points gagne 1 ticket.
+
+---
+![bg right:40%](images/peche_canards.jpg)
+
+# Graphe d'appel
+
+<br>
+<div class="mermaid">
+%%{init: {'theme':'neutral'}}%%
+
+graph LR
+    TapeTaupe --> initialiserTapeTaupe
+    initialiserTapeTaupe --> afficherTapeTaupe
+    TapeTaupe --> taperTaupe
+    taperTaupe --> detecterGagnant
+    detecterGagnant --> afficherGagnant
+    afficherGagnant --> afficherScore
+    afficherScore --> afficherGagnant
+
+</div>
+
+---
+
+# Structures
+
+- `struct TapeTaupe`
+    - `int x`
+    - `int y`
+    - `bool estVivant`
+    - `bool estTape`
+    - `bool Gagnant`
+    - `int score`
+
+![bg right:40%](images/peche_canards.jpg)
+
+---
+
+# Fonctions
+
+- `int main()` (tout est regroupé dans le main)
+- `void initialiserTapeTaupe()`
+- `void afficherTapeTaupe()`
+- `void taperTaupe()`
+- `void detecterGagnant()`
+- `void afficherGagnant()`
+- `void afficherScore()`
+---
+
+
+# Logigramme
+
+![bg right:40%](images/peche_canards.jpg)
+
+---
+# Attrape Chat (TAG)
+![bg right:40%](images/peche_canards.jpg)
+
+*Réalisé par : **Léon** (100%)*
+
+- Le jeu se joue à 2 joueurs.
+- Le joueur doit attraper la souris (aka le joueur adverse) qui se déplace sur la carte.
+- Le joueur gagne 1 point si il attrape la souris.
+- Le joueur qui reussit à attraper la souris gagne.
+
+---
+# Graphe d'appel
+
+<br>
+<div class="mermaid">
+%%{init: {'theme':'neutral'}}%%
+
+graph LR
+    AttrapeChat --> initialiserAttrapeChat
+    initialiserAttrapeChat --> afficherAttrapeChat
+    AttrapeChat --> attraperChat
+    attraperChat --> detecterGagnant
+    detecterGagnant --> afficherGagnant
+    afficherGagnant --> afficherScore
+    afficherScore --> afficherGagnant
+
+</div>
+
+---
+
+# Structures
+
+- `struct AttrapeChat`
+    - `int x`
+    - `int y`
+    - `bool estAttrape`
+    - `bool Gagnant`
+    - `int score`
+    - `int ticket`
+
+![bg right:40%](images/peche_canards.jpg)
+
+---
+# Fonctions
+
+- `int main()` (tout est regroupé dans le main)
+- `void initialiserAttrapeChat()`
+- `void afficherAttrapeChat()`
+- `void attraperChat()`
+- `void detecterGagnant()`
+- `void afficherGagnant()`
+- `void afficherScore()`
+
+![bg right:40%](images/peche_canards.jpg)
+
+---
+
+# Logigramme
+![bg right:40%](images/peche_canards.jpg)
+
+---
+
+# GEOMETRY DASH
+
+![bg right:40%](images/peche_canards.jpg)
+
+*Réalisé par : **Alfred** (100%)*
+
+- Le jeu se joue à 2 joueurs.
+- Les joueurs pourront controler leurs cubes grace à la barre espace et la fleche directionnelle du haut.
+- Le but du jeu sera de faire le plus grand score possible en essayant de ne pas se heurter aux obstacles.
+- Le gagnant se verra attribuer un ticket supplémentaire.
+
+---
+
+# Graphe d'appel
+![bg right:40%](images/peche_canards.jpg)
+
+<br>
+<div class="mermaid">
+%%{init: {'theme':'neutral'}}%%
+graph LR
+    GeometryDash --> initialiserCube
+    initialiserCube --> afficherCube
+    GeometryDash --> deplacerCube
+    deplacerCube --> detecterCollision
+    detecterCollision --> afficherScore
+    afficherScore --> afficherGagnant
+    afficherGagnant --> afficherScore
+</div>
+
+---
+
+# Fonctions
+
+![bg right:40%](images/peche_canards.jpg)
+
+- `void initaliserCube()`
+- `void afficherCube()`
+- `void deplacerCube()`
+- `void detecterCollision()`
+- `void afficherScore()`
+- `void afficherGagnant()`
+
+---
+
+# Structures 
+
+![bg right:40%](images/peche_canards.jpg)
+
+- `struct Cube`
+    - `int x`
+    - `int y`
+    - `int vitesse`
+    - `bool estMort`
+    - `bool estGagnant`
+    - `int score`
+    - `int ticket`
+
+---
+# Logigramme
+
+![bg right:40%](images/peche_canards.jpg)
+
+---
+
+
 <!--
 _class: lead
 -->
@@ -491,13 +750,55 @@ pie showData
 | Snake | 100% | - |
 | Jackpot | 100% | - |
 | Floppybird | 90% | Jeu totalement fonctionnel, seul petit soucis avec la marge de collision entre l'obstacle et l'oiseau  |
-| The Maze | -% | pas plus d'infos |
+| The Maze | 100% | - |
 | Tape-taupe | 100% | - |
 | Geometry dash | -% | pas plus d'infos |
-| Attrape Chat | -% | pas plus d'infos |
+| TAG | 100% | - |
 
 
+
+---
 
 <!--
 _class: lead
 -->
+# Quelques éléments que vous pouvez utiliser à votre guise dans votre présentation
+
+---
+
+# Schémas et Graphes
+
+Vous pouvez utiliser [Mermaid.js](https://mermaid.js.org/) pour générer des schémas. Regardez la documentation.
+
+---
+
+# Slide avec du code
+
+
+```C
+for(int i = 0; i < 5; i++) {
+    printf("%d ", i);
+}
+```
+
+> 0 1 2 3 4 
+
+
+---
+
+# Emojis
+
+https://gist.github.com/rxaviers/7360908
+
+---
+
+# Thème 
+
+Vous pouvez personnaliser l'affichage de votre présentation avec le langage CSS en modifiant le fichier `theme.css`.
+
+---
+
+# Export PDF
+
+Depuis récemment, l'export (**`Export Slide Deck...`**) en PDF oublie parfois des éléments. 
+Si c'est le cas, nous vous conseillons d'exporter en fichier PowerPoint (pptx), puis de l'exporter en PDF depuis PowerPoint.
