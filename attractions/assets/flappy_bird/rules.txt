@@ -1,5 +1,5 @@
 MES SUPER REGLES : 
 - 2 joueurs, 2 oiseaux le but ? esquiver le plus d'obstacles possible en passant entre les tuyaux.
-- Le joueur 1 controle son oiseau à l'aide de la touche ESPACE, tandis que le second le controle grace à la touche ENTREE.
+- Le joueur 1 controle son oiseau à l'aide de la touche ESPACE, tandis que le second le controle avec la touche ENTREE.
 - La personne avec le plus gros score se verra attribuer un ticket supplémentaire.
 BONNE CHANCE :D
