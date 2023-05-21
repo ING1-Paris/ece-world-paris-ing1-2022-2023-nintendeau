@@ -712,9 +712,9 @@ Matheo : projet amusant et interessant / grande comprehension de Github et de la
 
 Shaima : Super projet / Très bonne communication et cohésion /Très bon moyen d’apprendre et de consolider ses acquis en C
 
-Leon :
+Leon : Beaucoup de plaisir à travailler sur ce projet / Manque de temps global pour implémenter les jeux des autres / Bonne cohésion d'équipe
 
-Alfred :
+Alfred : Projet très ressourçant / Intéressant et instructif sur les librairies graphiques / Collaboration Git très efficace / Bon travail d'équipe
 
 ---
 
@@ -735,7 +735,7 @@ pie showData
 
 # Récapitulatif des jeux
 
-| Jeu | Avancement | Problèmes / reste |
+| Jeu | Avancement | Problèmes / reste |  
 | --- | --- | --- |
 | Paris hippiques | 100% | - |
 | Guitar Hero | 100% | - |
@@ -744,8 +744,9 @@ pie showData
 | Floppybird | 100% | - |
 | The Maze | 100% | - |
 | Tape-taupe | 100% | - |
-| Geometry dash | 100% | - |
-| TAG | 100% | - |
+| Geometry dash | 100% | - | 
+| Attrape-chat | 100% | SAUT MURAL BIZARRE|
+
 
 
 
