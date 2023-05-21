@@ -453,7 +453,7 @@ void wait_to_quit() {
 
 
 int check_victory(Player * player_1, Player * player_2, time_t start_time, time_t end_time, BITMAP * buffer, SAMPLE * win_music, SAMPLE * music, int * temps) {
-
+    int winner = 0;
     //* Si un des joueurs arrive à la fin du labyrinthe, on affiche le temps qu'il a mis pour le finir
     if (player_1->x <= CELL_SIZE && player_1->y <= CELL_SIZE || player_2->x <= CELL_SIZE && player_2->y <= CELL_SIZE) {
         stop_sample(music);
@@ -463,11 +463,11 @@ int check_victory(Player * player_1, Player * player_2, time_t start_time, time_
 
         if (player_1->x <= CELL_SIZE && player_1->y <= CELL_SIZE) {
             textprintf_ex(screen, font, 500, 400, makecol(255, 255, 255), -1, "PLAYER 1 WINS : %d s", *temps);
-            return 1;
+            winner = 1;
         }
         else {
             textprintf_ex(screen, font, 500, 400, makecol(255, 255, 255), -1, "PLAYER 2 WINS : %d s", *temps);
-            return 2;
+            winner = 2;
         }
 
         wait_to_quit();
@@ -479,7 +479,8 @@ int check_victory(Player * player_1, Player * player_2, time_t start_time, time_
         (*temps) = (int)difftime(end_time, start_time);
         textprintf_ex(buffer, font, 900, 200, makecol(255, 255, 255), -1, "TEMPS : %d s", *temps);
     }
-    return 0;
+
+    return winner;
 }
 
 

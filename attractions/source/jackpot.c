@@ -4,10 +4,11 @@
 
 #include "../header/jackpot.h"
 #include "../header/loader.h"
+#include "../header/player.h"
 
 #define MAX_IMAGES_CASE 3
 
-int jackpot(Playerh* player)
+int jackpot(Player* player)
 {
     srand(time(NULL));
     int cblanc, crouge, cbleu, cvert, cviolet, cnoir;

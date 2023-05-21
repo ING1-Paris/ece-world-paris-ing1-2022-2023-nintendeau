@@ -15,6 +15,7 @@
 #include <Allegro.h>
 
 #include "attractions/header/loader.h"
+#include "attractions/header/player.h"
 
 #include "attractions/header/tag.h"
 #include "attractions/header/geometry_dash.h"
@@ -25,20 +26,6 @@
 #include "attractions/header/tape_taupe.h"
 #include "attractions/header/jackpot.h"
 #include "attractions/header/flappy_bird.h"
-
-//#define PLAYER2_FILTER makecol(127, 0, 0)   // Red filter for player 2
-
-// Structure Player qui contient les informations du joueur
-typedef struct {
-    int x, y;
-    int number;
-    int previous_x, previous_y;
-    int direction, speed;
-    int score, tickets;
-    int leader;
-    BITMAP * sprite;
-    int color;
-} Player;
 
 // fonction pour ecrire le meilleur score dans le fichier "meilleurs_scores.txt"
 void ecrire_best_score(float * scores, char * game) {
@@ -110,9 +97,48 @@ void ecrire_best_score(float * scores, char * game) {
     rename("../attractions/assets/temp.txt", "../attractions/assets/best_scores.txt");
 }
 
+void welcome_screen() {
+    int alpha = 0;
+    int direction = 1;
+    BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H);
+    BITMAP* bmp = image_loader("attractions/assets/nintendeau.bmp");
+    SAMPLE* intro_sound = sound_loader("attractions/assets/intro.wav");
+    bool do_once = false;
 
-void afficher_regles(BITMAP* regles, BITMAP* contenu_ligne, const char* file_name) {
-    masked_stretch_blit(regles, contenu_ligne, 0, 0, regles->w, regles->h, 0, 0, SCREEN_W, SCREEN_H);
+    while (1) {
+        clear_to_color(buffer, makecol(0, 0, 0));
+        set_trans_blender(0, 0, 0, alpha);
+        draw_trans_sprite(buffer, bmp, 0, 0);
+        alpha += direction * 4;
+        rest(10);  // Adjust the rest time to control the fade speed
+
+        // Copy the buffer to the screen
+        acquire_screen();
+        blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+        release_screen();
+        //play sample only once 
+        vsync();
+
+        if (alpha >= 130 && !do_once) {
+            play_sample(intro_sound, 255, 128, 1000, 0);
+            do_once = true;
+        }
+        if (alpha >= 255) {
+            direction = -1;  // Start fading out
+        }
+        if (alpha <= 0) {
+            break;  // Fading effect complete, exit the loop
+        }
+    }
+
+    destroy_bitmap(buffer);
+    destroy_bitmap(bmp);
+    destroy_sample(intro_sound);
+}
+
+
+void afficher_regles(BITMAP* regles, BITMAP* buffer, const char* file_name) {
+    masked_stretch_blit(regles, buffer, 0, 0, regles->w, regles->h, 0, 0, SCREEN_W, SCREEN_H);
     // Fetch rules from file and display them (location: attractions/assets/(game_name)/rules.txt)
     char filepath[200];
     snprintf(filepath, sizeof(filepath), "attractions/assets/%s/rules.txt", file_name);
@@ -124,7 +150,7 @@ void afficher_regles(BITMAP* regles, BITMAP* contenu_ligne, const char* file_nam
     while (fgets(line, sizeof(line), file) != NULL) {
         //remove the ^ at the end of the line
         line[strlen(line) - 1] = '\0';
-        textout_ex(contenu_ligne, font, line, 200, y, makecol(0, 0, 0), -1);
+        textout_ex(buffer, font, line, 200, y, makecol(0, 0, 0), -1);
         y += 20;
     }
 
@@ -132,18 +158,20 @@ void afficher_regles(BITMAP* regles, BITMAP* contenu_ligne, const char* file_nam
 }
 
 
-void show_ending_screen(BITMAP * contenu_ligne, BITMAP * ending_screen) {
-    masked_stretch_blit(ending_screen, contenu_ligne, 0, 0, ending_screen->w, ending_screen->h, 0, 0, SCREEN_W, SCREEN_H);
-    textout_ex(contenu_ligne, font, "Appuyez sur ECHAP pour quitter", 550, 600, makecol(0, 0, 0), -1);
-    //blit(contenu_ligne, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+void show_ending_screen(BITMAP * buffer, BITMAP * ending_screen, SAMPLE * music_main) {
+    masked_stretch_blit(ending_screen, buffer, 0, 0, ending_screen->w, ending_screen->h, 0, 0, SCREEN_W, SCREEN_H);
+    textout_ex(buffer, font, "Appuyez sur ECHAP pour quitter", 550, 600, makecol(0, 0, 0), -1);
+    //blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
     if (key[KEY_ESC]) {
+        stop_sample(music_main);
+        welcome_screen();
         allegro_exit();
         exit(EXIT_SUCCESS);
     }
 }
 
 
-void check_collision_main(Player * player, Player * player_2, BITMAP * calque_collisions, BITMAP * player_sprite_1, SAMPLE * music_main, BITMAP * regles, BITMAP * contenu_ligne, BITMAP * ending_screen, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4], float scores[2]) {
+void check_collision_main(Player * player, Player * player_2, BITMAP * calque_collisions, BITMAP * player_sprite_1, SAMPLE * music_main, BITMAP * regles, BITMAP * buffer, BITMAP * ending_screen, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4], float scores[2]) {
 
     int active = 0;
 
@@ -202,7 +230,7 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
                 game = "flappy_bird";
             }
             else if (color_array[i] == sortie_color) {
-                show_ending_screen(contenu_ligne, ending_screen);
+                show_ending_screen(buffer, ending_screen, music_main);
             }
             else {
                 game = "none";
@@ -214,7 +242,7 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
                 player->y = y;
             }// si le joueur est sur un jeu, on lance l'attraction correspondante
             else if (color_array[i] != ground && color_array[i] != sortie_color && player->leader) {
-                afficher_regles(regles, contenu_ligne, game);
+                afficher_regles(regles, buffer, game);
                 if (key[KEY_SPACE]) {
                     stop_sample(music_main);
                     if (strcmp(game, "palais_des_glaces") == 0) {
@@ -283,10 +311,10 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
                     if (strcmp(game, "jackpot") == 0) {
                         printf("jackpot\n");
                         if (player->leader) {
-                            jackpot(&player);
+                            jackpot((Player**)&player);
                         }
                         else if (!player->leader) {
-                            jackpot(&player_2);
+                            jackpot((Player**)&player_2);
                         }
                     }
 
@@ -322,13 +350,13 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
 }
 
 
-void afficher_score(BITMAP * score_image, BITMAP * contenu_ligne, Player player) {
-    masked_stretch_blit(score_image, contenu_ligne, 0, 0, score_image->w, score_image->h, 0, 0, SCREEN_W, SCREEN_H);
-    textprintf_ex(contenu_ligne, font, SCREEN_W/2, SCREEN_H/2, makecol(0, 0, 0), -1, "Score: %d", player.score);
+void afficher_score(BITMAP * score_image, BITMAP * buffer, Player player) {
+    masked_stretch_blit(score_image, buffer, 0, 0, score_image->w, score_image->h, 0, 0, SCREEN_W, SCREEN_H);
+    textprintf_ex(buffer, font, SCREEN_W/2, SCREEN_H/2, makecol(0, 0, 0), -1, "Score: %d", player.score);
 }
 
 
-void display_player(Player player, BITMAP* contenu_ligne, int frame_counter, BITMAP* anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4]) {
+void display_player(Player player, BITMAP* buffer, int frame_counter, BITMAP* anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4]) {
     // Select the appropriate animation array based on the direction
     BITMAP ** animation_array;
     if (player.direction == 1) {
@@ -374,26 +402,26 @@ void display_player(Player player, BITMAP* contenu_ligne, int frame_counter, BIT
     draw_lit_sprite(masked_sprite, masked_sprite, 0, 0, filter);
 
     // Draw the masked sprite
-    masked_blit(masked_sprite, contenu_ligne, 0, 0, player.x, player.y, masked_sprite->w, masked_sprite->h);
+    masked_blit(masked_sprite, buffer, 0, 0, player.x, player.y, masked_sprite->w, masked_sprite->h);
 
     // Destroy the temporary bitmap
     destroy_bitmap(masked_sprite);
 }
 
 
-void afficher_map(BITMAP * titre, BITMAP * contenu_ligne, BITMAP * map, BITMAP * player_sprite_1, BITMAP * player_sprite_2, Player player_1, Player player_2, int * can_move, BITMAP * score_image, BITMAP * calque_collisions, BITMAP * contenu_ligne_texte, int frame_counter, BITMAP * anim_player_haut[4], BITMAP * anim_player_bas[4], BITMAP * anim_player_gauche[4], BITMAP * anim_player_droite[4]) {
+void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player_sprite_1, BITMAP * player_sprite_2, Player player_1, Player player_2, int * can_move, BITMAP * score_image, BITMAP * calque_collisions, BITMAP * buffer_texte, int frame_counter, BITMAP * anim_player_haut[4], BITMAP * anim_player_bas[4], BITMAP * anim_player_gauche[4], BITMAP * anim_player_droite[4]) {
 
-    clear_bitmap(contenu_ligne);
-    clear_to_color(contenu_ligne_texte, makecol(255, 0, 255));
-    stretch_blit(calque_collisions, contenu_ligne, 0, 0, calque_collisions->w, calque_collisions->h, 0, 0, contenu_ligne->w, contenu_ligne->h);
-    stretch_blit(map, contenu_ligne, 0, 0, map->w, map->h, 0, 0, contenu_ligne->w, contenu_ligne->h);
+    clear_bitmap(buffer);
+    clear_to_color(buffer_texte, makecol(255, 0, 255));
+    stretch_blit(calque_collisions, buffer, 0, 0, calque_collisions->w, calque_collisions->h, 0, 0, buffer->w, buffer->h);
+    stretch_blit(map, buffer, 0, 0, map->w, map->h, 0, 0, buffer->w, buffer->h);
 
     //Animation du joueur :
-    display_player(player_1, contenu_ligne, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
-    display_player(player_2, contenu_ligne, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
+    display_player(player_1, buffer, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
+    display_player(player_2, buffer, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
 
-    masked_stretch_blit(titre, contenu_ligne, 0, 0, titre->w, titre->h, SCREEN_W/2 - titre->w/1.35, SCREEN_H/2 - titre->h*1.5, titre->w*1.5, titre->h*1.5);
-    masked_blit(contenu_ligne_texte, contenu_ligne, 0, 0, 0, 0, contenu_ligne_texte->w, contenu_ligne_texte->h);
+    masked_stretch_blit(titre, buffer, 0, 0, titre->w, titre->h, SCREEN_W/2 - titre->w/1.35, SCREEN_H/2 - titre->h*1.5, titre->w*1.5, titre->h*1.5);
+    masked_blit(buffer_texte, buffer, 0, 0, 0, 0, buffer_texte->w, buffer_texte->h);
 
     // enlever le titre si la souris est clique
     if (key[KEY_SPACE] || mouse_b & 1) {
@@ -403,8 +431,8 @@ void afficher_map(BITMAP * titre, BITMAP * contenu_ligne, BITMAP * map, BITMAP *
 
     // afficher le score si le joueur est sur la case "score"
     if (940 < player_1.x && player_1.x < 1000 && 100 < player_1.y && player_1.y < 200 || 940 < player_2.x && player_2.x < 1000 && 100 < player_2.y && player_2.y < 200) {
-        afficher_score(score_image, contenu_ligne_texte, player_1);
-        afficher_score(score_image, contenu_ligne_texte, player_2);
+        afficher_score(score_image, buffer_texte, player_1);
+        afficher_score(score_image, buffer_texte, player_2);
     }
 }
 
@@ -428,18 +456,75 @@ void move_player(Player * player, int UP, int DOWN, int LEFT, int RIGHT) {
     }
 }
 
-
-int choose_player_color(Player * player){
-    BITMAP* contenu_ligne = create_bitmap(SCREEN_W, SCREEN_H); // Double contenu_ligne for smooth rendering
+int choose_player_name_color(Player * player){
+    BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H); // Double buffer for smooth rendering
     BITMAP* player_sprite = image_loader("attractions/assets/tag/player_1.bmp");
     BITMAP * masked_sprite = create_bitmap(player_sprite->w, player_sprite->h);
+
+    clear_to_color(buffer, makecol(0, 0, 0));
+
     int color = 0;
-    char inputText[9 + 1] = {0}; // contenu_ligne to store user input
+    char inputText[9 + 1] = {0}; // Buffer to store user input
     int textLength = 0; // Current length of the input text
     int r, g, b; // RGB color values
     bool colorSet = false; // Flag to indicate if the color is set
 
+    char nameText[100] = ""; // Buffer to store the entered name
+    int nameLength = 0;  // Length of the entered name
+    char name[100] = ""; // Name of the player
+
     bool done = false;
+
+    while (!done) 
+    {
+        clear_to_color(buffer, makecol(0, 0, 0));
+
+        if (keypressed())
+        {
+            int keyPressed = readkey();
+
+            if (keyPressed >> 8 == KEY_ENTER) { // Enter key to quit
+                done = true;
+                break;
+            }
+
+            if (keyPressed >> 8 == KEY_BACKSPACE) // Delete the last character when Backspace is pressed
+            {
+                if (nameLength > 0)
+                {
+                    nameLength--;
+                    nameText[nameLength] = '\0';
+                }
+            }
+            else // Add the typed character to the name
+            {
+                char newChar = keyPressed & 0xFF;
+
+                if (nameLength < sizeof(name) - 1)
+                {
+                    nameText[nameLength] = newChar;
+                    nameLength++;
+                    nameText[nameLength] = '\0';
+                }
+            }
+        }
+
+        // Draw the entered name on the screen
+        textprintf_centre_ex(buffer, font, SCREEN_W / 2, SCREEN_H / 2 - 30, makecol(255, 255, 255), -1, "Player %d, Choisissez votre nom (Validez en appuyant sur ENTER): ", player->number);
+        textout_ex(buffer, font, nameText, SCREEN_W / 2, SCREEN_H / 2, makecol(255, 255, 255), -1);
+        blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+
+        //Quick way to escape player color selection
+        if (key[KEY_ESC]) {
+            done = true;
+            strcpy(nameText, (player->number == 1) ? "Player 1" : "Player 2");
+        }
+    }
+
+    strcpy(name, nameText);
+    strcpy(player->name, name);
+
+    done = false;
 
     while (!done) {
         while (keypressed()) {
@@ -461,8 +546,8 @@ int choose_player_color(Player * player){
             }
         }
 
-        clear_to_color(contenu_ligne, makecol(0, 0, 0));
-
+        clear_to_color(buffer, makecol(0, 0, 0));
+        
        // Display the entered numbers with slashes
         char formattedText[9 + 3] = {0};
         if (textLength >= 1) {
@@ -500,8 +585,8 @@ int choose_player_color(Player * player){
         }
 
         // Display the text and the num of the player
-        textprintf_centre_ex(contenu_ligne, font, SCREEN_W / 2, SCREEN_H / 2 - 30, makecol(255, 255, 255), -1, "Joueur %d, Choisissez la couleur de votre personnage (Valeur RGB 0-255/0-255/0-255)", player->number);
-        textout_centre_ex(contenu_ligne, font, formattedText, SCREEN_W / 2, SCREEN_H / 2 - 10, makecol(255, 255, 255), -1);
+        textprintf_centre_ex(buffer, font, SCREEN_W / 2, SCREEN_H / 2 - 30, makecol(255, 255, 255), -1, "%s, Choisissez la couleur de votre personnage (Valeur RGB 0-255/0-255/0-255)", player->name);
+        textout_centre_ex(buffer, font, formattedText, SCREEN_W / 2, SCREEN_H / 2 - 10, makecol(255, 255, 255), -1);
 
         if (textLength == 9) {
             // Extract the RGB values from the input text
@@ -533,11 +618,11 @@ int choose_player_color(Player * player){
             draw_lit_sprite(masked_sprite, masked_sprite, 0, 0, filter);
 
             // Draw the masked sprite
-            masked_blit(masked_sprite, contenu_ligne, 0, 0, SCREEN_W/2, SCREEN_H/2, masked_sprite->w, masked_sprite->h);
+            masked_blit(masked_sprite, buffer, 0, 0, SCREEN_W/2, SCREEN_H/2, masked_sprite->w, masked_sprite->h);
         }
 
-        // Blit the contenu_ligne to the screen
-        blit(contenu_ligne, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+        // Blit the buffer to the screen
+        blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 
         vsync();
 
@@ -551,43 +636,12 @@ int choose_player_color(Player * player){
     }
 
     destroy_bitmap(masked_sprite);
-    destroy_bitmap(contenu_ligne);
+    destroy_bitmap(buffer);
     destroy_bitmap(player_sprite);
     return color;
 }
 
 
-void welcome_screen() {
-    int alpha = 0;
-    int direction = 1;
-    BITMAP* contenu_ligne = create_bitmap(SCREEN_W, SCREEN_H);
-    BITMAP* bmp = image_loader("attractions/assets/nintendeau.bmp");
-
-    while (1) {
-        clear_to_color(contenu_ligne, makecol(0, 0, 0));
-        set_trans_blender(0, 0, 0, alpha);
-        draw_trans_sprite(contenu_ligne, bmp, 0, 0);
-        alpha += direction * 4;
-        rest(10);  // Adjust the rest time to control the fade speed
-
-        // Copy the contenu_ligne to the screen
-        acquire_screen();
-        blit(contenu_ligne, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
-        release_screen();
-
-        vsync();
-
-        if (alpha >= 255) {
-            direction = -1;  // Start fading out
-        }
-        if (alpha <= 0) {
-            break;  // Fading effect complete, exit the loop
-        }
-    }
-
-    destroy_bitmap(contenu_ligne);
-    destroy_bitmap(bmp);
-}
 
 //! fonction principale
 int main() {
@@ -617,8 +671,8 @@ int main() {
     int scores[2]     = {0, 0};
 
     //! CHARGEMENT DES BITMAPS
-    BITMAP * contenu_ligne_texte      = create_bitmap(SCREEN_W, SCREEN_H);
-    BITMAP * contenu_ligne            = create_bitmap(SCREEN_W, SCREEN_H);
+    BITMAP * buffer_texte      = create_bitmap(SCREEN_W, SCREEN_H);
+    BITMAP * buffer            = create_bitmap(SCREEN_W, SCREEN_H);
     BITMAP * calque_collisions = image_loader("attractions/assets/collision_v3.bmp");
     BITMAP * player_sprite_1   = image_loader("attractions/assets/palais_des_glaces/player_1.bmp");
     BITMAP * player_sprite_2   = image_loader("attractions/assets/palais_des_glaces/player_2.bmp");
@@ -681,28 +735,31 @@ int main() {
     player_2.tickets = 5;
 
     welcome_screen();
-    player_1.color =  choose_player_color(&player_1);
-    player_2.color =  choose_player_color(&player_2);
+    player_1.color =  choose_player_name_color(&player_1);
+    player_2.color =  choose_player_name_color(&player_2);
 
     //Musique du menu
     play_sample(music_main, 255, 128, 1000, 1);
 
     //& boucle principale du menu (carte du parc)
-    while (!key[KEY_M]) {
-
-        afficher_map(titre, contenu_ligne, map, player_sprite_1, player_sprite_2, player_1, player_2, &can_move, score_image, calque_collisions, contenu_ligne, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
-        check_collision_main(&player_2, &player_1, calque_collisions, player_sprite_2, music_main, regles, contenu_ligne, ending_screen, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, scores);
-        check_collision_main(&player_1, &player_2, calque_collisions, player_sprite_1, music_main, regles, contenu_ligne, ending_screen, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, scores);
+    while (!key[KEY_P]) {
+        afficher_map(titre, buffer, map, player_sprite_1, player_sprite_2, player_1, player_2, &can_move, score_image, calque_collisions, buffer, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
+        //afficher le nom des joueurs au dessus de leur tête
+        textprintf_ex(buffer, font, player_1.x - 10, player_1.y - 20, player_1.color, -1, "%s", player_1.name);
+        textprintf_ex(buffer, font, player_2.x - 10, player_2.y - 20, player_2.color, -1, "%s", player_2.name);
+        
+        check_collision_main(&player_2, &player_1, calque_collisions, player_sprite_2, music_main, regles, buffer, ending_screen, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, scores);
+        check_collision_main(&player_1, &player_2, calque_collisions, player_sprite_1, music_main, regles, buffer, ending_screen, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, scores);
 
         // afficher le leader
         if (player_1.leader)
-            textprintf_ex(contenu_ligne, font, 10, 10, makecol(0, 0, 0), -1, "Joueur 1 leader");
+            textprintf_ex(buffer, font, 10, 10, makecol(0, 0, 0), -1, "%s leader", player_1.name);
         if (player_2.leader)
-            textprintf_ex(contenu_ligne, font, 10, 10, makecol(0, 0, 0), -1, "Joueur 2 leader");
+            textprintf_ex(buffer, font, 10, 10, makecol(0, 0, 0), -1, "%s leader", player_2.name);
 
         // afficher le nombre de tickets
-        textprintf_ex(contenu_ligne, font, 10, 30, makecol(0, 0, 0), -1, "Joueur 1 tickets : %d", player_1.tickets);
-        textprintf_ex(contenu_ligne, font, 10, 50, makecol(0, 0, 0), -1, "Joueur 2 tickets : %d", player_2.tickets);
+        textprintf_ex(buffer, font, 10, 30, makecol(0, 0, 0), -1, "%s tickets : %d",player_1.name, player_1.tickets);
+        textprintf_ex(buffer, font, 10, 50, makecol(0, 0, 0), -1, "%s tickets : %d",player_2.name, player_2.tickets);
 
         if (can_move) {
             move_player(&player_1, KEY_UP, KEY_DOWN, KEY_LEFT, KEY_RIGHT);
@@ -720,20 +777,20 @@ int main() {
         (frame_counter == 0) ? frame_counter += 4 : frame_counter;
 
         vsync();
-        blit(contenu_ligne, screen, 0, 0, 0, 0, contenu_ligne->w, contenu_ligne->h);
+        blit(buffer, screen, 0, 0, 0, 0, buffer->w, buffer->h);
     }
-    rest(1000);
     if(player_1.tickets <= 0 || player_2.tickets <= 0){
-        //display a black screen and the winner on it until a key is pressed:
+        rest(1000);
+        //display a black screen and the winner on it until a key is pressed: 
         if (player_1.tickets <= 0) {
-            textprintf_ex(contenu_ligne, font, 10, 10, makecol(255, 255, 255), -1, "Joueur 2 a gagne !");
+            textprintf_ex(buffer, font, 10, 10, makecol(255, 255, 255), -1, "%s a gagne !", player_2.name);
         }
         else {
-            textprintf_ex(contenu_ligne, font, 10, 10, makecol(255, 255, 255), -1, "Joueur 1 a gagne !");
+            textprintf_ex(buffer, font, 10, 10, makecol(255, 255, 255), -1, "%s a gagne !", player_1.name);
         }
-        blit(contenu_ligne, screen, 0, 0, 0, 0, contenu_ligne->w, contenu_ligne->h);
+        blit(buffer, screen, 0, 0, 0, 0, buffer->w, buffer->h);
+        rest(5000);
     }
-    rest(5000);
     readkey();
 
     allegro_exit();

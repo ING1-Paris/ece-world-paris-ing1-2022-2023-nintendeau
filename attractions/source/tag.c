@@ -95,7 +95,7 @@ int tag(int player_color1, int player_color2, BITMAP * anim_player_haut[4], BITM
     BITMAP *cheminee2 = image_loader("attractions/assets/tag/cheminee2.bmp");
     BITMAP *torche1   = image_loader("attractions/assets/tag/torche1.bmp");
     BITMAP *torche2   = image_loader("attractions/assets/tag/torche2.bmp");
-    SAMPLE *jump      = sound_loader("attractions/assets/tag/jump.wav");
+    SAMPLE *jump      = sound_loader("attractions/assets/tag/jump1.wav");
     SAMPLE *music     = sound_loader("attractions/assets/tag/music.wav");
 
     play_sample(music, 255, 127, 1000, 1);
