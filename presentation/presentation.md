@@ -28,6 +28,20 @@ _footer: Algorithmique Avancée et Bibliothèque Graphique - 2022-2023
 
 ---
 
+# Sommaire
+- Thème et Carte 
+- Organisation des jeux
+- Guitar Hero
+- Paris Hippiques
+- Snake
+- Jackpot
+- Floppy Bird
+- The Maze
+- Tape Taupe
+- Geometry Dash
+- Bilan
+---
+
 # Equipe Nintendeau
 
 ![bg right:60%](./images/nintendeau.bmp)
