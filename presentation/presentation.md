@@ -24,15 +24,13 @@ _footer: Algorithmique Avancée et Bibliothèque Graphique - 2022-2023
 **ING1** Projet d'informatique
 
 
-# ECE World
-
-Nintendeau
+# ECE World, by Nintendeau
 
 ---
 
 # Equipe Nintendeau
 
-![bg :50%](./images/nintendeau.bmp)
+![bg right:60%](./images/nintendeau.bmp)
 
 - DALLE Léon
 - DE VULPIAN Alfred
@@ -43,41 +41,51 @@ Nintendeau
 
 # ECE World
 
-![bg right:50% 198%](./images/eceworld.png)
+![bg right:55% 150%](./images/eceworld.png)
 
 ## Thème
 
 - Fête foraine (médieval et + encore)
-- 9 jeux 
+- 9 jeux très variés
 - 2 joueurs 
-- 1 classement
 - 5 tickets par joueur
 ---
 
 # Carte `1/2`
 
 *Réalisée par : **Léon**, **Alfred**.*
-
-Décrire ici les fonctionnalités implémentées : choix joueurs, saisie des noms, affichage des scores/classement... Comment avez-vous fait ? Quels étaient les problèmes rencontrés.
+Fonctionnalités : 
+- Logo d'intro de Nintendeau:tm:
+- Choix du Nom et des Couleurs (16 Millions de sprites possibles avec un filtre rgb !)
+- Déplacement sur la carte avec carte des collisions
+- Affichage des règles avant attraction
+- Affichage des tickets restants
 
 ---
 
 # Carte `2/2`
 
-Suite si ça ne tient pas sur une slide. 
-
-:bulb: *Vous pouvez faire comme ça à chaque fois qu'une slide ne suffit pas, il vaut mieux 5 slides légères qu'une surchargée.*
+:warning: Problèmes rencontrés : 
+-> Grand volume de variables, d'éléments à passer entre les sous-fonctions
+-> Des crash inopinés, rendant l'implémentation difficile
+-> Des bugs à la fin d'un jeu et la gestion des tickets associée
 
 ---
 
 # Organisation des jeux
 
-Les jeux ont tous été enregistrés dans un dossier specialement créé pour eux nommé attractions. Chaque jeu est dans un fichier séparé où l'on retrouve les fonctions principales du jeu, les assets et les CMAKE.
+Les jeux ont tous été codés dans des fichiers source indépendants. L'arborescence est telle que : 
+<div class="mermaid">
+%%{init: {'theme':'neutral'}}%%
+flowchart LR
+    Attractions --> Assets
+    Attractions --> Header
+    Attractions --> Source
+</div>
 
-Les jeux prennent en parametres le solde de tickets de chaque joueur, les scores et les choix faits au debut de chaque partie.
+Les jeux ne prennent quasi rien en paramètres, si ce n'est certains assets utiles du main comme les animations.
 
 Pour lancer un jeu, il suffit de diriger son personnage vers l'une des nombreuses maisons presentes sur la carte, les regles seront affichées et il suffira de cliquer sur la barre espace pour executer le jeu.
-
 
 ---
 
@@ -238,10 +246,10 @@ flowchart LR
 
 *Réalisé par : **Léon** (100%)*
 
--Le jeu se joue à deux joueurs.
--Il y a 5 tickets par joueur.
--Les 2 joueurs se voient attribuer chacun un serpent.
--Le but du jeu est de manger le plus de pommes possible tout en évitant de se mordre la queue, de se prendre un mur ou le corps du serpent adverse.
+- Le jeu se joue à deux joueurs.
+- Géré avec des listes chaînées
+- Les 2 joueurs se voient attribuer chacun un serpent.
+- Le but du jeu est de manger le plus de pommes possible tout en évitant de se mordre la queue, de se prendre un mur ou le corps du serpent adverse.
 
 
 ---
@@ -271,18 +279,13 @@ flowchart LR
 # Structures
 
 - `struct Serpent`
-    - `int x`
-    - `int y`
-    - `int vitesse`
+    - `int x, y`
     - `int direction`
-    - `int taille`
-    - `int estVivant`
-    - `int estAffiche`
-    - `int estMange`
-    - `int estMort`
-    
+    - `int previous_pos_x, previous_pos_y`
+    - `struct Snake *next`
+    - `bool is_head`
 
-![bg right:60%](https://th.bing.com/th/id/OIP.55U-8PJe_zHnA7d7grEveQHaGO?pid=ImgDet&rs=1)
+![bg right:55%](https://th.bing.com/th/id/OIP.55U-8PJe_zHnA7d7grEveQHaGO?pid=ImgDet&rs=1)
 
 ---
 
@@ -290,13 +293,15 @@ flowchart LR
 ![bg right:50%](https://th.bing.com/th/id/OIP.55U-8PJe_zHnA7d7grEveQHaGO?pid=ImgDet&rs=1)
 
 
-- `void initialiserSerpent()`
-- `void afficherSerpent()`
-- `void deplacerSerpent()`
-- `void detecterCollision()`
-- `void afficherGagnant()`
-- `void afficherScore()`
-
+- `void initSNAKE()`
+- `void initfood()`
+- `void lib_memoire()`
+- `void draw_SNAKE()`
+- `void add_block()`
+- `void move_SNAKE()`
+- `void gestion_mouvements()`
+- `collision_mort()`
+- `collision_food()`
 
 ---
 
@@ -567,8 +572,8 @@ graph LR
 
 *Réalisé par : **Léon** (100%)*
 
-- Le jeu se joue à 2 joueurs.
-- Le joueur doit attraper la souris (aka le joueur adverse) qui se déplace sur la carte.
+- Le jeu se joue à 2 joueurs, et est dans le style platformer 2D.
+- Le joueur doit attraper la souris (aka le joueur adverse) qui se déplace sur une carte 2D.
 - Le joueur gagne 1 point si il attrape la souris.
 - Le joueur touché deviendra alors le chat et vice-versa.
 

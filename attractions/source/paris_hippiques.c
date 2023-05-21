@@ -7,9 +7,9 @@
 #define SCREEN_WIDTH 1500
 #define SCREEN_HEIGHT 700
 
-void choix();
+void choix(char nom1, char nom2);
 
-int paris_hippiques() {
+int paris_hippiques(char nom1, char nom2) {
     SAMPLE *music = sound_loader("attractions/assets/paris_hippiques/accueil.wav");
     play_sample(music, 255, 128, 1000, 1); //permet de jouer de la musique en boucle
 
@@ -35,22 +35,22 @@ int paris_hippiques() {
     while (choix1 == 0) {
         if (key[KEY_1]) {
             choix1 = 1;
-            textprintf_ex(choixjoueur1, font, 600, 620, makecol(0, 55, 255), -1, "JOUEUR 1,VOUS AVEZ CHOISI LE CHEVAL 1", choix1);
+            textprintf_ex(choixjoueur1, font, 600, 620, makecol(0, 55, 255), -1, "%s,VOUS AVEZ CHOISI LE CHEVAL 1",nom1, choix1);
             blit(choixjoueur1, screen, 0, 0, 0, 0, 1500, 700);
         }
         if (key[KEY_2]) {
             choix1 = 2;
-            textprintf_ex(choixjoueur1, font, 600, 620, makecol(0, 55, 255), -1, "JOUEUR 1,VOUS AVEZ CHOISI LE CHEVAL 2", choix1);
+            textprintf_ex(choixjoueur1, font, 600, 620, makecol(0, 55, 255), -1, "%s,VOUS AVEZ CHOISI LE CHEVAL 1",nom1, choix1);
             blit(choixjoueur1, screen, 0, 0, 0, 0, 1500, 700);
         }
         if (key[KEY_3]) {
             choix1 = 3;
-            textprintf_ex(choixjoueur1, font, 600, 620, makecol(0, 55, 255), -1, "JOUEUR 1,VOUS AVEZ CHOISI LE CHEVAL 3", choix1);
+            textprintf_ex(choixjoueur1, font, 600, 620, makecol(0, 55, 255), -1, "%s,VOUS AVEZ CHOISI LE CHEVAL 1",nom1, choix1);
             blit(choixjoueur1, screen, 0, 0, 0, 0, 1500, 700);
         }
         if (key[KEY_4]) {
             choix1 = 4;
-            textprintf_ex(choixjoueur1, font, 600, 620, makecol(0, 55, 255), -1, "JOUEUR 1,VOUS AVEZ CHOISI LE CHEVAL 4", choix1);
+            textprintf_ex(choixjoueur1, font, 600, 620, makecol(0, 55, 255), -1, "%s,VOUS AVEZ CHOISI LE CHEVAL 1",nom1, choix1);
             blit(choixjoueur1, screen, 0, 0, 0, 0, 1500, 700);
         }
         if (key[KEY_5]) {
@@ -98,12 +98,12 @@ int paris_hippiques() {
             blit(choixjoueur2, screen, 0, 0, 0, 0, 1500, 700);
         }
         if (key[KEY_ENTER]){
-            choix();
+            choix(nom1, nom2);
 
         }
     }
-    textprintf_ex(choixjoueur2, font, 600, 620, makecol(0, 55, 255), -1, "JOUEUR 1,VOUS AVEZ CHOISI LE CHEVAL %d", choix1);
-    textprintf_ex(choixjoueur2, font, 600, 650, makecol(0, 0, 0), -1, "JOUEUR 2,VOUS AVEZ CHOISI LE CHEVAL %d", choix2);
+    textprintf_ex(choixjoueur2, font, 600, 620, makecol(0, 55, 255), -1, "%s,VOUS AVEZ CHOISI LE CHEVAL %d",nom1, choix1);
+    textprintf_ex(choixjoueur2, font, 600, 650, makecol(0, 0, 0), -1, "%s,VOUS AVEZ CHOISI LE CHEVAL %d",nom2, choix2);
     textprintf_ex(choixjoueur2, font, 570, 680, makecol(255, 0, 0), -1, "Appuyez sur ENTREE pour commencer la course.");
     blit(choixjoueur2, screen, 0, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     while (!key[KEY_ENTER]) {
@@ -238,18 +238,18 @@ int paris_hippiques() {
                     score1 ++;
                     soldeticket1 += 1;
                     soldeticket2 -= 1;
-                    allegro_message("Joueur 1,remporte la course !");
+                    allegro_message("%s remporte la course !", nom1);
                     stop_sample(music2);
                 }else if(choix2 ==1){
                     score2 ++;
                     soldeticket2 += 1;
                     soldeticket1 -= 1;
-                    allegro_message("Joueur 2,remporte la course !");
+                    allegro_message("%s remporte la course !", nom2);
                     stop_sample(music2);
                 }else{
                     soldeticket1 -= 1;
                     soldeticket2 -= 1;
-                    allegro_message("Match nul ! Solde J1 = %d, Solde J2 = %d",soldeticket1,soldeticket2);
+                    allegro_message("Match nul ! Solde %s = %d, Solde %s = %d",nom1, nom2,soldeticket1,soldeticket2);
                     stop_sample(music2);
                 }
             }
@@ -263,18 +263,18 @@ int paris_hippiques() {
                     score1++;
                     soldeticket1 += 1;
                     soldeticket2 -= 1;
-                    allegro_message("Joueur 1,remporte la course !");
+                    allegro_message("%s remporte la course !", nom1);
                     stop_sample(music2);
                 } else if (choix2 == 2) {
                     score2++;
                     soldeticket2 += 1;
                     soldeticket1 -= 1;
-                    allegro_message("Joueur 2,remporte la course !");
+                    allegro_message("%s remporte la course !", nom2);
                     stop_sample(music2);
                 } else {
                     soldeticket1 -= 1;
                     soldeticket2 -= 1;
-                    allegro_message("Match nul ! Solde J1 = %d, Solde J2 = %d", soldeticket1, soldeticket2);
+                    allegro_message("Match nul ! Solde %s = %d, Solde %s = %d",nom1, nom2,soldeticket1,soldeticket2);
                     stop_sample(music2);
                 }
             }
@@ -288,18 +288,18 @@ int paris_hippiques() {
                     score1 ++;
                     soldeticket1 += 1;
                     soldeticket2 -= 1;
-                    allegro_message("Joueur 1,remporte la course !");
+                    allegro_message("%s remporte la course !", nom1);
                     stop_sample(music2);
                 }else if(choix2 ==3){
                     score2 ++;
                     soldeticket2 += 1;
                     soldeticket1 -= 1;
-                    allegro_message("Joueur 2,remporte la course !");
+                    allegro_message("%s remporte la course !", nom2);
                     stop_sample(music2);
                 } else{
                     soldeticket1 -= 1;
                     soldeticket2 -= 1;
-                    allegro_message("Match nul ! Solde J1 = %d, Solde J2 = %d",soldeticket1,soldeticket2);
+                    allegro_message("Match nul ! Solde %s = %d, Solde %s = %d",nom1, nom2,soldeticket1,soldeticket2);
                     stop_sample(music2);
                 }
             }
@@ -313,20 +313,20 @@ int paris_hippiques() {
                     score1 ++;
                     soldeticket1 += 1;
                     soldeticket2 -= 1;
-                    allegro_message("Joueur 1,remporte la course !");
+                    allegro_message("%s remporte la course !", nom1);
                     winner = 1;
                     stop_sample(music2);
                 }else if(choix2 ==4){
                     score2 ++;
                     soldeticket2 += 1;
                     soldeticket1 -= 1;
-                    allegro_message("Joueur 2,remporte la course !");
+                    allegro_message("%s remporte la course !", nom2);
                     winner = 2;
                     stop_sample(music2);
                 } else{
                     soldeticket1 -= 1;
                     soldeticket2 -= 1;
-                    allegro_message("Match nul ! Solde J1 = %d, Solde J2 = %d",soldeticket1,soldeticket2);
+                    allegro_message("Match nul ! Solde %s = %d, Solde %s = %d",nom1, nom2,soldeticket1,soldeticket2);
                     winner = 0;
                     stop_sample(music2);
                 }
@@ -341,7 +341,7 @@ int paris_hippiques() {
     return winner;
 }
 
-void choix(){
+void choix(char nom1, char nom2){
 
     BITMAP *accueil = image_loader("attractions/assets/paris_hippiques/accueil.bmp"); //création d'un bitmap
     BITMAP *choixjoueur1 = image_loader("attractions/assets/paris_hippiques/choixjoueur1.bmp");
@@ -414,12 +414,12 @@ void choix(){
             blit(choixjoueur2, screen, 0, 0, 0, 0, 1500, 700);
         }
         if (key[KEY_ENTER]){
-            choix();
+            choix(nom1, nom2);
 
         }
     }
-    textprintf_ex(choixjoueur2, font, 10, 10, makecol(255, 255, 255), -1, "JOUEUR 1,VOUS AVEZ CHOISI LE CHEVAL %d", choix1);
-    textprintf_ex(choixjoueur2, font, 10, 30, makecol(0, 0, 0), -1, "JOUEUR 2,VOUS AVEZ CHOISI LE CHEVAL %d", choix2);
+    textprintf_ex(choixjoueur2, font, 10, 10, makecol(255, 255, 255), -1, " %s,VOUS AVEZ CHOISI LE CHEVAL %d",nom1, choix1);
+    textprintf_ex(choixjoueur2, font, 10, 30, makecol(0, 0, 0), -1, "%s,VOUS AVEZ CHOISI LE CHEVAL %d",nom2, choix2);
     textprintf_ex(choixjoueur2, font, 10, 50, makecol(0, 0, 0), -1, "Appuyez sur ENTREE pour commencer la course.");
     blit(choixjoueur2, screen, 0, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     while (!key[KEY_ENTER]) {

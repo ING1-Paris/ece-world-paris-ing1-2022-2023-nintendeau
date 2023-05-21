@@ -15,7 +15,7 @@
 #define GRAVITE 2.5
 #define SAUT 15
 
-int flappy_bird() {
+int flappy_bird(char nom1, char nom2) {
     set_gfx_mode(GFX_AUTODETECT_WINDOWED, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0);
 
     srand(time(NULL));
@@ -166,12 +166,12 @@ int flappy_bird() {
         if (game_over1 && game_over2) {
             if(score1 > score2){
                 rest(2000);
-                allegro_message("Le joueur 1 gagne !");
+                allegro_message(" %s a gagné !", nom1);
                 return 1;
 
             } else if(score1 < score2){
                 rest(2000);
-                allegro_message("Le joueur 2 gagne !");
+                allegro_message("%s a gagné !", nom2);
                 return 2;
             } else {
                 rest(2000);

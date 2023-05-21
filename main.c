@@ -267,6 +267,8 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
 
     int x = player->previous_x;
     int y = player->previous_y;
+    char nom1 = player->name;
+    char nom2 = player_2->name;
 
     int ground = makecol(0, 255, 0);
     int wall   = makecol(255, 0, 0);
@@ -337,11 +339,11 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
                     stop_sample(music_main);
                     if (strcmp(game, "palais_des_glaces") == 0) {
                         printf("palais_des_glaces\n");
-                        winner = palais_des_glaces(player->color,player_2->color,anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
+                        winner = palais_des_glaces(nom1, nom2, player->color,player_2->color,anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
                     }
                     else if (strcmp(game, "paris_hippiques") == 0) {
                         printf("paris_hippiques\n");
-                        winner = paris_hippiques();
+                        winner = paris_hippiques(nom1, nom2);
                     }
                     else if (strcmp(game, "geometry_dash") == 0) {
                         printf("geometry_dash\n");
@@ -349,11 +351,11 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
                     }
                     else if (strcmp(game, "tape_taupe") == 0) {
                         printf("tape_taupe\n");
-                        winner = tape_taupe();
+                        winner = tape_taupe(nom1, nom2);
                     }
                     else if (strcmp(game, "guitar_hero") == 0) {
                         printf("guitar_hero\n");
-                        winner = guitar_hero(scores);
+                        winner = guitar_hero(nom1, nom2, scores);
                     }
                     else if (strcmp(game, "tag") == 0) {
                         printf("tag\n");
@@ -361,11 +363,11 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
                     }
                     else if (strcmp(game, "snake") == 0) {
                         printf("snake\n");
-                        winner = snake();
+                        winner = snake(nom1, nom2);
                     }
                     else if (strcmp(game, "flappy_bird") == 0) {
                         printf("flappy_bird\n");
-                        winner = flappy_bird();
+                        winner = flappy_bird(nom1, nom2);
                     }
 
                     if (player->leader) {

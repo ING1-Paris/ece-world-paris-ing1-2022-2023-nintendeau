@@ -31,6 +31,7 @@ typedef struct {
     int speed;
     int direction;
     int id;
+    char name;
 } Player;
 
 
@@ -58,7 +59,7 @@ void show_start_menu_maze(BITMAP * buffer, BITMAP * titre);
 void show_distance_to_finish(Player * player_1, Player * player_2, BITMAP * buffer);
 int check_visited(Cell *** cell_grid);
 void show_player(BITMAP * buffer, Player * player, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4],int frame_counter, int player_color);
-int palais_des_glaces(int player_color1, int player_color2, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4]) {
+int palais_des_glaces(char nom1, char nom2, int player_color1, int player_color2, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4]) {
 
     set_window_title("Palais des Glaces");
 
@@ -69,11 +70,13 @@ int palais_des_glaces(int player_color1, int player_color2, BITMAP * anim_player
     player_1->x = SCREEN_H - CELL_SIZE/2;
     player_1->y = SCREEN_H - CELL_SIZE/2 - player_1->size;
     player_1->id = 1;
+    player_1->name = nom1;
 
     Player * player_2 = initialiser_joueur();
     player_2->x = SCREEN_H - CELL_SIZE/2 - player_1->size;
     player_2->y = SCREEN_H - CELL_SIZE/2;
     player_2->id = 2;
+    player_2->name = nom2;
 
     //* On initialise les BITMAPS
     BITMAP * buffer = create_bitmap(SCREEN_W, SCREEN_H);
@@ -143,9 +146,7 @@ int palais_des_glaces(int player_color1, int player_color2, BITMAP * anim_player
         //masked_stretch_blit(player_sprite_1, buffer, 0, 0, player_sprite_1->w, player_sprite_1->h, player_1->x, player_1->y - 10, player_1->size, player_1->size + 10);
         //masked_stretch_blit(player_sprite_2, buffer, 0, 0, player_sprite_2->w, player_sprite_2->h, player_2->x, player_2->y - 10, player_2->size, player_2->size + 10);
 
-        printf("on tente d'afficher le joueur 1\n");
         show_player(buffer, player_1, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, frame_counter, player_color1);
-        printf("on tente d'afficher le joueur 2\n");
         show_player(buffer, player_2, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, frame_counter, player_color2);
         //* Collisions et mouvements
         check_collision(player_1, maze);
@@ -462,11 +463,11 @@ int check_victory(Player * player_1, Player * player_2, time_t start_time, time_
         clear_to_color(screen, makecol(0, 0, 0));
 
         if (player_1->x <= CELL_SIZE && player_1->y <= CELL_SIZE) {
-            textprintf_ex(screen, font, 500, 400, makecol(255, 255, 255), -1, "PLAYER 1 WINS : %d s", *temps);
+            textprintf_ex(screen, font, 500, 400, makecol(255, 255, 255), -1, "%s WINS : %d s",player_1->name, *temps);
             winner = 1;
         }
         else {
-            textprintf_ex(screen, font, 500, 400, makecol(255, 255, 255), -1, "PLAYER 2 WINS : %d s", *temps);
+            textprintf_ex(screen, font, 500, 400, makecol(255, 255, 255), -1, "%s WINS : %d s",player_2->name, *temps);
             winner = 2;
         }
 
@@ -535,8 +536,8 @@ void show_distance_to_finish(Player * player_1, Player * player_2, BITMAP * buff
     int distance_1 = (int)sqrt(pow(player_1->x - CELL_SIZE, 2) + pow(player_1->y - CELL_SIZE, 2));
     int distance_2 = (int)sqrt(pow(player_2->x - CELL_SIZE, 2) + pow(player_2->y - CELL_SIZE, 2));
 
-    textprintf_ex(buffer, font, 900, 100, makecol(255, 255, 255), -1, "Joueur 1 a %dm de la fin", distance_1);
-    textprintf_ex(buffer, font, 900, 150, makecol(255, 255, 255), -1, "Joueur 2 a %dm de la fin", distance_2);
+    textprintf_ex(buffer, font, 900, 100, makecol(255, 255, 255), -1, "%s a %dm de la fin",player_1->name, distance_1);
+    textprintf_ex(buffer, font, 900, 150, makecol(255, 255, 255), -1, "%s a %dm de la fin",player_2->name, distance_2);
 }
 
 

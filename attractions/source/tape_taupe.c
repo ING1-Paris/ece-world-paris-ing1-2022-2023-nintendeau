@@ -57,14 +57,14 @@ void afficherScores(int* J1, int* J2, int cbleu, int crouge, int cblanc, int cno
     textprintf_ex(screen, font, 10, 20, cblanc, -1, "Joueur 2 : %d",  *J2);
 }
 
-int verifierscores(int* J1, int* J2, int cblanc){
+int verifierscores(int* J1, int* J2, int cblanc, char nom1, char nom2){
     if (*J1 > *J2) {
-        textprintf_ex(screen, font, 300, 20, cblanc, -1, "Joueur 1 a gagné avec %d points", *J1);
-        textprintf_ex(screen, font, 300, 40, cblanc, -1, "Joueur 2 a perdu avec %d points", *J2);
+        textprintf_ex(screen, font, 300, 20, cblanc, -1, "%s a gagné avec %d points",nom1, *J1);
+        textprintf_ex(screen, font, 300, 40, cblanc, -1, "%s a perdu avec %d points",nom2, *J2);
         return 1;
     } else if (*J2 > *J1) {
-        textprintf_ex(screen, font, 300, 20, cblanc, -1, "Joueur 2 a gagné avec %d points", *J2);
-        textprintf_ex(screen, font, 300, 40, cblanc, -1, "Joueur 1 a perdu avec %d points", *J1);
+        textprintf_ex(screen, font, 300, 20, cblanc, -1, "%s a gagné avec %d points",nom2, *J2);
+        textprintf_ex(screen, font, 300, 40, cblanc, -1, "%s a perdu avec %d points",nom1, *J1);
         return 2;
     } else {
         textprintf_ex(screen, font, 250, 20, cblanc, -1, "Egalité ! Les deux joueurs ont %d points", *J1);
@@ -74,7 +74,7 @@ int verifierscores(int* J1, int* J2, int cblanc){
 
 
 
-int tape_taupe(){
+int tape_taupe(char nom1, char nom2){
 
     if (set_gfx_mode(GFX_AUTODETECT_WINDOWED, 800, 600, 0, 0) != 0) {
         allegro_message("prb gfx mode");
@@ -122,7 +122,7 @@ int tape_taupe(){
         }
     }
     textprintf_ex(screen, font, 270, 10, cblanc, -1, "BIENVENUE DANS LE JEU TAPE TAUPE");
-    textprintf_ex(screen, font, 270, 40, cblanc, -1, "Le joueur 1 ce prépare pour jouer");
+    textprintf_ex(screen, font, 270, 40, cblanc, -1, "%s se prépare pour jouer", nom1);
     rest(5000);
     lancerLeDecompte(cnoir, cblanc);
 
@@ -172,8 +172,8 @@ int tape_taupe(){
         //verification du nbr de tours pour changer de joueur
         if (nbrdetours == 15) {
             joueuractif = 2;
-            textprintf_ex(screen, font, 310, 40, cblanc, -1, "Joueur 1 a %d points", J1);
-            textprintf_ex(screen, font, 270, 60, cblanc, -1, "Joueur 2 ce prépare pour jouer");
+            textprintf_ex(screen, font, 310, 40, cblanc, -1, "%s a %d points",nom1,J1);
+            textprintf_ex(screen, font, 270, 60, cblanc, -1, "%s se prépare pour jouer", nom2);
             rest(5000);
             lancerLeDecompte(cnoir, cblanc);
         } else if (nbrdetours == 30) {
@@ -184,15 +184,15 @@ int tape_taupe(){
     }
 
     //affichage des scores finaux
-    gagnant = verifierscores(pJ1, pJ2, cblanc);
+    gagnant = verifierscores(pJ1, pJ2, cblanc, nom1, nom2);
     rest (3000) ;
     rectfill(screen, 290, 15, 600, 50, cnoir);
     int winner = 0;
     if (gagnant == 1) {
-        textprintf_ex(screen, font, 300, 40, cblanc, -1, "Joueur 1 a gagné 1 ticket");
+        textprintf_ex(screen, font, 300, 40, cblanc, -1, "%s a gagné 1 ticket", nom1);
         winner = 1;
     } else if (gagnant == 2) {
-        textprintf_ex(screen, font, 300, 40, cblanc, -1, "Joueur 2 a gagné 1 ticket");
+        textprintf_ex(screen, font, 300, 40, cblanc, -1, "%s a gagné 1 ticket", nom2);
         winner = 2;
     }
     
