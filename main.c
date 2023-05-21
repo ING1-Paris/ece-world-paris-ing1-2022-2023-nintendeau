@@ -8,6 +8,7 @@
 
 //& 4 fichiers .h seront mis en place dans le dossier "attractions" pour accueilir les codes des 4 attractions (4 membres de l'equipe).
 //& les fichiers .h seront inclus dans le main.c, dans lequel le code principal sera ecrit.
+//launch
 
 #include <stdio.h>
 #include <string.h>
