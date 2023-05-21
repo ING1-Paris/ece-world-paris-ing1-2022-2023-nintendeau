@@ -33,13 +33,13 @@ void dessinerRectangleBleu(int x, int y, int cbleu, int crouge, int compteur, in
 void lancerLeDecompte(int cnoir, int cblanc) {
 
     rectfill(screen, 200, 40, 610, 60, cnoir);
-    textprintf_ex(screen, font, 300, 40, cblanc, -1, "le jeu va commencez dans 3 ");
+    textprintf_ex(screen, font, 300, 40, cblanc, -1, "le jeu va commencer dans 3 ");
     rest(1000);
     rectfill(screen, 200, 40, 610, 60, cnoir);
-    textprintf_ex(screen, font, 300, 40, cblanc, -1, "le jeu va commencez dans 2 ");
+    textprintf_ex(screen, font, 300, 40, cblanc, -1, "le jeu va commencer dans 2 ");
     rest(1000);
     rectfill(screen, 300, 40, 510, 60, cnoir);
-    textprintf_ex(screen, font, 300, 40, cblanc, -1, "le jeu va commencez dans 1 ");
+    textprintf_ex(screen, font, 300, 40, cblanc, -1, "le jeu va commencer dans 1 ");
     rest(1000);
     rectfill(screen, 200, 40, 610, 60, cnoir);
     textprintf_ex(screen, font, 380, 40, cblanc, -1, "START ! ");
@@ -122,7 +122,7 @@ int tape_taupe(){
         }
     }
     textprintf_ex(screen, font, 270, 10, cblanc, -1, "BIENVENUE DANS LE JEU TAPE TAUPE");
-    textprintf_ex(screen, font, 270, 40, cblanc, -1, "Le joueur 1 ce prépare pour jouer");
+    textprintf_ex(screen, font, 270, 40, cblanc, -1, "Le joueur 1 se prépare pour jouer");
     rest(5000);
     lancerLeDecompte(cnoir, cblanc);
 
@@ -173,7 +173,7 @@ int tape_taupe(){
         if (nbrdetours == 15) {
             joueuractif = 2;
             textprintf_ex(screen, font, 310, 40, cblanc, -1, "Joueur 1 a %d points", J1);
-            textprintf_ex(screen, font, 270, 60, cblanc, -1, "Joueur 2 ce prépare pour jouer");
+            textprintf_ex(screen, font, 270, 60, cblanc, -1, "Joueur 2 se prépare pour jouer");
             rest(5000);
             lancerLeDecompte(cnoir, cblanc);
         } else if (nbrdetours == 30) {
