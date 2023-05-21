@@ -170,8 +170,98 @@ void show_ending_screen(BITMAP * buffer, BITMAP * ending_screen, SAMPLE * music_
     }
 }
 
+void display_player(Player player, BITMAP* buffer, int frame_counter, BITMAP* anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4]) {
+    // Select the appropriate animation array based on the direction
+    BITMAP ** animation_array;
+    if (player.direction == 1) {
+        animation_array = anim_player_haut;
+    }
+    else if (player.direction == 2) {
+        animation_array = anim_player_bas;
+    }
+    else if (player.direction == 3) {
+        animation_array = anim_player_gauche;
+    }
+    else if (player.direction == 4) {
+        animation_array = anim_player_droite;
+    }
+    else {
+        // Invalid direction, do nothing
+        return;
+    }
 
-void check_collision_main(Player * player, Player * player_2, BITMAP * calque_collisions, BITMAP * player_sprite_1, SAMPLE * music_main, BITMAP * regles, BITMAP * buffer, BITMAP * ending_screen, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4], float scores[2]) {
+    // Retrieve the current frame bitmap from the animation array
+    BITMAP * current_frame;
+    if (player.x != player.previous_x || player.y != player.previous_y) {
+        current_frame = animation_array[frame_counter];
+    }
+    else {
+        if (player.direction == 1 || player.direction == 2){
+            current_frame = animation_array[1];
+        }else{
+            current_frame = animation_array[2];
+        }
+    }
+
+    // Create a temporary bitmap for the masked sprite
+    BITMAP * masked_sprite = create_bitmap(current_frame->w, current_frame->h);
+
+    // Apply the mask to the sprite
+    clear(masked_sprite);
+    blit(current_frame, masked_sprite, 0, 0, 0, 0, current_frame->w, current_frame->h);
+
+    // Apply the color filter
+    int filter = player.color;
+    set_trans_blender(0, 0, 0, 255);
+    draw_lit_sprite(masked_sprite, masked_sprite, 0, 0, filter);
+
+    // Draw the masked sprite
+    masked_blit(masked_sprite, buffer, 0, 0, player.x, player.y, masked_sprite->w, masked_sprite->h);
+
+    // Destroy the temporary bitmap
+    destroy_bitmap(masked_sprite);
+}
+
+void circle_effect(BITMAP* buffer, Player player_1, Player player_2, int frame_counter, BITMAP * anim_player_haut[4], BITMAP * anim_player_bas[4], BITMAP * anim_player_gauche[4], BITMAP * anim_player_droite[4], int type, bool title)
+{   
+    BITMAP * titre = image_loader("attractions/assets/Titre.bmp");
+    BITMAP * map  = image_loader("attractions/assets/map_v3.bmp");
+    BITMAP * mask = create_bitmap(SCREEN_W, SCREEN_H);
+    bool can_move = false;
+    if (type == 1){
+        for (int i = 65; i < SCREEN_W; i+=10){
+            clear_to_color(mask, makecol(0, 0, 0));
+            //draw the map, the players, the title and the score
+            stretch_blit(map, buffer, 0, 0, map->w, map->h, 0, 0, buffer->w, buffer->h);
+            if (title){
+                masked_stretch_blit(titre, buffer, 0, 0, titre->w, titre->h, SCREEN_W/2 - titre->w/1.35, SCREEN_H/2 - titre->h*1.5, titre->w*1.5, titre->h*1.5);
+            }
+            display_player(player_1, buffer, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
+            display_player(player_2, buffer, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
+            circlefill(mask, player_1.x + player_1.sprite->w/2, player_1.y + player_1.sprite->h/2, i, makecol(255, 0, 255));
+            circlefill(mask, player_2.x + player_2.sprite->w/2, player_2.y + player_2.sprite->h/2, i, makecol(255, 0, 255));
+            masked_blit(mask, buffer, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+            blit(buffer, screen, 0, 0, 0, 0, buffer->w, buffer->h);
+        }
+    }else if (type == 2){
+        for (int i = SCREEN_W; i > 0; i-=10){
+            clear_to_color(mask, makecol(0, 0, 0));
+            //draw the map, the players, the title and the score
+            stretch_blit(map, buffer, 0, 0, map->w, map->h, 0, 0, buffer->w, buffer->h);
+            display_player(player_1, buffer, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
+            display_player(player_2, buffer, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
+            circlefill(mask, player_1.x + player_1.sprite->w/2, player_1.y + player_1.sprite->h/2, i, makecol(255, 0, 255));
+            circlefill(mask, player_2.x + player_2.sprite->w/2, player_2.y + player_2.sprite->h/2, i, makecol(255, 0, 255));
+            masked_blit(mask, buffer, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
+            blit(buffer, screen, 0, 0, 0, 0, buffer->w, buffer->h);
+        }
+    }
+    
+    destroy_bitmap(mask);
+}
+
+
+void check_collision_main(Player * player, Player * player_2, BITMAP * calque_collisions, BITMAP * player_sprite_1, SAMPLE * music_main, BITMAP * regles, BITMAP * buffer, BITMAP * ending_screen, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4], float scores[2]){
 
     int active = 0;
 
@@ -355,60 +445,6 @@ void afficher_score(BITMAP * score_image, BITMAP * buffer, Player player) {
     textprintf_ex(buffer, font, SCREEN_W/2, SCREEN_H/2, makecol(0, 0, 0), -1, "Score: %d", player.score);
 }
 
-
-void display_player(Player player, BITMAP* buffer, int frame_counter, BITMAP* anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4]) {
-    // Select the appropriate animation array based on the direction
-    BITMAP ** animation_array;
-    if (player.direction == 1) {
-        animation_array = anim_player_haut;
-    }
-    else if (player.direction == 2) {
-        animation_array = anim_player_bas;
-    }
-    else if (player.direction == 3) {
-        animation_array = anim_player_gauche;
-    }
-    else if (player.direction == 4) {
-        animation_array = anim_player_droite;
-    }
-    else {
-        // Invalid direction, do nothing
-        return;
-    }
-
-    // Retrieve the current frame bitmap from the animation array
-    BITMAP * current_frame;
-    if (player.x != player.previous_x || player.y != player.previous_y) {
-        current_frame = animation_array[frame_counter];
-    }
-    else {
-        if (player.direction == 1 || player.direction == 2){
-            current_frame = animation_array[1];
-        }else{
-            current_frame = animation_array[2];
-        }
-    }
-
-    // Create a temporary bitmap for the masked sprite
-    BITMAP * masked_sprite = create_bitmap(current_frame->w, current_frame->h);
-
-    // Apply the mask to the sprite
-    clear(masked_sprite);
-    blit(current_frame, masked_sprite, 0, 0, 0, 0, current_frame->w, current_frame->h);
-
-    // Apply the color filter
-    int filter = player.color;
-    set_trans_blender(0, 0, 0, 255);
-    draw_lit_sprite(masked_sprite, masked_sprite, 0, 0, filter);
-
-    // Draw the masked sprite
-    masked_blit(masked_sprite, buffer, 0, 0, player.x, player.y, masked_sprite->w, masked_sprite->h);
-
-    // Destroy the temporary bitmap
-    destroy_bitmap(masked_sprite);
-}
-
-
 void afficher_map(BITMAP * titre, BITMAP * buffer, BITMAP * map, BITMAP * player_sprite_1, BITMAP * player_sprite_2, Player player_1, Player player_2, int * can_move, BITMAP * score_image, BITMAP * calque_collisions, BITMAP * buffer_texte, int frame_counter, BITMAP * anim_player_haut[4], BITMAP * anim_player_bas[4], BITMAP * anim_player_gauche[4], BITMAP * anim_player_droite[4]) {
 
     clear_bitmap(buffer);
@@ -455,6 +491,7 @@ void move_player(Player * player, int UP, int DOWN, int LEFT, int RIGHT) {
         player->direction = 4;
     }
 }
+
 
 int choose_player_name_color(Player * player){
     BITMAP* buffer = create_bitmap(SCREEN_W, SCREEN_H); // Double buffer for smooth rendering
@@ -642,7 +679,6 @@ int choose_player_name_color(Player * player){
 }
 
 
-
 //! fonction principale
 int main() {
 
@@ -669,6 +705,7 @@ int main() {
     int frame_counter = 0;
     int can_move      = 0;
     int scores[2]     = {0, 0};
+    bool do_once      = true;
 
     //! CHARGEMENT DES BITMAPS
     BITMAP * buffer_texte      = create_bitmap(SCREEN_W, SCREEN_H);
@@ -741,6 +778,8 @@ int main() {
     //Musique du menu
     play_sample(music_main, 255, 128, 1000, 1);
 
+    circle_effect(buffer, player_1, player_2, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, 1, TRUE);
+
     //& boucle principale du menu (carte du parc)
     while (!key[KEY_P]) {
         afficher_map(titre, buffer, map, player_sprite_1, player_sprite_2, player_1, player_2, &can_move, score_image, calque_collisions, buffer, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
@@ -751,6 +790,8 @@ int main() {
         check_collision_main(&player_2, &player_1, calque_collisions, player_sprite_2, music_main, regles, buffer, ending_screen, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, scores);
         check_collision_main(&player_1, &player_2, calque_collisions, player_sprite_1, music_main, regles, buffer, ending_screen, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, scores);
 
+        
+        
         // afficher le leader
         if (player_1.leader)
             textprintf_ex(buffer, font, 10, 10, makecol(0, 0, 0), -1, "%s leader", player_1.name);
@@ -779,6 +820,9 @@ int main() {
         vsync();
         blit(buffer, screen, 0, 0, 0, 0, buffer->w, buffer->h);
     }
+
+    circle_effect(buffer, player_1, player_2, frame_counter, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, 2, FALSE);
+
     if(player_1.tickets <= 0 || player_2.tickets <= 0){
         rest(1000);
         //display a black screen and the winner on it until a key is pressed: 
