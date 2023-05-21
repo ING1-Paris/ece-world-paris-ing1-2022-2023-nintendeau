@@ -47,7 +47,7 @@ Nintendeau
 
 ## Thème
 
-- Fête foraine 
+- Fête foraine (médieval et + encore)
 - 9 jeux 
 - 2 joueurs 
 - 1 classement
@@ -81,7 +81,7 @@ Pour lancer un jeu, il suffit de diriger son personnage vers l'une des nombreuse
 
 ---
 
-![bg right:40%](images/peche_canards.jpg)
+![bg right:40%](https://th.bing.com/th/id/OIP.wECKrb7x6RpwyGUY7x4x-AHaHa?pid=ImgDet&rs=1)
 
 # GUITAR HERO
 
@@ -97,7 +97,7 @@ Pour lancer un jeu, il suffit de diriger son personnage vers l'une des nombreuse
 
 ---
 
-![bg right:40%](images/peche_canards.jpg)
+![bg right:50%](https://th.bing.com/th/id/OIP.55U-8PJe_zHnA7d7grEveQHaGO?pid=ImgDet&rs=1)
 
 
 # GUITAR HERO
@@ -114,7 +114,7 @@ Pour lancer un jeu, il suffit de diriger son personnage vers l'une des nombreuse
     - `int estAffichee`
 
 ---
-![bg right:40%](images/peche_canards.jpg)
+![bg right:50%](https://th.bing.com/th/id/OIP.55U-8PJe_zHnA7d7grEveQHaGO?pid=ImgDet&rs=1)
 
 ### Fonctions
 
@@ -125,6 +125,7 @@ Pour lancer un jeu, il suffit de diriger son personnage vers l'une des nombreuse
 - `void afficherGagnant()`
 
 
+
 ### Tableaux
 
 - `struct Note notes[20]`
@@ -132,7 +133,7 @@ Pour lancer un jeu, il suffit de diriger son personnage vers l'une des nombreuse
 
 ---
 
-![bg right:40%](images/peche_canards.jpg)
+![bg right:42%](images/guitarhero1.png)
 
 # GUITAR HERO
 
@@ -153,7 +154,7 @@ flowchart LR
 
 ---
 
-![bg right:40%](images/peche_canards.jpg)
+![bg right:42%](images/guitarhero2.png)
 
 # GUITAR HERO
 
@@ -164,9 +165,9 @@ flowchart LR
 
 
 ---
-![bg right:40%](images/peche_canards.jpg)
+![bg right:40%](https://th.bing.com/th/id/R.f2ba0f6dd0d0c4bca7c7625e68ad7229?rik=SKoFRtUm7aRqqw&pid=ImgRaw&r=0)
 
-# Paris hippiques
+# Paris hippiques 
 
 *Réalisé par : **Shaïma** (100%)*
 
@@ -179,9 +180,9 @@ flowchart LR
 
 ---
 
-![bg right:40%](images/peche_canards.jpg)
+![bg :40%](https://th.bing.com/th/id/R.676b2e9860d1c230859f356d52eaab13?rik=DDVY97zEIGgeMg&riu=http%3a%2f%2f1.bp.blogspot.com%2f_GJmSkzXiepQ%2fTDes5OU72gI%2fAAAAAAAAAFQ%2femh27J6kX4M%2fw1200-h630-p-k-no-nu%2fcharismatic%2b001.JPG&ehk=GbnLZQVjDHglPg2%2fgSNsKTzVLLdCO%2f27JIMOEUK2TIM%3d&risl=&pid=ImgRaw&r=0)
 
-# Paris hippiques
+# Paris hippiques (edition my little pony)
 
 ### Graphe d'appel
 
@@ -195,8 +196,7 @@ flowchart LR
     parisHippiques --> deplacerChevaux
     deplacerChevaux --> InitaliserVitesseAleatoire
     parisHippiques --> detecterLigneArrivee
-    detecterLigneArrivee --> ChevalGagnant
-    ChevalGagnant --> afficherGagnant
+    detecterLigneArrivee --> ChevalGagnant --> ChoixCheval -->afficherGagnant
 
 </div>
 
@@ -209,12 +209,12 @@ flowchart LR
     - `int xArrivee`
     - `int choixjoueur1,choixjoueur2`
 
-![bg right:40%](images/peche_canards.jpg)
+![bg right:50%](https://th.bing.com/th/id/OIP.55U-8PJe_zHnA7d7grEveQHaGO?pid=ImgDet&rs=1)
 
 ---
 
 # Fonctions
-![bg right:40%](images/peche_canards.jpg)
+![bg right:50%](https://th.bing.com/th/id/OIP.55U-8PJe_zHnA7d7grEveQHaGO?pid=ImgDet&rs=1)
 
 - `int main` (tout  est regroupé dans le main)
 - `initialiserChoixCheval()`
@@ -228,11 +228,11 @@ flowchart LR
 ---
 
 # Logigramme
-![bg right:40%](images/peche_canards.jpg)
+![bg right:40%](images/parishippiques.png)
 
 
 ---
-![bg right:40%](images/peche_canards.jpg)
+![bg right:50%](https://th.bing.com/th/id/R.079b197c46059da0428789b4fabe5e8b?rik=RsM3X9D4%2fwSADw&pid=ImgRaw&r=0)
 
 # Snake à 2 joueurs
 
@@ -246,7 +246,7 @@ flowchart LR
 
 ---
 
-![bg right:40%](images/peche_canards.jpg)
+![bg :10%](https://image.winudf.com/v2/image/Y29tLnNuYWtlY29tcGFueS5zbmFrZWdhbWVfc2NyZWVuXzFfanhsM21pams/screen-1.jpg?fakeurl=1&type=.jpg)
 
 # Snake à 2 joueurs
 
@@ -282,12 +282,12 @@ flowchart LR
     - `int estMort`
     
 
-![bg right:40%](images/peche_canards.jpg)
+![bg right:60%](https://th.bing.com/th/id/OIP.55U-8PJe_zHnA7d7grEveQHaGO?pid=ImgDet&rs=1)
 
 ---
 
 # Fonctions
-![bg right:40%](images/peche_canards.jpg)
+![bg right:50%](https://th.bing.com/th/id/OIP.55U-8PJe_zHnA7d7grEveQHaGO?pid=ImgDet&rs=1)
 
 
 - `void initialiserSerpent()`
@@ -301,13 +301,13 @@ flowchart LR
 ---
 
 # Logigramme
-![bg right:40%](images/peche_canards.jpg)
+![bg right:46%](images/snake.png)
 
 
 
 ---
 
-![bg right:40%](images/peche_canards.jpg)
+![bg right:50%](https://th.bing.com/th/id/OIP.GLUOTz6Wzd5QpJcNloihsAHaHN?pid=ImgDet&rs=1)
 
 # Jackpot
 
@@ -322,7 +322,7 @@ flowchart LR
 
 ---
 
-![bg right:40%](images/peche_canards.jpg)
+![bg :100%](https://th.bing.com/th/id/OIP.Juq-qSumAJgHoaGvW8uphgHaFj?pid=ImgDet&rs=1)
 
 # Jackpot
 
@@ -355,12 +355,12 @@ flowchart LR
     - `bool estGagnant`
 
 
-![bg right:40%](images/peche_canards.jpg)
+![bg right:40%](https://th.bing.com/th/id/OIP.55U-8PJe_zHnA7d7grEveQHaGO?pid=ImgDet&rs=1)
 
 ---
 
 # Fonctions
-![bg right:40%](images/peche_canards.jpg)
+![bg right:40%](https://th.bing.com/th/id/OIP.55U-8PJe_zHnA7d7grEveQHaGO?pid=ImgDet&rs=1)
 
 - `int main()` (tout est regroupé dans le main)
 - `void initialiserJackpot()`
@@ -374,11 +374,11 @@ flowchart LR
 ---
 
 # Logigramme
-![bg right:40%](images/peche_canards.jpg)
+![bg right:42%](images/jackpot.png)
 
 
 ---
-![bg right:40%](images/peche_canards.jpg)
+![bg right:40%](https://th.bing.com/th/id/R.0b9c1ea9228696e1b8ec1b103c119771?rik=nYxF5AWapSvOGQ&pid=ImgRaw&r=0)
 
 # JEUX BONUS
 
@@ -393,7 +393,7 @@ flowchart LR
 
 ---
 
-![bg right:40%](images/peche_canards.jpg)
+![bg :40%](https://th.bing.com/th/id/OIP.yhUkoSouuc2Eah1icWy4YQHaHa?pid=ImgDet&w=512&h=512&rs=1)
 
 
 
@@ -426,12 +426,12 @@ graph LR
     - `bool obstacletouche`
 
 
-![bg right:40%](images/peche_canards.jpg)
+![bg right:50%](https://th.bing.com/th/id/OIP.55U-8PJe_zHnA7d7grEveQHaGO?pid=ImgDet&rs=1)
 
 ---
 
 # Fonctions
-![bg right:40%](images/peche_canards.jpg)
+![bg right:40%](https://th.bing.com/th/id/OIP.55U-8PJe_zHnA7d7grEveQHaGO?pid=ImgDet&rs=1)
 
 - `int main()` (tout est regroupé dans le main)
 - `void initialiserOiseau()`
@@ -444,18 +444,10 @@ graph LR
 ---
 
 
-# Logigramme
-
-![bg right:40%](images/peche_canards.jpg)
-
----
-
-![bg right:40%](images/peche_canards.jpg)
-
 # JEUX BONUS
 
 ## The Maze
-![bg right:40%](images/peche_canards.jpg)
+![bg right:40%](https://i.ytimg.com/vi/uC3nOV7YQ7s/maxresdefault.jpg)
 
 *Réalisé par : **Alfred** (100%)*
 
@@ -466,6 +458,8 @@ graph LR
 
 ---
 # Graphe d'appel
+
+![bg right:40](https://th.bing.com/th/id/R.3ca8972be64fb427187c700b2f112d56?rik=ko1fpYUqTOS%2fyw&riu=http%3a%2f%2fiversonboyan.50webs.com%2fPhotoshop%2fThe+Maze.jpg&ehk=fjqZY%2fD1aqOGSFgnx1H2gY1TBy%2ff6lqaV9D348QtlQ0%3d&risl=&pid=ImgRaw&r=0)
 
 <br>
 
@@ -490,7 +484,7 @@ graph LR
     - `int vitesse`
     - `bool estGagnant`
 
-![bg right:40%](images/peche_canards.jpg)
+![bg right:50%](https://th.bing.com/th/id/OIP.55U-8PJe_zHnA7d7grEveQHaGO?pid=ImgDet&rs=1)
 
 ---
 
@@ -503,15 +497,11 @@ graph LR
 - `void detecterSortie()`
 - `void determinerGagnant()`
 
-![bg right:40%](images/peche_canards.jpg)
+![bg right:50%](https://th.bing.com/th/id/OIP.55U-8PJe_zHnA7d7grEveQHaGO?pid=ImgDet&rs=1)
 
 ---
-# Logigramme
 
-![bg right:40%](images/peche_canards.jpg)
----
-
-![bg right:40%](images/peche_canards.jpg)
+![bg right:50%](https://www.stepindance.fr/wp-content/uploads/2018/11/mattel-jeux-chass-taupes.jpg)
 # Tape taupe
 
 *Réalisé par : **Mathéo** (100%)*
@@ -523,7 +513,7 @@ graph LR
 - Le joueur qui a le plus de points gagne 1 ticket.
 
 ---
-![bg right:40%](images/peche_canards.jpg)
+![bg :40%](https://coolrom.com/screenshots/nds/That's%20So%20Raven%20-%20Psychic%20on%20the%20Scene%20(2).jpg)
 
 # Graphe d'appel
 
@@ -554,7 +544,7 @@ graph LR
     - `bool Gagnant`
     - `int score`
 
-![bg right:40%](images/peche_canards.jpg)
+![bg right:40%](https://th.bing.com/th/id/OIP.55U-8PJe_zHnA7d7grEveQHaGO?pid=ImgDet&rs=1)
 
 ---
 
@@ -567,23 +557,20 @@ graph LR
 - `void detecterGagnant()`
 - `void afficherGagnant()`
 - `void afficherScore()`
----
 
+![bg right:40%](https://th.bing.com/th/id/OIP.55U-8PJe_zHnA7d7grEveQHaGO?pid=ImgDet&rs=1)
 
-# Logigramme
-
-![bg right:40%](images/peche_canards.jpg)
 
 ---
 # Attrape Chat (TAG)
-![bg right:40%](images/peche_canards.jpg)
+![bg right:50%](https://th.bing.com/th/id/R.8120d8d8e07e9ac87e7df7c81de7e5c5?rik=DDsQ%2f5ilxFU14Q&pid=ImgRaw&r=0)
 
 *Réalisé par : **Léon** (100%)*
 
 - Le jeu se joue à 2 joueurs.
 - Le joueur doit attraper la souris (aka le joueur adverse) qui se déplace sur la carte.
 - Le joueur gagne 1 point si il attrape la souris.
-- Le joueur qui reussit à attraper la souris gagne.
+- Le joueur touché deviendra alors le chat et vice-versa.
 
 ---
 # Graphe d'appel
@@ -615,7 +602,7 @@ graph LR
     - `int score`
     - `int ticket`
 
-![bg right:40%](images/peche_canards.jpg)
+![bg right:40%](https://th.bing.com/th/id/OIP.55U-8PJe_zHnA7d7grEveQHaGO?pid=ImgDet&rs=1)
 
 ---
 # Fonctions
@@ -628,18 +615,14 @@ graph LR
 - `void afficherGagnant()`
 - `void afficherScore()`
 
-![bg right:40%](images/peche_canards.jpg)
+![bg right:40%](https://th.bing.com/th/id/OIP.55U-8PJe_zHnA7d7grEveQHaGO?pid=ImgDet&rs=1)
 
 ---
 
-# Logigramme
-![bg right:40%](images/peche_canards.jpg)
-
----
 
 # GEOMETRY DASH
 
-![bg right:40%](images/peche_canards.jpg)
+![bg right:50%](https://th.bing.com/th/id/R.0df9ec9d7126054da4c8306678c3af92?rik=jve%2frmvWRTBMNA&riu=http%3a%2f%2f2.bp.blogspot.com%2f-Wl1AS-zKl0s%2fVZVcSDOSckI%2fAAAAAAAAAJ8%2fWAFNDi4o_Hc%2fs1600%2fGeometryDash.png&ehk=xkArEQZGRRbWDGd0ekqI1PmY0DVkVFeYebYySbqiUEU%3d&risl=&pid=ImgRaw&r=0)
 
 *Réalisé par : **Alfred** (100%)*
 
@@ -651,7 +634,7 @@ graph LR
 ---
 
 # Graphe d'appel
-![bg right:40%](images/peche_canards.jpg)
+![bg :50%](https://i.ytimg.com/vi/tRnVhXQ-ayg/maxresdefault.jpg)
 
 <br>
 <div class="mermaid">
@@ -670,7 +653,7 @@ graph LR
 
 # Fonctions
 
-![bg right:40%](images/peche_canards.jpg)
+![bg right:40%](https://th.bing.com/th/id/OIP.55U-8PJe_zHnA7d7grEveQHaGO?pid=ImgDet&rs=1)
 
 - `void initaliserCube()`
 - `void afficherCube()`
@@ -683,7 +666,7 @@ graph LR
 
 # Structures 
 
-![bg right:40%](images/peche_canards.jpg)
+![bg right:40%](https://th.bing.com/th/id/OIP.55U-8PJe_zHnA7d7grEveQHaGO?pid=ImgDet&rs=1)
 
 - `struct Cube`
     - `int x`
@@ -693,11 +676,6 @@ graph LR
     - `bool estGagnant`
     - `int score`
     - `int ticket`
-
----
-# Logigramme
-
-![bg right:40%](images/peche_canards.jpg)
 
 ---
 
@@ -720,8 +698,8 @@ _class: lead
     - *Pour certains jeux, les regles et les scores ne sont pas affichés mais c'est en route.*
 - `✅ 100%` Terminer les 9 jeux (jeu.c)
     - *Tous les jeux sont terminés.*
-- `❌ 80%` Relier la carte aux jeux (carte.c)
-    - *Les jeux sont reliés à la carte mais l'execution des programmes demeure tres instable (beaucoup de crashs).*
+- `✅ 100%` Relier la carte aux jeux (carte.c)
+    - *Les jeux sont reliés à la carte et s'executent normalement.*
 
 ---
 
@@ -732,8 +710,8 @@ Si vous deviez vous répartir des points, comment feriez-vous ?
 <div class="mermaid">
 %%{init: {'theme':'neutral'}}%%
 pie showData
-    "Shaïma" : 20
-    "Mathéo" : 20
+    "Shaïma" : 25
+    "Mathéo" : 15
     "Léon" : 30
     "Alfred" : 30
     
@@ -749,10 +727,10 @@ pie showData
 | Guitar Hero | 100% | - |
 | Snake | 100% | - |
 | Jackpot | 100% | - |
-| Floppybird | 90% | Jeu totalement fonctionnel, seul petit soucis avec la marge de collision entre l'obstacle et l'oiseau  |
+| Floppybird | 100% | - |
 | The Maze | 100% | - |
 | Tape-taupe | 100% | - |
-| Geometry dash | -% | pas plus d'infos |
+| Geometry dash | 100% | - |
 | TAG | 100% | - |
 
 
@@ -762,7 +740,7 @@ pie showData
 <!--
 _class: lead
 -->
-# Quelques éléments que vous pouvez utiliser à votre guise dans votre présentation
+
 
 ---
 
