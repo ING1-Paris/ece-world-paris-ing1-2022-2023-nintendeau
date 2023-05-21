@@ -141,7 +141,7 @@ Pour lancer un jeu, il suffit de diriger son personnage vers l'une des nombreuse
 
 ---
 
-![bg right:42%](images/guitarhero1.png)
+![bg right:42%](images/algorigramme_guitarhero_partie1.png)
 
 # GUITAR HERO
 
@@ -162,15 +162,11 @@ flowchart LR
 
 ---
 
-![bg right:42%](images/guitarhero2.png)
+![bg right:42%](images/algorigramme_guitarhero_partie2.png)
 
 # GUITAR HERO
 
 ### Logigramme
-
-
-
-
 
 ---
 ![bg right:40%](https://th.bing.com/th/id/R.f2ba0f6dd0d0c4bca7c7625e68ad7229?rik=SKoFRtUm7aRqqw&pid=ImgRaw&r=0)
