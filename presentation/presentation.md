@@ -302,7 +302,7 @@ flowchart LR
 ---
 
 # Logigramme
-![bg right:46%](images/algorigramme_snake_image.png)
+![bg right:42%](images/algorigramme_snake_image.png)
 
 
 
@@ -742,17 +742,17 @@ _class: lead
 
 # Schémas et Graphes
 
-![bg left : 70%](./images/commit.jpeg)
+![bg left : 100%](./images/commit.jpeg)
 Comits et activités des membres de l'équipe
 
 ---
-![bg left : 90%](./images/frequence_code.jpeg)
+![bg left : 100%](./images/frequence_code.jpeg)
 
 # Comparaison entre l'ajout des éléments et leurs retraits
 
 ---
 
-![bg right : 80%](./images/frequence_commit.jpeg)
+![bg right : 90%](./images/frequence_commit.jpeg)
 
 ## Comparaison entre les commits et les ajouts de lignes de code dans une periode hebdomadaire
 
