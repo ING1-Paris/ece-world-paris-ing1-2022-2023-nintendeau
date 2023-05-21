@@ -355,7 +355,7 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
                     }
                     else if (strcmp(game, "tape_taupe") == 0) {
                         printf("tape_taupe\n");
-                        winner = tape_taupe(nom1, nom2);
+                        winner = tape_taupe(nom1, nom2, scores);
                     }
                     else if (strcmp(game, "guitar_hero") == 0) {
                         printf("guitar_hero\n");
@@ -363,15 +363,15 @@ void check_collision_main(Player * player, Player * player_2, BITMAP * calque_co
                     }
                     else if (strcmp(game, "tag") == 0) {
                         printf("tag\n");
-                        winner = tag(player->color, player_2->color, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite);
+                        winner = tag(player->color, player_2->color, anim_player_haut, anim_player_bas, anim_player_gauche, anim_player_droite, scores);
                     }
                     else if (strcmp(game, "snake") == 0) {
                         printf("snake\n");
-                        winner = snake(nom1, nom2);
+                        winner = snake(nom1, nom2, scores);
                     }
                     else if (strcmp(game, "flappy_bird") == 0) {
                         printf("flappy_bird\n");
-                        winner = flappy_bird(nom1, nom2);
+                        winner = flappy_bird(nom1, nom2, scores);
                     }
 
                     if (player->leader) {

@@ -57,7 +57,7 @@ void gestion_mouvements(SNAKE *head1, SNAKE *head2);
 int collision_mort(SNAKE *head1, SNAKE *head2);
 int collision_food(SNAKE *head, food *food);
 
-int snake(char * nom1, char * nom2){
+int snake(char * nom1, char * nom2, float scores[2]){
 
     set_window_title("SNAKE");
 
@@ -126,6 +126,8 @@ int snake(char * nom1, char * nom2){
                 printf("Game Over ! second player loosed !\n");
                 winner = 1;
             }
+            scores[0] = score1;
+            scores[1] = score2;
             game_over = 1;
         }
 

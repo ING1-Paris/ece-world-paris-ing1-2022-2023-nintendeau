@@ -50,7 +50,7 @@ void loadNumberBitmaps(BITMAP *numberBitmaps[10]);
 void displayNumber(BITMAP* destination, BITMAP* numberBitmaps[], int number, int x, int y);
 void draw_background_elements_animation(BITMAP *buffer, BITMAP *torche1, BITMAP *torche2, BITMAP *cheminee1, BITMAP *cheminee2, int compteur);
 
-int tag(int player_color1, int player_color2, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4]){
+int tag(int player_color1, int player_color2, BITMAP * anim_player_haut[4], BITMAP* anim_player_bas[4], BITMAP* anim_player_gauche[4], BITMAP* anim_player_droite[4], float scores[2]){
 
     set_window_title("Chat");
 
@@ -149,7 +149,7 @@ int tag(int player_color1, int player_color2, BITMAP * anim_player_haut[4], BITM
         vsync();
         blit(buffer, screen, 0, 0, 0, 0, SCREEN_W, SCREEN_H);
 
-        
+
         // Update arrow counter
         if (compteur == 19) {
             reverse = TRUE;
@@ -175,7 +175,10 @@ int tag(int player_color1, int player_color2, BITMAP * anim_player_haut[4], BITM
         printf("Egalité !\n");
         winner = 0;
     }
-    
+
+    scores[0] = bonhomme1.score;
+    scores[1] = bonhomme2.score;
+
 
     // Fermeture d'Allegro
     lib_memory(buffer, calque_collisions, map, bonhomme1.sprite, bonhomme2.sprite, torche1, torche2, cheminee1, cheminee2, jump, music);

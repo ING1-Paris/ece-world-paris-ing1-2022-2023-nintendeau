@@ -82,7 +82,7 @@ void afficherScores(int* J1, int* J2, int cbleu, int crouge, int cblanc, int cno
 int verifierscores(int* J1, int* J2, int cblanc, char * nom1, char * nom2);
 
 
-int tape_taupe(char * nom1, char * nom2){
+int tape_taupe(char * nom1, char * nom2, float scores[2]){
 
     if (set_gfx_mode(GFX_AUTODETECT_WINDOWED, 800, 600, 0, 0) != 0) {
         allegro_message("prb gfx mode");
@@ -203,6 +203,9 @@ int tape_taupe(char * nom1, char * nom2){
         textprintf_ex(screen, font, 300, 40, cblanc, -1, "%s a gagné 1 ticket", nom2);
         winner = 2;
     }
+
+    scores[0] = J1;
+    scores[1] = J2;
 
     readkey();
     return winner;

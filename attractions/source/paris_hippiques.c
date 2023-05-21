@@ -239,17 +239,20 @@ int paris_hippiques(char * nom1, char * nom2) {
                     soldeticket1 += 1;
                     soldeticket2 -= 1;
                     allegro_message("%s remporte la course !", nom1);
+                    winner = 1;
                     stop_sample(music2);
                 }else if(choix2 ==1){
                     score2 ++;
                     soldeticket2 += 1;
                     soldeticket1 -= 1;
                     allegro_message("%s remporte la course !", nom2);
+                    winner = 2;
                     stop_sample(music2);
                 }else{
                     soldeticket1 -= 1;
                     soldeticket2 -= 1;
                     allegro_message("Match nul ! Solde %s = %d, Solde %s = %d",nom1, nom2,soldeticket1,soldeticket2);
+                    winner = 0;
                     stop_sample(music2);
                 }
             }
@@ -264,17 +267,20 @@ int paris_hippiques(char * nom1, char * nom2) {
                     soldeticket1 += 1;
                     soldeticket2 -= 1;
                     allegro_message("%s remporte la course !", nom1);
+                    winner = 1;
                     stop_sample(music2);
                 } else if (choix2 == 2) {
                     score2++;
                     soldeticket2 += 1;
                     soldeticket1 -= 1;
                     allegro_message("%s remporte la course !", nom2);
+                    winner = 2;
                     stop_sample(music2);
                 } else {
                     soldeticket1 -= 1;
                     soldeticket2 -= 1;
                     allegro_message("Match nul ! Solde %s = %d, Solde %s = %d",nom1, nom2,soldeticket1,soldeticket2);
+                    winner = 0;
                     stop_sample(music2);
                 }
             }
@@ -289,17 +295,20 @@ int paris_hippiques(char * nom1, char * nom2) {
                     soldeticket1 += 1;
                     soldeticket2 -= 1;
                     allegro_message("%s remporte la course !", nom1);
+                    winner = 1;
                     stop_sample(music2);
                 }else if(choix2 ==3){
                     score2 ++;
                     soldeticket2 += 1;
                     soldeticket1 -= 1;
                     allegro_message("%s remporte la course !", nom2);
+                    winner = 2;
                     stop_sample(music2);
                 } else{
                     soldeticket1 -= 1;
                     soldeticket2 -= 1;
                     allegro_message("Match nul ! Solde %s = %d, Solde %s = %d",nom1, nom2,soldeticket1,soldeticket2);
+                    winner = 0;
                     stop_sample(music2);
                 }
             }
