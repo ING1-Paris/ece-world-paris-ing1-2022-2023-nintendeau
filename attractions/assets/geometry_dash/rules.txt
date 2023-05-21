@@ -1,9 +1,17 @@
-MES SUPER REGLES : 
-1 -  se laver les dents
-2 -  se laver les mains
-3 -  se laver les pieds
-4 -  se laver les oreilles
-5 -  se laver les cheveux
-6 -  se laver le visage
-7 -  se laver le cou
-8 -  se laver les yeux à l'eau de javel
+GEOMETRY DASH :
+
+Quelle est cete trappe etrange !?
+Vous tombez dedans et vous vous retrouvez dans un monde parallele !!
+Vous controllez chacun un cube et vous devez eviter les obstacles pour arriver a la fin du niveau !!
+
+TOUCHES :
+    -> Joueur 1 : Fleche du HAUT (saut)
+    -> Joueur 2 : Barre ESPACE (saut)
+
+BUT :
+    -> Soyez le dernier a mourir pour gagner la partie !!
+
+Sautez sur les plateformes pour eviter les piques mortels !!
+(Attention, ne vous faites pas emporter par les plateformes)
+
+BONNE CHANCE !!
