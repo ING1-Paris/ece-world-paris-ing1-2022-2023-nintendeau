@@ -716,9 +716,9 @@ _class: lead
 ---
 
 # Bilan individuel
-Matheo : projet amusant et interessant. grande comprehension de Github et de la bibliotheque Allegro. Meilleure organisation et meilleure gestion du temps.
+Matheo : projet amusant et interessant / grande comprehension de Github et de la bibliotheque Allegro / Meilleure organisation et meilleure gestion du temps.
 
-Shaima :
+Shaima : Super projet / Très bonne communication et cohésion /Très bon moyen d’apprendre et de consolider ses acquis en C
 
 Leon :
 
